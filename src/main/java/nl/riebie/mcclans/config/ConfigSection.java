@@ -21,6 +21,10 @@ public class ConfigSection {
         this.configOptions = configOptions;
     }
 
+    public boolean hasComment() {
+        return comment != null && comment.length() != 0;
+    }
+
 
     public static class Builder {
         private String key;
