@@ -1,51 +1,180 @@
 package nl.riebie.mcclans.config;
 
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
+import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
+import ninja.leaping.configurate.loader.ConfigurationLoader;
+import nl.riebie.mcclans.MCClans;
+import nl.riebie.mcclans.config.model.ConfigOption;
+import nl.riebie.mcclans.config.model.ConfigSection;
+import nl.riebie.mcclans.utils.MessageBoolean;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
 
 /**
  * Created by Koen on 22/12/2015.
  */
 public class Config {
 
+    // ======================================== SECTION GENERAL ======================================== //
+    private static final String SECTION_GENERAL = "general";
+
     public static final String DEBUGGING = "debugging";
     public static final String USE_PERMISSIONS = "use-permissions";
-    public static final String SOME_STRING = "some-string";
     public static final String TELEPORT_DELAY_SECONDS = "teleport-delay-seconds";
-    public static final String SOME_LIST = "some-list";
+    public static final String TELEPORT_COOLDOWN_SECONDS = "teleport-cooldown-seconds";
+    public static final String RE_SET_CLANHOME_COOLDOWN_SECONDS = "re-set-clanhome-cooldown-seconds";
+    public static final String USE_CHAT_CLAN_TAGS = "use-chat-clan-tags";
+    public static final String USE_COLORED_TAGS_BASED_ON_CLAN_KDR = "use-colored-tags-based-on-clan-kdr";
+    public static final String ALLOW_FF_PROTECTION = "allow-ff-protection";
+    public static final String LOG_PLAYER_KDR = "log-player-kdr";
+    public static final String BLOCKED_WORLDS_FF_PROTECTION = "blocked-worlds-ff-protection";
+    public static final String BLOCKED_WORLDS_PLAYER_KDR = "blocked-worlds-player-kdr";
 
-    private static List<ConfigSection> sConfigSections = new ArrayList<>();
+    public static final String CREATE_BACKUP_AFTER_HOURS = "create-backup-after-hours";
+    public static final String MAXIMUM_AMOUNT_OF_BACKUPS_BEFORE_REMOVING_OLDEST = "maximum-amount-of-backups-before-removing-oldest";
+    public static final String REMOVE_INACTIVE_CLAN_PLAYERS_AFTER_DAYS = "remove-inactive-clan-players-after-days";
+    public static final String REMOVE_INACTIVE_CLAN_OWNERS_INCLUDING_CLAN = "remove-inactive-clan-owners-including-clan";
 
+    public static final String CLAN_TAG_REGEX = "clan-tag-regex";
+    public static final String CLAN_TAG_CHARACTERS_MINIMUM = "clan-tag-characters-minimum";
+    public static final String CLAN_TAG_CHARACTERS_MAXIMUM = "clan-tag-characters-maximum";
+    public static final String CLAN_NAME_REGEX = "clan-name-regex";
+    public static final String CLAN_NAME_CHARACTERS_MINIMUM = "clan-name-characters-minimum";
+    public static final String CLAN_NAME_CHARACTERS_MAXIMUM = "clan-name-characters-maximum";
+
+    // ======================================== SECTION DATABASE ======================================== //
+    private static final String SECTION_DATABASE = "database";
+
+    public static final String USE_DATABASE = "use-database";
+    public static final String DBMS_TYPE = "dbms-type";
+    public static final String DATABASE_SERVER_PORT = "database-server-port";
+    public static final String DATABASE_SERVER = "database-server";
+    public static final String DATABASE_NAME = "database-name";
+    public static final String DATABASE_SERVER_USER = "database-server-user";
+    public static final String DATABASE_SERVER_PASSWORD = "database-server-password";
+
+    // ======================================== SECTION ECONOMY ======================================== //
+    private static final String SECTION_ECONOMY = "economy";
+
+    public static final String USE_ECONOMY = "use-economy";
+    public static final String CLAN_CREATION_COST = "clan-creation-cost";
+    public static final String SET_CLANHOME_COST = "set-clanhome-cost";
+    public static final String RE_SET_CLANHOME_COST_INCREASE = "re-set-clanhome-cost-increase";
+    public static final String TELEPORT_COST = "teleport-cost";
+
+    // ======================================== SECTION COMMAND ALIASES ======================================== //
+    private static final String SECTION_COMMAND_ALIASES = "command-aliases";
+
+    public static final String COMMAND_ALIASES = "command-aliases";
+
+    // Loaded config values
     private static Map<String, Object> sConfig = new HashMap<>();
 
-    static {
-        ConfigSection generalConfigSection = new ConfigSection.Builder("general").withConfigOptions(
-                new ConfigOption.Builder(DEBUGGING).withValue(false).build(),
-                new ConfigOption.Builder(USE_PERMISSIONS).withValue(false).build(),
-                new ConfigOption.Builder(SOME_STRING).withValue("someVALUEVBA").build(),
-                new ConfigOption.Builder(TELEPORT_DELAY_SECONDS).withValue(5).build()
+    public static List<ConfigSection> getDefaults() {
+        List<ConfigSection> configSections = new ArrayList<>();
+
+        ConfigSection generalConfigSection = ConfigSection.builder(SECTION_GENERAL).setConfigOptions(
+                ConfigOption.builder(DEBUGGING, false).build(),
+                ConfigOption.builder(USE_PERMISSIONS, false).build(),
+                ConfigOption.builder(TELEPORT_DELAY_SECONDS, 5).addMinimumNumberConstraint(0).build(),
+                ConfigOption.builder(TELEPORT_COOLDOWN_SECONDS, 120).addMinimumNumberConstraint(0).build(),
+                ConfigOption.builder(RE_SET_CLANHOME_COOLDOWN_SECONDS, 1800).addMinimumNumberConstraint(0).build(),
+                ConfigOption.builder(USE_CHAT_CLAN_TAGS, true).build(),
+                ConfigOption.builder(USE_COLORED_TAGS_BASED_ON_CLAN_KDR, true).build(),
+                ConfigOption.builder(ALLOW_FF_PROTECTION, true).build(),
+                ConfigOption.builder(LOG_PLAYER_KDR, true).build(),
+                ConfigOption.builder(BLOCKED_WORLDS_FF_PROTECTION, Arrays.asList("example_world1", "example_world2")).build(),
+                ConfigOption.builder(BLOCKED_WORLDS_PLAYER_KDR, Arrays.asList("example_world1", "example_world2")).build(),
+
+                ConfigOption.builder(CREATE_BACKUP_AFTER_HOURS, 24).addMinimumNumberConstraint(0).build(),
+                ConfigOption.builder(MAXIMUM_AMOUNT_OF_BACKUPS_BEFORE_REMOVING_OLDEST, 14).addMinimumNumberConstraint(0).build(),
+                ConfigOption.builder(REMOVE_INACTIVE_CLAN_PLAYERS_AFTER_DAYS, 60).addMinimumNumberConstraint(0).build(),
+                ConfigOption.builder(REMOVE_INACTIVE_CLAN_OWNERS_INCLUDING_CLAN, false).build(),
+
+                ConfigOption.builder(CLAN_TAG_REGEX, "[A-Za-z0-9_]+").build(),
+                ConfigOption.builder(CLAN_TAG_CHARACTERS_MINIMUM, 2).addMinimumNumberConstraint(1).build(),
+                ConfigOption.builder(CLAN_TAG_CHARACTERS_MAXIMUM, 6).addMinimumNumberConstraint(1).build(),
+                ConfigOption.builder(CLAN_NAME_REGEX, "[A-Za-z0-9_]+").build(),
+                ConfigOption.builder(CLAN_NAME_CHARACTERS_MINIMUM, 2).addMinimumNumberConstraint(1).build(),
+                ConfigOption.builder(CLAN_NAME_CHARACTERS_MAXIMUM, 30).addMinimumNumberConstraint(1).build()
         ).build();
 
-        ConfigSection listConfigSection = new ConfigSection.Builder("section-list-inside").withConfigOptions(
-                new ConfigOption.Builder(SOME_LIST).withValue(Arrays.asList("entry1", "entry2")).build()
+        ConfigSection databaseConfigSection = ConfigSection.builder(SECTION_DATABASE).setConfigOptions(
+                ConfigOption.builder(USE_DATABASE, false).build(),
+                ConfigOption.builder(DBMS_TYPE, "mysql").addOneOfStringConstraint(true, "mysql", "sqlite").setValueIfConstraintFailed("unrecognised").build(),
+                ConfigOption.builder(DATABASE_SERVER_PORT, 3306).addMinimumNumberConstraint(0).build(),
+                ConfigOption.builder(DATABASE_SERVER, "localhost").build(),
+                ConfigOption.builder(DATABASE_NAME, "database_name").build(),
+                ConfigOption.builder(DATABASE_SERVER_USER, "user").build(),
+                ConfigOption.builder(DATABASE_SERVER_PASSWORD, "password").build()
         ).build();
 
+        ConfigSection economyConfigSection = ConfigSection.builder(SECTION_ECONOMY).setConfigOptions(
+                ConfigOption.builder(USE_ECONOMY, false).build(),
+                ConfigOption.builder(CLAN_CREATION_COST, 50).addMinimumNumberConstraint(0).build(),
+                ConfigOption.builder(SET_CLANHOME_COST, 10).addMinimumNumberConstraint(0).build(),
+                ConfigOption.builder(RE_SET_CLANHOME_COST_INCREASE, 0).addMinimumNumberConstraint(0).build(),
+                ConfigOption.builder(TELEPORT_COST, 0).addMinimumNumberConstraint(0).build()
+        ).build();
 
-        sConfigSections.add(generalConfigSection);
-        sConfigSections.add(listConfigSection);
+        Map<String, String> commandAliases = new HashMap<>();
+        commandAliases.put("/g", "/clan chat global");
+        commandAliases.put("/cc", "/clan chat clan");
+        commandAliases.put("/ac", "/clan chat ally");
+        commandAliases.put("/clanff", "/clan friendlyfire clan toggle");
+        commandAliases.put("/personalff", "/clan friendlyfire personal toggle");
+
+        ConfigSection commandAliasesConfigSection = ConfigSection.builder(SECTION_COMMAND_ALIASES).setConfigOptions(
+                ConfigOption.builder(COMMAND_ALIASES, commandAliases).build()
+        ).build();
+
+        configSections.add(generalConfigSection);
+        configSections.add(databaseConfigSection);
+        configSections.add(economyConfigSection);
+        configSections.add(commandAliasesConfigSection);
+
+        return configSections;
     }
 
-    public static void load(CommentedConfigurationNode rootNode) {
-        putDefaultsAndGetValues(rootNode);
+    public static boolean load(File configDir) {
+        if (!configDir.exists() && !configDir.mkdir()) {
+            // todo failed to create config dir go die
+            return false;
+        }
+
+        File config = new File(configDir, "config.conf");
+        ConfigurationLoader<CommentedConfigurationNode> configLoader;
+        CommentedConfigurationNode rootNode;
+
+        try {
+            if (config.exists()) {
+                configLoader = HoconConfigurationLoader.builder().setFile(config).build();
+                rootNode = configLoader.load();
+            } else if (config.createNewFile()) {
+                configLoader = HoconConfigurationLoader.builder().setFile(config).build();
+                rootNode = configLoader.createEmptyNode();
+            } else {
+                // todo failed to create file for config go die
+                return false;
+            }
+
+            sConfig.clear();
+            putDefaultsAndGetValues(rootNode);
+
+            configLoader.save(rootNode);
+        } catch (IOException e) {
+            e.printStackTrace();
+            // todo some error go die
+            return false;
+        }
+
+        return true;
     }
 
     private static void putDefaultsAndGetValues(CommentedConfigurationNode rootNode) {
-        for (ConfigSection configSection : sConfigSections) {
+        for (ConfigSection configSection : getDefaults()) {
             CommentedConfigurationNode sectionNode = rootNode.getNode(configSection.key);
             if (sectionNode.isVirtual() && configSection.hasComment()) {
                 sectionNode.setComment(configSection.comment);
@@ -54,8 +183,25 @@ public class Config {
                 CommentedConfigurationNode subNode = sectionNode.getNode(configOption.key);
                 if (subNode.isVirtual()) {
                     subNode.setValue(configOption.value);
+                    if (configOption.hasComment()) {
+                        subNode.setComment(configOption.comment);
+                    }
                 }
-                sConfig.put(configOption.key, subNode.getValue());
+                Object value = subNode.getValue();
+                MessageBoolean isOfType = configOption.isOfType(value);
+                if (isOfType.value) {
+                    MessageBoolean meetsConstraints = configOption.meetsConstraints(value);
+                    if (!meetsConstraints.value) {
+                        value = configOption.valueIfConstraintFailed;
+                        subNode.setValue(configOption.value);
+                        MCClans.getPlugin().getLogger().warn("Could not load config option " + configOption.key + ": " + meetsConstraints.message);
+                    }
+                } else {
+                    value = configOption.value;
+                    subNode.setValue(configOption.value);
+                    MCClans.getPlugin().getLogger().warn("Could not load config option " + configOption.key + ": needs to be a " + isOfType.message);
+                }
+                sConfig.put(configOption.key, value);
             }
         }
     }
@@ -87,7 +233,16 @@ public class Config {
         }
     }
 
-    public static <T> List<T> getList(String key, Class<T> clazz) {
+    public static double getDouble(String key) {
+        Object value = sConfig.get(key);
+        if (value == null || !(value instanceof Double)) {
+            return 0;
+        } else {
+            return (double) value;
+        }
+    }
+
+    public static <T> List<T> getList(String key, Class<T> typeClazz) {
         List<T> list = new ArrayList<>();
         Object value = sConfig.get(key);
 
@@ -95,11 +250,27 @@ public class Config {
             return list;
         } else {
             for (Object object : (List<?>) value) {
-                if (clazz.isInstance(object)) {
-                    list.add(clazz.cast(object));
+                if (typeClazz.isInstance(object)) {
+                    list.add(typeClazz.cast(object));
                 }
             }
             return list;
+        }
+    }
+
+    public static <K, V> Map<K, V> getMap(String key, Class<K> keyClazz, Class<V> valueClazz) {
+        Map<K, V> map = new HashMap<>();
+        Object value = sConfig.get(key);
+
+        if (value == null || !(value instanceof Map)) {
+            return map;
+        } else {
+            for (Map.Entry<?, ?> entry : ((Map<?, ?>) value).entrySet()) {
+                if (keyClazz.isInstance(entry.getKey()) && valueClazz.isInstance(entry.getValue())) {
+                    map.put(keyClazz.cast(entry.getKey()), valueClazz.cast(entry.getValue()));
+                }
+            }
+            return map;
         }
     }
 }

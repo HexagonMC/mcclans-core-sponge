@@ -1,6 +1,7 @@
-package nl.riebie.mcclans.config;
+package nl.riebie.mcclans.config.model;
 
 import com.sun.istack.internal.NotNull;
+import com.sun.istack.internal.Nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -15,7 +16,7 @@ public class ConfigSection {
     public String comment;
     public List<ConfigOption> configOptions;
 
-    public ConfigSection(@NotNull String key, @NotNull String comment, @NotNull List<ConfigOption> configOptions) {
+    public ConfigSection(@NotNull String key, @Nullable String comment, @NotNull List<ConfigOption> configOptions) {
         this.key = key;
         this.comment = comment;
         this.configOptions = configOptions;
@@ -25,27 +26,30 @@ public class ConfigSection {
         return comment != null && comment.length() != 0;
     }
 
+    public static Builder builder(@NotNull String key) {
+        return new Builder(key);
+    }
 
     public static class Builder {
         private String key;
         private String comment = "";
         private List<ConfigOption> configOptions = new ArrayList<>();
 
-        public Builder(@NotNull String key) {
+        private Builder(@NotNull String key) {
             this.key = key;
         }
 
-        public Builder withComment(@NotNull String comment) {
+        public Builder setComment(@Nullable String comment) {
             this.comment = comment;
             return this;
         }
 
-        public Builder withConfigOptions(@NotNull List<ConfigOption> configOptions) {
+        public Builder setConfigOptions(@NotNull List<ConfigOption> configOptions) {
             this.configOptions = configOptions;
             return this;
         }
 
-        public Builder withConfigOptions(@NotNull ConfigOption... configOptions) {
+        public Builder setConfigOptions(@NotNull ConfigOption... configOptions) {
             this.configOptions = Arrays.asList(configOptions);
             return this;
         }

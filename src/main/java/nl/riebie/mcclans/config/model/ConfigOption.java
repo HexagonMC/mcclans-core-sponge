@@ -1,0 +1,164 @@
+package nl.riebie.mcclans.config.model;
+
+import com.sun.istack.internal.NotNull;
+import com.sun.istack.internal.Nullable;
+import nl.riebie.mcclans.config.constraints.MaximumNumberConstraint;
+import nl.riebie.mcclans.config.constraints.MinimumNumberConstraint;
+import nl.riebie.mcclans.config.constraints.OneOfStringConstraint;
+import nl.riebie.mcclans.config.types.*;
+import nl.riebie.mcclans.utils.MessageBoolean;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * Created by Koen on 22/12/2015.
+ */
+public class ConfigOption {
+
+    public String key;
+    public String comment;
+    public Object value;
+    public Object valueIfConstraintFailed;
+    private Type mType;
+    private List<Constraint> mConstraints;
+
+    public ConfigOption(@NotNull String key, @Nullable String comment, @NotNull Object value, @NotNull Object valueIfConstraintFailed, @NotNull Type type, @NotNull List<Constraint> constraints) {
+        this.key = key;
+        this.comment = comment;
+        this.value = value;
+        this.valueIfConstraintFailed = valueIfConstraintFailed;
+        this.mType = type;
+        this.mConstraints = constraints;
+    }
+
+    public MessageBoolean isOfType(Object value) {
+        MessageBoolean isOfType = new MessageBoolean();
+        isOfType.value = mType.isOfType(value);
+        if (!isOfType.value) {
+            isOfType.message = mType.getTypeDescription();
+        }
+        return isOfType;
+    }
+
+    public MessageBoolean meetsConstraints(Object value) {
+        MessageBoolean meetsConstraint = new MessageBoolean();
+        meetsConstraint.value = true;
+        for (Constraint constraint : mConstraints) {
+            if (!constraint.meetsConstraint(value)) {
+                meetsConstraint.value = false;
+                meetsConstraint.message = constraint.getConstraintDescription();
+                return meetsConstraint;
+            }
+        }
+        return meetsConstraint;
+    }
+
+    public boolean hasComment() {
+        return comment != null && comment.length() != 0;
+    }
+
+    public static Builder builder(@NotNull String key, @NotNull Object value) {
+        return new Builder(key, value);
+    }
+
+    public static class Builder {
+        private String mKey;
+        private String mComment = "";
+        private Object mValue;
+        private Object mValueIfConstraintFailed;
+        private Type mType;
+        private List<Constraint> mConstraints = new ArrayList<>();
+
+        private Builder(@NotNull String key, @NotNull Object value) {
+            this.mKey = key;
+            this.mValue = value;
+            this.mType = Type.inferType(value);
+        }
+
+        public Builder setComment(@Nullable String comment) {
+            this.mComment = comment;
+            return this;
+        }
+
+        public Builder setValueIfConstraintFailed(@Nullable Object value) {
+            mValueIfConstraintFailed = value;
+            return this;
+        }
+
+        public Builder addMinimumNumberConstraint(int min) {
+            mConstraints.add(new MinimumNumberConstraint(min));
+            return this;
+        }
+
+        public Builder addMinimumNumberConstraint(double min) {
+            mConstraints.add(new MinimumNumberConstraint(min));
+            return this;
+        }
+
+        public Builder addMaximumNumberConstraint(int max) {
+            mConstraints.add(new MaximumNumberConstraint(max));
+            return this;
+        }
+
+        public Builder addMaximumNumberConstraint(double max) {
+            mConstraints.add(new MaximumNumberConstraint(max));
+            return this;
+        }
+
+        public Builder addOneOfStringConstraint(boolean caseSensitive, String... possibilities) {
+            mConstraints.add(new OneOfStringConstraint(caseSensitive, possibilities));
+            return this;
+        }
+
+        public Builder addConstraints(@NotNull Constraint... constraints) {
+            mConstraints.addAll(Arrays.asList(constraints));
+            return this;
+        }
+
+        public ConfigOption build() {
+            return new ConfigOption(mKey, mComment, mValue, (mValueIfConstraintFailed == null) ? mValue : mValueIfConstraintFailed, mType, mConstraints);
+        }
+    }
+
+    public interface Constraint {
+
+        boolean meetsConstraint(Object value);
+
+        String getConstraintDescription();
+    }
+
+    public static abstract class Type {
+        public static final Type BOOLEAN_TYPE = new BooleanType();
+        public static final Type DOUBLE_TYPE = new DoubleType();
+        public static final Type INTEGER_TYPE = new IntegerType();
+        public static final Type STRING_TYPE = new StringType();
+        public static final Type LIST_TYPE = new ListType();
+        public static final Type MAP_TYPE = new MapType();
+        public static final Type UNKNOWN_TYPE = new UnknownType();
+
+        public abstract boolean isOfType(Object value);
+
+        public abstract String getTypeDescription();
+
+        private static Type inferType(Object value) {
+            if (value instanceof Integer) {
+                return Type.INTEGER_TYPE;
+            } else if (value instanceof Double) {
+                return Type.DOUBLE_TYPE;
+            } else if (value instanceof Boolean) {
+                return Type.BOOLEAN_TYPE;
+            } else if (value instanceof String) {
+                return Type.STRING_TYPE;
+            } else if (value instanceof List) {
+                return Type.LIST_TYPE;
+            } else if (value instanceof Map) {
+                return Type.MAP_TYPE;
+            } else {
+                return Type.UNKNOWN_TYPE;
+            }
+        }
+    }
+}
