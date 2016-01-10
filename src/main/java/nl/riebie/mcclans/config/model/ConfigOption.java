@@ -36,8 +36,8 @@ public class ConfigOption {
 
     public MessageBoolean isOfType(Object value) {
         MessageBoolean isOfType = new MessageBoolean();
-        isOfType.value = mType.isOfType(value);
-        if (!isOfType.value) {
+        isOfType.bool = mType.isOfType(value);
+        if (!isOfType.bool) {
             isOfType.message = mType.getTypeDescription();
         }
         return isOfType;
@@ -45,10 +45,10 @@ public class ConfigOption {
 
     public MessageBoolean meetsConstraints(Object value) {
         MessageBoolean meetsConstraint = new MessageBoolean();
-        meetsConstraint.value = true;
+        meetsConstraint.bool = true;
         for (Constraint constraint : mConstraints) {
             if (!constraint.meetsConstraint(value)) {
-                meetsConstraint.value = false;
+                meetsConstraint.bool = false;
                 meetsConstraint.message = constraint.getConstraintDescription();
                 return meetsConstraint;
             }

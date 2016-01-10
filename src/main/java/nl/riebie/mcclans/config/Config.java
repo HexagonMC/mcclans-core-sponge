@@ -72,7 +72,7 @@ public class Config {
     // Loaded config values
     private static Map<String, Object> sConfig = new HashMap<>();
 
-    public static List<ConfigSection> getDefaults() {
+    private static List<ConfigSection> getDefaults() {
         List<ConfigSection> configSections = new ArrayList<>();
 
         ConfigSection generalConfigSection = ConfigSection.builder(SECTION_GENERAL).setConfigOptions(
@@ -189,17 +189,17 @@ public class Config {
                 }
                 Object value = subNode.getValue();
                 MessageBoolean isOfType = configOption.isOfType(value);
-                if (isOfType.value) {
+                if (isOfType.bool) {
                     MessageBoolean meetsConstraints = configOption.meetsConstraints(value);
-                    if (!meetsConstraints.value) {
+                    if (!meetsConstraints.bool) {
+                        MCClans.getPlugin().getLogger().warn("Could not load config option " + configOption.key + " (" + value + "): " + meetsConstraints.message);
                         value = configOption.valueIfConstraintFailed;
                         subNode.setValue(configOption.value);
-                        MCClans.getPlugin().getLogger().warn("Could not load config option " + configOption.key + ": " + meetsConstraints.message);
                     }
                 } else {
+                    MCClans.getPlugin().getLogger().warn("Could not load config option " + configOption.key + " (" + value + "): needs to be a " + isOfType.message);
                     value = configOption.value;
                     subNode.setValue(configOption.value);
-                    MCClans.getPlugin().getLogger().warn("Could not load config option " + configOption.key + ": needs to be a " + isOfType.message);
                 }
                 sConfig.put(configOption.key, value);
             }

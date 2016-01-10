@@ -5,6 +5,6 @@ package nl.riebie.mcclans.utils;
  */
 public class MessageBoolean {
 
-    public boolean value = false;
+    public boolean bool = false;
     public String message = "";
 }

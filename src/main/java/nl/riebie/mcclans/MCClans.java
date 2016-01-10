@@ -3,12 +3,10 @@ package nl.riebie.mcclans;
 import com.google.inject.Inject;
 import nl.riebie.mcclans.config.Config;
 import org.slf4j.Logger;
-import org.spongepowered.api.Sponge;
 import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GameStartedServerEvent;
 import org.spongepowered.api.plugin.Plugin;
-import org.spongepowered.api.text.Text;
 
 import java.io.File;
 
@@ -30,7 +28,7 @@ public class MCClans {
     public void onServerStart(GameStartedServerEvent event) {
         sPlugin = this;
         if (!Config.load(mConfigDir)) {
-            Sponge.getServer().getConsole().sendMessage(Text.of("Config failed to load"));
+            getLogger().error("Config failed to load");
             // todo stop plugin?
             return;
         }
