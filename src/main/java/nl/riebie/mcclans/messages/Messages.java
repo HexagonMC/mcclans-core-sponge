@@ -1,5 +1,8 @@
 package nl.riebie.mcclans.messages;
 
+import nl.riebie.mcclans.api.enums.Permission;
+import nl.riebie.mcclans.clan.ClanImpl;
+import nl.riebie.mcclans.player.ClanPlayerImpl;
 import nl.riebie.mcclans.utils.Utils;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
@@ -104,56 +107,109 @@ public class Messages {
         Sponge.getServer().getBroadcastChannel().send(message);
     }
 
-//    public static void sendClanBroadcastMessageClanFriendlyFireProtectionHasBeenActivatedByPlayer(ClanImpl clan, String playerName) {
-//        clan.sendMessage(BASIC_CHAT_COLOR + "Clan friendly fire protection has been activated by " + BASIC_HIGHLIGHT + playerName);
-//    }
-//
-//    public static void sendClanBroadcastMessageClanFriendlyFireProtectionHasBeenDeactivatedByPlayer(ClanImpl clan, String playerName) {
-//        clan.sendMessage(BASIC_CHAT_COLOR + "Clan friendly fire protection has been deactivated by " + BASIC_HIGHLIGHT + playerName);
-//    }
-//
-//    public static void sendClanBroadcastMessagePlayerResignedFromTheClan(ClanImpl clan, String playerName) {
-//        clan.sendMessage(BASIC_CHAT_COLOR + "Player " + BASIC_HIGHLIGHT + playerName + BASIC_CHAT_COLOR + " resigned from the clan");
-//    }
-//
-//    public static void sendClanBroadcastMessagePlayerRemovedFromTheClanBy(ClanImpl clan, String playerName, String removerPlayer) {
-//        clan.sendMessage(BASIC_CHAT_COLOR + "Player " + BASIC_HIGHLIGHT + playerName + BASIC_CHAT_COLOR + " has been removed from the clan by "
-//                + BASIC_HIGHLIGHT + removerPlayer);
-//    }
-//
-//    public static void sendClanBroadcastMessagePlayerJoinedTheClan(ClanImpl clan, String playerName) {
-//        clan.sendMessage(BASIC_CHAT_COLOR + "Player " + BASIC_HIGHLIGHT + playerName + BASIC_CHAT_COLOR + " joined the clan");
-//    }
-//
-//    public static void sendClanBroadcastMessagePlayerDeclinedClanInvite(ClanImpl clan, String playerName, Permission permission) {
-//        clan.sendMessage(BASIC_CHAT_COLOR + "Player " + BASIC_HIGHLIGHT + playerName + BASIC_CHAT_COLOR + " declined the clan invite", permission);
-//    }
-//
-//    public static void sendClanBroadcastMessagePlayerInvitedToTheClan(ClanImpl clan, String playerName, String inviterName, Permission permission) {
-//        clan.sendMessage(BASIC_CHAT_COLOR + "Player " + BASIC_HIGHLIGHT + playerName + BASIC_CHAT_COLOR + " has been invited to the clan by "
-//                + BASIC_HIGHLIGHT + inviterName, permission);
-//    }
-//
-//    public static void sendClanBroadcastMessageClanHasBeenInvitedToBecomeAlliesBy(ClanImpl clan, String clanName, String inviterName,
-//                                                                                  Permission permission) {
-//        clan.sendMessage(BASIC_CHAT_COLOR + "Clan " + BASIC_HIGHLIGHT + clanName + BASIC_CHAT_COLOR + " has been invited to become allies by "
-//                + BASIC_HIGHLIGHT + inviterName, permission);
-//    }
-//
-//    public static void sendClanBroadcastMessageClanHasDeclinedToBecomeAllies(ClanImpl clan, String clanName, Permission permission) {
-//        clan.sendMessage(
-//                BASIC_CHAT_COLOR + "Clan " + BASIC_HIGHLIGHT + clanName + BASIC_CHAT_COLOR + " has declined to become allies with your clan",
-//                permission);
-//    }
-//
-//    public static void sendClanBroadcastMessagePlayerHasDeclinedToBecomeAlliesWithClan(ClanImpl clan, String playerName, String clanName,
-//                                                                                       Permission permission) {
-//        clan.sendMessage(BASIC_CHAT_COLOR + "Player " + BASIC_HIGHLIGHT + playerName + BASIC_CHAT_COLOR + " has declined to become allies with "
-//                + BASIC_HIGHLIGHT + clanName, permission);
-//    }
-//
+    public static void sendClanBroadcastMessageClanFriendlyFireProtectionHasBeenActivatedByPlayer(ClanImpl clan, String playerName) {
+        Text message = Text.join(
+                Text.builder("Clan friendly fire protection has been activated by ").color(BASIC_CHAT_COLOR).build(),
+                Text.builder(playerName).color(BASIC_HIGHLIGHT).build()
+        );
+        clan.sendMessage(message);
+    }
+
+    public static void sendClanBroadcastMessageClanFriendlyFireProtectionHasBeenDeactivatedByPlayer(ClanImpl clan, String playerName) {
+        Text message = Text.join(
+                Text.builder("Clan friendly fire protection has been deactivated by ").color(BASIC_CHAT_COLOR).build(),
+                Text.builder(playerName).color(BASIC_HIGHLIGHT).build()
+        );
+        clan.sendMessage(message);
+    }
+
+    public static void sendClanBroadcastMessagePlayerResignedFromTheClan(ClanImpl clan, String playerName) {
+        Text message = Text.join(
+                Text.builder("Player ").color(BASIC_CHAT_COLOR).build(),
+                Text.builder(playerName).color(BASIC_HIGHLIGHT).build(),
+                Text.builder(" resigned from the clan").color(BASIC_CHAT_COLOR).build()
+        );
+        clan.sendMessage(message);
+    }
+
+    public static void sendClanBroadcastMessagePlayerRemovedFromTheClanBy(ClanImpl clan, String playerName, String removerPlayer) {
+        Text message = Text.join(
+                Text.builder("Player ").color(BASIC_CHAT_COLOR).build(),
+                Text.builder(playerName).color(BASIC_HIGHLIGHT).build(),
+                Text.builder(" has been removed from the clan by ").color(BASIC_CHAT_COLOR).build(),
+                Text.builder(removerPlayer).color(BASIC_HIGHLIGHT).build()
+        );
+        clan.sendMessage(message);
+    }
+
+    public static void sendClanBroadcastMessagePlayerJoinedTheClan(ClanImpl clan, String playerName) {
+        Text message = Text.join(
+                Text.builder("Player ").color(BASIC_CHAT_COLOR).build(),
+                Text.builder(playerName).color(BASIC_HIGHLIGHT).build(),
+                Text.builder(" joined the clan").color(BASIC_CHAT_COLOR).build()
+        );
+        clan.sendMessage(message);
+    }
+
+    public static void sendClanBroadcastMessagePlayerDeclinedClanInvite(ClanImpl clan, String playerName, Permission permission) {
+        Text message = Text.join(
+                Text.builder("Player ").color(BASIC_CHAT_COLOR).build(),
+                Text.builder(playerName).color(BASIC_HIGHLIGHT).build(),
+                Text.builder(" declined the clan invite").color(BASIC_CHAT_COLOR).build()
+        );
+        clan.sendMessage(permission, message);
+    }
+
+    public static void sendClanBroadcastMessagePlayerInvitedToTheClan(ClanImpl clan, String playerName, String inviterName, Permission permission) {
+        Text message = Text.join(
+                Text.builder("Player ").color(BASIC_CHAT_COLOR).build(),
+                Text.builder(playerName).color(BASIC_HIGHLIGHT).build(),
+                Text.builder(" has been invited to the clan by ").color(BASIC_CHAT_COLOR).build(),
+                Text.builder(inviterName).color(BASIC_HIGHLIGHT).build()
+        );
+        clan.sendMessage(permission, message);
+    }
+
+    public static void sendClanBroadcastMessageClanHasBeenInvitedToBecomeAlliesBy(ClanImpl clan, String clanName, String inviterName,
+                                                                                  Permission permission) {
+        Text message = Text.join(
+                Text.builder("Clan ").color(BASIC_CHAT_COLOR).build(),
+                Text.builder(clanName).color(BASIC_HIGHLIGHT).build(),
+                Text.builder(" has been invited to become allies by ").color(BASIC_CHAT_COLOR).build(),
+                Text.builder(inviterName).color(BASIC_HIGHLIGHT).build()
+        );
+        clan.sendMessage(permission, message);
+    }
+
+    public static void sendClanBroadcastMessageClanHasDeclinedToBecomeAllies(ClanImpl clan, String clanName, Permission permission) {
+        Text message = Text.join(
+                Text.builder("Clan ").color(BASIC_CHAT_COLOR).build(),
+                Text.builder(clanName).color(BASIC_HIGHLIGHT).build(),
+                Text.builder(" has declined to become allies with your clan").color(BASIC_CHAT_COLOR).build()
+        );
+        clan.sendMessage(permission);
+    }
+
+    public static void sendClanBroadcastMessagePlayerHasDeclinedToBecomeAlliesWithClan(ClanImpl clan, String playerName, String clanName,
+                                                                                       Permission permission) {
+        Text message = Text.join(
+                Text.builder("Player ").color(BASIC_CHAT_COLOR).build(),
+                Text.builder(playerName).color(BASIC_HIGHLIGHT).build(),
+                Text.builder(" has declined to become allies with ").color(BASIC_CHAT_COLOR).build(),
+                Text.builder(clanName).color(BASIC_HIGHLIGHT).build()
+        );
+        clan.sendMessage(permission, message);
+    }
+
+    // TODO SPONGE: Clan sendMessage message vararg minimum of one
 //    public static void sendClanBroadcastMessageYourClanHasBeenInvitedToBecomeAlliesWithClan(ClanImpl clan, String clanName, String coloredClanTag,
 //                                                                                            Permission permission) {
+//        Text message = Text.join(
+//                Text.builder("Player ").color(BASIC_CHAT_COLOR).build(),
+//                Text.builder(playerName).color(BASIC_HIGHLIGHT).build(),
+//                Text.builder(" has been removed from the clan by ").color(BASIC_CHAT_COLOR).build(),
+//                Text.builder(removerPlayer).color(BASIC_HIGHLIGHT).build()
+//        );
 //        clan.sendMessage("", permission);
 //        clan.sendMessage(BASIC_CHAT_COLOR + "Your clan has been invited to become allies with " + coloredClanTag + " " + BASIC_HIGHLIGHT + clanName,
 //                permission);
@@ -168,23 +224,41 @@ public class Messages {
 //        clanPlayer.sendMessage(BASIC_CHAT_COLOR + "To accept or decline type " + BASIC_HIGHLIGHT + "/clan ally accept" + BASIC_CHAT_COLOR + " or "
 //                + BASIC_HIGHLIGHT + "/clan ally decline");
 //    }
-//
-//    public static void sendClanBroadcastMessageYourClanHasBecomeAlliesWithClan(ClanImpl clan, String allyClanName) {
-//        clan.sendMessage(BASIC_CHAT_COLOR + "Your clan has become allies with " + BASIC_HIGHLIGHT + allyClanName);
-//    }
-//
-//    public static void sendClanBroadcastMessagePlayerHasEndedTheAllianceWithClan(ClanImpl clan, String playerName, String allyClanName) {
-//        clan.sendMessage(BASIC_CHAT_COLOR + "Player " + BASIC_HIGHLIGHT + playerName + BASIC_CHAT_COLOR + " has ended the alliance with "
-//                + BASIC_HIGHLIGHT + allyClanName);
-//    }
-//
-//    public static void sendClanBroadcastMessageClanHasEndedTheAllianceWithYourClan(ClanImpl clan, String allyClanName) {
-//        clan.sendMessage(BASIC_CHAT_COLOR + "Clan " + BASIC_HIGHLIGHT + allyClanName + BASIC_CHAT_COLOR + " has ended the alliance with your clan");
-//    }
-//
-//    public static void sendYouHaveBeenRemovedFromClan(ClanPlayerImpl clanPlayer, String clanName) {
-//        clanPlayer.sendMessage(BASIC_CHAT_COLOR + "You have been removed from " + BASIC_HIGHLIGHT + clanName);
-//    }
+
+    public static void sendClanBroadcastMessageYourClanHasBecomeAlliesWithClan(ClanImpl clan, String allyClanName) {
+        Text message = Text.join(
+                Text.builder("Your clan has become allies with ").color(BASIC_CHAT_COLOR).build(),
+                Text.builder(allyClanName).color(BASIC_HIGHLIGHT).build()
+        );
+        clan.sendMessage(message);
+    }
+
+    public static void sendClanBroadcastMessagePlayerHasEndedTheAllianceWithClan(ClanImpl clan, String playerName, String allyClanName) {
+        Text message = Text.join(
+                Text.builder("Player ").color(BASIC_CHAT_COLOR).build(),
+                Text.builder(playerName).color(BASIC_HIGHLIGHT).build(),
+                Text.builder(" has ended the alliance with ").color(BASIC_CHAT_COLOR).build(),
+                Text.builder(allyClanName).color(BASIC_HIGHLIGHT).build()
+        );
+        clan.sendMessage(message);
+    }
+
+    public static void sendClanBroadcastMessageClanHasEndedTheAllianceWithYourClan(ClanImpl clan, String allyClanName) {
+        Text message = Text.join(
+                Text.builder("Clan ").color(BASIC_CHAT_COLOR).build(),
+                Text.builder(allyClanName).color(BASIC_HIGHLIGHT).build(),
+                Text.builder(" has ended the alliance with your clan").color(BASIC_CHAT_COLOR).build()
+        );
+        clan.sendMessage(message);
+    }
+
+    public static void sendYouHaveBeenRemovedFromClan(ClanPlayerImpl clanPlayer, String clanName) {
+        Text message = Text.join(
+                Text.builder("You have been removed from ").color(BASIC_CHAT_COLOR).build(),
+                Text.builder(clanName).color(BASIC_HIGHLIGHT).build()
+        );
+        clanPlayer.sendMessage(message);
+    }
 
     public static void sendRankSuccessfullyCreated(CommandSource commandSource, String rankName) {
         Text message = Text.join(

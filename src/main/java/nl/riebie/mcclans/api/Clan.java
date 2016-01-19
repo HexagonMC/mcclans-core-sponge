@@ -2,6 +2,7 @@ package nl.riebie.mcclans.api;
 
 import nl.riebie.mcclans.api.enums.Permission;
 import nl.riebie.mcclans.api.exceptions.NotDefaultImplementationException;
+import org.spongepowered.api.text.Text;
 import org.spongepowered.api.world.Location;
 
 import java.util.Date;
@@ -260,7 +261,7 @@ public interface Clan {
      *
      * @param message the message to be sent
      */
-    public void sendMessage(String message);
+    public void sendMessage(Text... message);
 
     /**
      * Send a message to all the members of this clan with the given permission
@@ -268,7 +269,7 @@ public interface Clan {
      * @param message    the message to be sent
      * @param permission the permission needed by the members to receive this message
      */
-    public void sendMessage(String message, Permission permission);
+    public void sendMessage(Permission permission, Text... message);
 
     /**
      * Get a list of all the allies of this clan
