@@ -21,7 +21,7 @@ public final class Utils {
 //                return chatColor;
 //            }
 //        }
-        // todo FIX MEH TIS NOT A FOCKIN ENUM
+        // TODO SPONGE: FIX MEH TIS NOT A FOCKIN ENUM
         return null;
     }
 
@@ -36,7 +36,7 @@ public final class Utils {
                     Text.of(location.getBlockY()),
                     Text.builder(" Z:").color(TextColors.GRAY).build(),
                     Text.of(location.getBlockZ()),
-                    Text.builder(" WORLD").color(TextColors.GRAY).build() // todo FIX MEH THERS NO FOCKIN WORWLD. OK getExtent IS ZE WORLD BUT NO getName WOT
+                    Text.builder(" WORLD").color(TextColors.GRAY).build() // TODO SPONGE: FIX MEH THERS NO FOCKIN WORWLD. OK getExtent IS ZE WORLD BUT NO getName WOT
             );
         }
     }
