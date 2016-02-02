@@ -24,6 +24,10 @@ public class MCClans {
     @ConfigDir(sharedRoot = false)
     private File mConfigDir;
 
+    public File getXmlDataFolder() {
+        return new File(mConfigDir, "data");
+    }
+
     @Listener
     public void onServerStart(GameStartedServerEvent event) {
         sPlugin = this;

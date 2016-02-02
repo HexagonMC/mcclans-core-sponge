@@ -10,6 +10,8 @@ import nl.riebie.mcclans.clan.ClanImpl;
 import nl.riebie.mcclans.clan.RankFactory;
 import nl.riebie.mcclans.clan.RankImpl;
 import nl.riebie.mcclans.comparators.ClanKdrComparator;
+import nl.riebie.mcclans.config.Config;
+import nl.riebie.mcclans.database.TaskForwarder;
 import nl.riebie.mcclans.player.ClanInvite;
 import nl.riebie.mcclans.player.ClanPlayerImpl;
 
@@ -157,7 +159,7 @@ public class ClansImpl implements Clans {
                 clans.put(tag.toLowerCase(), newClan);
 // TODO SPONGE:
 //                EventDispatcher.getInstance().dispatchClanCreateEvent(newClan);
-//                TaskForwarder.sendInsertClan(newClan);
+                TaskForwarder.sendInsertClan(newClan);
                 updateClanTagCache();
                 return newClan;
             }
@@ -192,7 +194,7 @@ public class ClansImpl implements Clans {
         clans.remove(tag.toLowerCase());
         // TODO SPONGE
 //        EventDispatcher.getInstance().dispatchClanDisbandEvent(clan);
-//        TaskForwarder.sendDeleteClan(clan.getID());
+        TaskForwarder.sendDeleteClan(clan.getID());
         updateClanTagCache();
     }
 
@@ -242,8 +244,7 @@ public class ClansImpl implements Clans {
                 invitingClan.removeInvitedPlayer(playerName);
             }
             clanPlayers.remove(clanPlayerImpl.getUUID());
-// TODO SPONGE:
-//            TaskForwarder.sendDeleteClanPlayer(clanPlayerImpl.getID());
+            TaskForwarder.sendDeleteClanPlayer(clanPlayerImpl.getID());
         } else {
             throw new NotDefaultImplementationException(clanPlayer.getClass());
         }
@@ -273,10 +274,9 @@ public class ClansImpl implements Clans {
     public ClanPlayerImpl createClanPlayer(UUID uuid, String name) {
         ClanPlayerImpl clanPlayer = new ClanPlayerImpl.Builder(getNextAvailableClanPlayerID(), uuid, name).build();
         this.clanPlayers.put(uuid, clanPlayer);
-        // TODO SPONGE:
-//        if (Configuration.useDatabase) {
-//            TaskForwarder.sendInsertClanPlayer(clanPlayer);
-//        }
+        if (Config.getBoolean(Config.USE_DATABASE)) {
+            TaskForwarder.sendInsertClanPlayer(clanPlayer);
+        }
         return clanPlayer;
     }
 

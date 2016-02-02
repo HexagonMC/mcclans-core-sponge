@@ -4,6 +4,7 @@ import nl.riebie.mcclans.api.enums.Permission;
 import nl.riebie.mcclans.api.exceptions.NotDefaultImplementationException;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
 
 import java.util.Date;
 import java.util.List;
@@ -65,14 +66,14 @@ public interface Clan {
      *
      * @param location position of the new home location
      */
-    public void setHome(Location location);
+    public void setHome(Location<World> location);
 
     /**
      * Get the home location of this clan
      *
      * @return position of the home location
      */
-    public Location getHome();
+    public Location<World> getHome();
 
     /**
      * Get the total unweighted kills of all the members in this clan

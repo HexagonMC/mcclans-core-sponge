@@ -6,6 +6,8 @@ import nl.riebie.mcclans.api.Rank;
 import nl.riebie.mcclans.api.exceptions.NotDefaultImplementationException;
 import nl.riebie.mcclans.clan.ClanImpl;
 import nl.riebie.mcclans.clan.RankImpl;
+import nl.riebie.mcclans.config.Config;
+import nl.riebie.mcclans.database.TaskForwarder;
 import nl.riebie.mcclans.enums.PlayerChatState;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
@@ -79,8 +81,7 @@ public class ClanPlayerImpl implements ClanPlayer, Cloneable {
     // ClansImpl
     public void setUUID(UUID uuid) {
         this.uuid = uuid;
-        // TODO SPONGE:
-//        TaskForwarder.sendUpdateClanPlayer(this);
+        TaskForwarder.sendUpdateClanPlayer(this);
     }
 
     public void setLastKnownName(String lastKnownName) {
@@ -167,12 +168,10 @@ public class ClanPlayerImpl implements ClanPlayer, Cloneable {
     public void setRank(Rank rank) {
         if (rank instanceof RankImpl) {
             this.rank = (RankImpl) rank;
-            // TODO SPONGE:
-//            TaskForwarder.sendUpdateClanPlayer(this);
+            TaskForwarder.sendUpdateClanPlayer(this);
         } else if (rank == null) {
             this.rank = null;
-            // TODO SPONGE:
-//            TaskForwarder.sendUpdateClanPlayer(this);
+            TaskForwarder.sendUpdateClanPlayer(this);
         } else {
             throw new NotDefaultImplementationException(rank.getClass());
         }
@@ -181,12 +180,10 @@ public class ClanPlayerImpl implements ClanPlayer, Cloneable {
     public void setClan(Clan clan) {
         if (clan instanceof ClanImpl) {
             this.clan = (ClanImpl) clan;
-            // TODO SPONGE:
-//            TaskForwarder.sendUpdateClanPlayer(this);
+            TaskForwarder.sendUpdateClanPlayer(this);
         } else if (clan == null) {
             this.clan = null;
-            // TODO SPONGE:
-//            TaskForwarder.sendUpdateClanPlayer(this);
+            TaskForwarder.sendUpdateClanPlayer(this);
         } else {
             throw new NotDefaultImplementationException(clan.getClass());
         }
@@ -235,22 +232,19 @@ public class ClanPlayerImpl implements ClanPlayer, Cloneable {
     @Override
     public void setKillsHigh(int kills) {
         this.killsHigh = kills;
-        // TODO SPONGE:
-//        TaskForwarder.sendUpdateClanPlayer(this);
+        TaskForwarder.sendUpdateClanPlayer(this);
     }
 
     @Override
     public void setKillsMedium(int kills) {
         this.killsMedium = kills;
-        // TODO SPONGE:
-//        TaskForwarder.sendUpdateClanPlayer(this);
+        TaskForwarder.sendUpdateClanPlayer(this);
     }
 
     @Override
     public void setKillsLow(int kills) {
         this.killsLow = kills;
-        // TODO SPONGE:
-//        TaskForwarder.sendUpdateClanPlayer(this);
+        TaskForwarder.sendUpdateClanPlayer(this);
     }
 
     @Override
@@ -307,22 +301,19 @@ public class ClanPlayerImpl implements ClanPlayer, Cloneable {
     @Override
     public void setDeathsHigh(int deathsHigh) {
         this.deathsHigh = deathsHigh;
-        // TODO SPONGE:
-//        TaskForwarder.sendUpdateClanPlayer(this);
+        TaskForwarder.sendUpdateClanPlayer(this);
     }
 
     @Override
     public void setDeathsMedium(int deathsMedium) {
         this.deathsMedium = deathsMedium;
-        // TODO SPONGE:
-//        TaskForwarder.sendUpdateClanPlayer(this);
+        TaskForwarder.sendUpdateClanPlayer(this);
     }
 
     @Override
     public void setDeathsLow(int deathsLow) {
         this.deathsLow = deathsLow;
-        // TODO SPONGE:
-//        TaskForwarder.sendUpdateClanPlayer(this);
+        TaskForwarder.sendUpdateClanPlayer(this);
     }
 
     @Override
@@ -332,8 +323,7 @@ public class ClanPlayerImpl implements ClanPlayer, Cloneable {
 
     public void setLastOnline(LastOnlineImpl lastOnline) {
         this.lastOnline = lastOnline;
-        // TODO SPONGE:
-//        TaskForwarder.sendUpdateClanPlayer(this);
+        TaskForwarder.sendUpdateClanPlayer(this);
     }
 
     public PlayerChatState getChatState() {
@@ -393,8 +383,7 @@ public class ClanPlayerImpl implements ClanPlayer, Cloneable {
     @Override
     public void setFfProtection(boolean ffProtection) {
         this.ffProtection = ffProtection;
-        // TODO SPONGE:
-//        TaskForwarder.sendUpdateClanPlayer(this);
+        TaskForwarder.sendUpdateClanPlayer(this);
     }
 
     @Override
@@ -406,10 +395,9 @@ public class ClanPlayerImpl implements ClanPlayer, Cloneable {
                 clone = (ClanPlayerImpl) object;
             }
         } catch (CloneNotSupportedException e) {
-            // TODO SPONGE: New config
-//            if (Configuration.debugging) {
-//                e.printStackTrace();
-//            }
+            if (Config.getBoolean(Config.DEBUGGING)) {
+                e.printStackTrace();
+            }
         }
 
         return clone;

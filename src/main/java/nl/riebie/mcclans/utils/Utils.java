@@ -5,6 +5,7 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
 
 /**
  * Created by K.Volkers on 12-1-2016.
@@ -25,7 +26,7 @@ public final class Utils {
         return null;
     }
 
-    public static Text formatLocation(@Nullable Location location) {
+    public static Text formatLocation(@Nullable Location<World> location) {
         if (location == null) {
             return Text.builder("NOT SET").color(TextColors.DARK_RED).build();
         } else {
@@ -36,7 +37,7 @@ public final class Utils {
                     Text.of(location.getBlockY()),
                     Text.builder(" Z:").color(TextColors.GRAY).build(),
                     Text.of(location.getBlockZ()),
-                    Text.builder(" WORLD").color(TextColors.GRAY).build() // TODO SPONGE: FIX MEH THERS NO FOCKIN WORWLD. OK getExtent IS ZE WORLD BUT NO getName WOT
+                    Text.builder(" " + location.getExtent().getName()).color(TextColors.GRAY).build()
             );
         }
     }

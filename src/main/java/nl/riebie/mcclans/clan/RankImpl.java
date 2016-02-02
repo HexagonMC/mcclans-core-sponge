@@ -3,6 +3,7 @@ package nl.riebie.mcclans.clan;
 import nl.riebie.mcclans.api.Rank;
 import nl.riebie.mcclans.api.enums.Permission;
 import nl.riebie.mcclans.api.enums.PermissionModifyResponse;
+import nl.riebie.mcclans.database.TaskForwarder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,8 +35,7 @@ public class RankImpl implements Rank {
     // Don't call this method without changing the Rank hashmap key in ClansImpl
     public void setName(String name) {
         this.name = name;
-        // TODO SPONGE:
-        // TaskForwarder.sendUpdateRank(this);
+        TaskForwarder.sendUpdateRank(this);
     }
 
     @Override
@@ -65,8 +65,7 @@ public class RankImpl implements Rank {
                 return PermissionModifyResponse.ALREADY_CONTAINS_PERMISSION;
             } else {
                 permissions.add(permEnum);
-                // TODO SPONGE:
-//                TaskForwarder.sendUpdateRank(this);
+                TaskForwarder.sendUpdateRank(this);
                 return PermissionModifyResponse.SUCCESSFULLY_MODIFIED;
             }
         } else {
@@ -80,8 +79,7 @@ public class RankImpl implements Rank {
             Permission permEnum = Permission.valueOf(permission);
             if (hasPermission(permEnum)) {
                 permissions.remove(permEnum);
-                // TODO SPONGE:
-//                TaskForwarder.sendUpdateRank(this);
+                TaskForwarder.sendUpdateRank(this);
                 return PermissionModifyResponse.SUCCESSFULLY_MODIFIED;
             } else {
                 return PermissionModifyResponse.DOES_NOT_CONTAIN_PERMISSION;

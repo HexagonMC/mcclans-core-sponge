@@ -6,12 +6,14 @@ import nl.riebie.mcclans.api.ClanPlayer;
 import nl.riebie.mcclans.api.Rank;
 import nl.riebie.mcclans.api.enums.Permission;
 import nl.riebie.mcclans.api.exceptions.NotDefaultImplementationException;
+import nl.riebie.mcclans.config.Config;
+import nl.riebie.mcclans.database.TaskForwarder;
 import nl.riebie.mcclans.player.ClanPlayerImpl;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
 
-import javax.security.auth.login.Configuration;
 import java.text.DateFormat;
 import java.util.*;
 
@@ -160,15 +162,14 @@ public class ClanImpl implements Clan, Cloneable {
     }
 
     @Override
-    public void setHome(Location location) {
+    public void setHome(Location<World> location) {
         // TODO SPONGE: clone has protected access in Object..
 //        home = location.clone();
-        // TODO SPONGE:
-        // TaskForwarder.sendUpdateClan(this);
+        TaskForwarder.sendUpdateClan(this);
     }
 
     @Override
-    public Location getHome() {
+    public Location<World> getHome() {
         if (home != null) {
             // TODO SPONGE: clone has protected access in Object..
 //            return home.clone();
@@ -188,21 +189,18 @@ public class ClanImpl implements Clan, Cloneable {
 
     public int increaseHomeSetTimes() {
         homeSetTimes++;
-        // TODO SPONGE:
-        // TaskForwarder.sendUpdateClan(this);
+        TaskForwarder.sendUpdateClan(this);
         return homeSetTimes;
     }
 
     public void setHomeSetTimes(int homeSetTimes) {
         this.homeSetTimes = homeSetTimes;
-        // TODO SPONGE:
-        // TaskForwarder.sendUpdateClan(this);
+        TaskForwarder.sendUpdateClan(this);
     }
 
     public void setHomeSetTimeStamp(long homeLastSetTimeStamp) {
         this.homeLastSetTimeStamp = homeLastSetTimeStamp;
-        // TODO SPONGE:
-        // TaskForwarder.sendUpdateClan(this);
+        TaskForwarder.sendUpdateClan(this);
     }
 
     @Override
@@ -306,8 +304,7 @@ public class ClanImpl implements Clan, Cloneable {
             // TODO SPONGE:
             // EventDispatcher.getInstance().dispatchClanOwnerChangeEvent(this, owner, clanPlayerImpl);
             this.owner = clanPlayerImpl;
-            // TODO SPONGE:
-            // TaskForwarder.sendUpdateClan(this);
+            TaskForwarder.sendUpdateClan(this);
         } else {
             throw new NotDefaultImplementationException(clanPlayer.getClass());
         }
@@ -321,8 +318,7 @@ public class ClanImpl implements Clan, Cloneable {
     @Override
     public void setName(String name) {
         this.name = name;
-        // TODO SPONGE:
-        // TaskForwarder.sendUpdateClan(this);
+        TaskForwarder.sendUpdateClan(this);
     }
 
     @Override
@@ -363,18 +359,16 @@ public class ClanImpl implements Clan, Cloneable {
     public void addRank(String name) {
         RankImpl rank = new RankImpl.Builder(ClansImpl.getInstance().getNextAvailableRankID(), name).build();
         ranks.put(name.toLowerCase(), rank);
-        // TODO SPONGE:
-//        TaskForwarder.sendInsertRank(getID(), rank);
-//        TaskForwarder.sendUpdateClan(this);
+        TaskForwarder.sendInsertRank(getID(), rank);
+        TaskForwarder.sendUpdateClan(this);
     }
 
     public void addRank(Rank rank) {
         if (rank instanceof RankImpl) {
             RankImpl rankImpl = (RankImpl) rank;
             ranks.put(rank.getName().toLowerCase(), rankImpl);
-            // TODO SPONGE:
-//            TaskForwarder.sendInsertRank(getID(), rankImpl);
-//            TaskForwarder.sendUpdateClan(this);
+            TaskForwarder.sendInsertRank(getID(), rankImpl);
+            TaskForwarder.sendUpdateClan(this);
         } else {
             throw new NotDefaultImplementationException(rank.getClass());
         }
@@ -384,8 +378,7 @@ public class ClanImpl implements Clan, Cloneable {
         RankImpl rank = getRank(name);
         if (rank != null) {
             ranks.remove(name.toLowerCase());
-            // TODO SPONGE:
-//            TaskForwarder.sendDeleteRank(rank.getID());
+            TaskForwarder.sendDeleteRank(rank.getID());
         }
     }
 
@@ -395,8 +388,7 @@ public class ClanImpl implements Clan, Cloneable {
         ranks.remove(oldName.toLowerCase());
         rank.setName(newName);
         this.ranks.put(newName.toLowerCase(), rank);
-        // TODO SPONGE:
-//        TaskForwarder.sendUpdateRank(rank);
+        TaskForwarder.sendUpdateRank(rank);
     }
 
     @Override
@@ -408,8 +400,8 @@ public class ClanImpl implements Clan, Cloneable {
         if (player instanceof ClanPlayerImpl) {
             ClanPlayerImpl clanPlayerImpl = (ClanPlayerImpl) player;
             members.add(clanPlayerImpl);
+            TaskForwarder.sendUpdateClanPlayer(clanPlayerImpl);
             // TODO SPONGE:
-//            TaskForwarder.sendUpdateClanPlayer(clanPlayerImpl);
 //            EventDispatcher.getInstance().dispatchClanMemberJoinEvent(this, clanPlayerImpl);
         } else {
             throw new NotDefaultImplementationException(player.getClass());
@@ -426,7 +418,7 @@ public class ClanImpl implements Clan, Cloneable {
             members.remove(member);
             // TODO SPONGE:
 //            EventDispatcher.getInstance().dispatchClanMemberLeaveEvent(this, member);
-//            TaskForwarder.sendUpdateClanPlayer(member);
+            TaskForwarder.sendUpdateClanPlayer(member);
         }
     }
 
@@ -461,14 +453,13 @@ public class ClanImpl implements Clan, Cloneable {
     public boolean setTagColor(String chatColor) {
         // TODO SPONGE:
 //        this.tagColor = chatColor;
-//        TaskForwarder.sendUpdateClan(this);
+        TaskForwarder.sendUpdateClan(this);
         return true;
     }
 
     public boolean setTag(String newTag) {
         // TODO Maybe not allow changing of tags as discussed
-        // TODO SPONGE:
-//        TaskForwarder.sendUpdateClan(this);
+        TaskForwarder.sendUpdateClan(this);
         return false;
     }
 
@@ -532,8 +523,7 @@ public class ClanImpl implements Clan, Cloneable {
             ClanImpl clanImpl = (ClanImpl) clan;
             if (!allies.contains(clanImpl)) {
                 allies.add(clanImpl);
-                // TODO SPONGE:
-//                TaskForwarder.sendInsertClanAlly(getID(), clanImpl.getID());
+                TaskForwarder.sendInsertClanAlly(getID(), clanImpl.getID());
             }
         } else {
             throw new NotDefaultImplementationException(clan.getClass());
@@ -554,8 +544,7 @@ public class ClanImpl implements Clan, Cloneable {
         ClanImpl ally = getAlly(clanTag);
         if (ally != null) {
             allies.remove(ally);
-            // TODO SPONGE:
-//            TaskForwarder.sendDeleteClanAlly(getID(), ally.getID());
+            TaskForwarder.sendDeleteClanAlly(getID(), ally.getID());
         }
     }
 
@@ -600,8 +589,7 @@ public class ClanImpl implements Clan, Cloneable {
     @Override
     public void setAllowingAllyInvites(boolean inviteable) {
         this.allowAllyInvites = inviteable;
-        // TODO SPONGE:
-//        TaskForwarder.sendUpdateClan(this);
+        TaskForwarder.sendUpdateClan(this);
     }
 
     @Override
@@ -648,8 +636,7 @@ public class ClanImpl implements Clan, Cloneable {
     @Override
     public void setFfProtection(boolean ffProtection) {
         this.ffProtection = ffProtection;
-        // TODO SPONGE:
-//        TaskForwarder.sendUpdateClan(this);
+        TaskForwarder.sendUpdateClan(this);
     }
 
     public void setupDefaultRanks() {
@@ -675,10 +662,9 @@ public class ClanImpl implements Clan, Cloneable {
                 clone = (ClanImpl) object;
             }
         } catch (CloneNotSupportedException e) {
-            // TODO SPONGE: New config
-//            if (Configuration.debugging) {
-//                e.printStackTrace();
-//            }
+            if (Config.getBoolean(Config.DEBUGGING)) {
+                e.printStackTrace();
+            }
         }
 
         return clone;

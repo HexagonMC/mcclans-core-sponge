@@ -1,5 +1,7 @@
 package nl.riebie.mcclans.player;
 
+import nl.riebie.mcclans.config.Config;
+
 import javax.security.auth.login.Configuration;
 
 /**
@@ -14,9 +16,7 @@ public class LastClanHomeTeleport {
     }
 
     public boolean canPlayerTeleport() {
-        // TODO SPONGE: New config
-//        int teleportCooldownSeconds = Configuration.teleportCooldownSeconds;
-        int teleportCooldownSeconds = 5;
+        int teleportCooldownSeconds = Config.getInteger(Config.TELEPORT_COOLDOWN_SECONDS);
         long timeDifferenceSeconds = (System.currentTimeMillis() - lastClanHomeTeleport) / 1000;
         if (timeDifferenceSeconds > teleportCooldownSeconds) {
             return true;
@@ -26,9 +26,7 @@ public class LastClanHomeTeleport {
     }
 
     public int secondsBeforePlayerCanTeleport() {
-        // TODO SPONGE: New config
-//        int teleportCooldownSeconds = Configuration.teleportCooldownSeconds;
-        int teleportCooldownSeconds = 5;
+        int teleportCooldownSeconds = Config.getInteger(Config.TELEPORT_COOLDOWN_SECONDS);
         long timeDifferenceSeconds = (System.currentTimeMillis() - lastClanHomeTeleport) / 1000;
         long timeBeforePlayerCanTeleportInSeconds = teleportCooldownSeconds - timeDifferenceSeconds;
         if (timeBeforePlayerCanTeleportInSeconds > 0) {

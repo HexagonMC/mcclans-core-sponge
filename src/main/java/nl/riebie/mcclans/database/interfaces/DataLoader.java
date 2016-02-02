@@ -1,0 +1,217 @@
+package nl.riebie.mcclans.database.interfaces;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.UUID;
+
+import nl.riebie.mcclans.ClansImpl;
+import nl.riebie.mcclans.MCClans;
+import nl.riebie.mcclans.clan.ClanImpl;
+import nl.riebie.mcclans.clan.RankFactory;
+import nl.riebie.mcclans.clan.RankImpl;
+import nl.riebie.mcclans.config.Config;
+import nl.riebie.mcclans.player.ClanPlayerImpl;
+import nl.riebie.mcclans.player.LastOnlineImpl;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.world.Location;
+
+import javax.security.auth.login.Configuration;
+
+public abstract class DataLoader {
+
+    private Map<Integer, ClanImpl> clans = new HashMap<Integer, ClanImpl>();
+    private Map<Integer, ClanPlayerImpl> clanPlayers = new HashMap<Integer, ClanPlayerImpl>();
+    private Map<Integer, RankImpl> ranks = new HashMap<Integer, RankImpl>();
+
+    private Map<Integer, Integer> clanOwners = new HashMap<Integer, Integer>();
+
+    private List<ClanPlayerImpl> markedClanPlayers = new ArrayList<ClanPlayerImpl>();
+
+    private int highestUsedClanID = -1;
+    private int highestUsedClanPlayerID = -1;
+    private int highestUsedRankID = -1;
+
+    public boolean load() {
+        if (initialize()) {
+            loadClans();
+            loadRanks();
+            loadClanPlayers();
+            loadAllies();
+
+            setOwners();
+
+            ClansImpl.getInstance().setHighestUsedClanID(highestUsedClanID);
+            ClansImpl.getInstance().setHighestUsedClanPlayerID(highestUsedClanPlayerID);
+            ClansImpl.getInstance().setHighestUsedRankID(highestUsedRankID);
+
+            setResults();
+
+            if (markedClanPlayers.size() != 0) {
+                MCClans.getPlugin().getLogger().info(
+                        "Scheduled " + markedClanPlayers.size() + " ClanPlayer(s) for deletion due to inactivity (>"
+                                + Config.getInteger(Config.REMOVE_INACTIVE_CLAN_PLAYERS_AFTER_DAYS) + "d)", false);
+            }
+            // ClansImpl.getInstance().fillThisDummyDummy();
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    protected abstract boolean initialize();
+
+    protected abstract void loadClans();
+
+    protected abstract void loadRanks();
+
+    protected abstract void loadClanPlayers();
+
+    protected abstract void loadAllies();
+
+    protected void loadedClan(int clanID, String clanTag, String clanName, int ownerID, String tagColor, boolean allowAllyInvites,
+                              boolean ffProtection, long creationTime, String homeWorld, double homeX, double homeY, double homeZ, float homeYaw, float homePitch,
+                              int homeSetTimes, long homeLastSetTimeStamp) {
+        ClanImpl clan = new ClanImpl.Builder(clanID, clanTag, clanName).tagColor(tagColor).acceptAllyInvites(allowAllyInvites)
+                .ffProtection(ffProtection).creationTime(creationTime).homeSetTimes(homeSetTimes).homeLastSetTimeStamp(homeLastSetTimeStamp).build();
+        if (homeWorld != null && Sponge.getServer().getWorld(UUID.fromString(homeWorld)).isPresent()) {
+            // TODO SPONGE homeYaw, homePitch
+            clan.setHome(new Location<>(Sponge.getServer().getWorld(UUID.fromString(homeWorld)).get(), homeX, homeY, homeZ));
+        }
+
+        clan.addRank(RankFactory.getInstance().createOwner());
+        clan.addRank(RankFactory.getInstance().createRecruit());
+
+        clanOwners.put(clanID, ownerID);
+        clans.put(clanID, clan);
+
+        checkHighestUsedClanID(clanID);
+    }
+
+    protected void loadedRank(int rankID, int clanID, String rankName, String permissions, boolean changeable) {
+
+        RankImpl.Builder builder = new RankImpl.Builder(rankID, rankName);
+        if (!changeable) {
+            builder.unchangeable();
+        }
+        RankImpl rank = builder.build();
+
+        for (String permission : permissions.split(",")) {
+            rank.addPermission(permission);
+        }
+        clans.get(clanID).addRank(rank);
+        ranks.put(rankID, rank);
+
+        checkHighestUsedRankID(rankID);
+    }
+
+    protected void loadedClanPlayer(int clanPlayerID, long uuidMostSigBits, long uuidLeastSigBits, String playerName, int clanID, int rankID,
+                                    int killsHigh, int killsMedium, int killsLow, int deathsHigh, int deathsMedium, int deathsLow, boolean ffProtection, long lastOnlineTime) {
+        ClanImpl clan = null;
+        RankImpl rankImpl = null;
+
+        if (clanID != -1 && rankID != -1) {
+            clan = clans.get(clanID);
+            if (rankID == RankFactory.getOwnerID()) {
+                rankImpl = RankFactory.getInstance().createOwner();
+            } else if (rankID == RankFactory.getRecruitID()) {
+                rankImpl = RankFactory.getInstance().createRecruit();
+            } else {
+                rankImpl = ranks.get(rankID);
+            }
+        }
+
+        ClanPlayerImpl cp = new ClanPlayerImpl.Builder(clanPlayerID, new UUID(uuidMostSigBits, uuidLeastSigBits), playerName).clan(clan)
+                .rank(rankImpl).kills(killsHigh, killsMedium, killsLow).deaths(deathsHigh, deathsMedium, deathsLow).ffProtection(ffProtection)
+                .lastOnline(new LastOnlineImpl(lastOnlineTime)).build();
+
+        clanPlayers.put(clanPlayerID, cp);
+        if (clan != null) {
+            clan.addMember(cp);
+        }
+
+        markInactiveClanPlayer(cp);
+
+        checkHighestUsedClanPlayerID(clanPlayerID);
+    }
+
+    protected void loadedAlly(int clanID, int clanIDAlly) {
+        ClanImpl clan = clans.get(clanID);
+        ClanImpl ally = clans.get(clanIDAlly);
+        clan.addAlly(ally);
+    }
+
+    private void setOwners() {
+        for (Entry<Integer, Integer> entry : clanOwners.entrySet()) {
+            ClanImpl clan = clans.get(entry.getKey());
+            ClanPlayerImpl clanPlayer = clanPlayers.get(entry.getValue());
+            clan.setLoadedOwner(clanPlayer);
+        }
+    }
+
+    private void setResults() {
+        Map<UUID, ClanPlayerImpl> finishedClanPlayers = new HashMap<UUID, ClanPlayerImpl>();
+        Map<String, ClanImpl> finishedClans = new HashMap<String, ClanImpl>();
+
+        for (ClanImpl clan : clans.values()) {
+            finishedClans.put(clan.getTag().toLowerCase(), clan);
+        }
+        for (ClanPlayerImpl clanPlayer : clanPlayers.values()) {
+            finishedClanPlayers.put(clanPlayer.getUUID(), clanPlayer);
+        }
+
+        ClansImpl.getInstance().setClanPlayers(finishedClanPlayers);
+        ClansImpl.getInstance().setClans(finishedClans);
+    }
+
+    private void checkHighestUsedClanID(int clanID) {
+        if (clanID > highestUsedClanID) {
+            highestUsedClanID = clanID;
+        }
+    }
+
+    private void checkHighestUsedClanPlayerID(int clanPlayerID) {
+        if (clanPlayerID > highestUsedClanPlayerID) {
+            highestUsedClanPlayerID = clanPlayerID;
+        }
+    }
+
+    private void checkHighestUsedRankID(int rankID) {
+        if (rankID > highestUsedRankID) {
+            highestUsedRankID = rankID;
+        }
+    }
+
+    public int getHighestUsedClanID() {
+        return highestUsedClanID;
+    }
+
+    public int getHighestUsedClanPlayerID() {
+        return highestUsedClanPlayerID;
+    }
+
+    public int getHighestUsedRankID() {
+        return highestUsedRankID;
+    }
+
+    private void markInactiveClanPlayer(ClanPlayerImpl clanPlayer) {
+        int removeInactiveClanPlayersAfterDays = Config.getInteger(Config.REMOVE_INACTIVE_CLAN_PLAYERS_AFTER_DAYS);
+        boolean removeInactiveClanOwnersIncludingClan = Config.getBoolean(Config.REMOVE_INACTIVE_CLAN_OWNERS_INCLUDING_CLAN);
+        if (removeInactiveClanPlayersAfterDays != 0) {
+            long lastOnlineTime = clanPlayer.getLastOnline().getTime();
+            if ((System.currentTimeMillis() - lastOnlineTime) / (86400000) > removeInactiveClanPlayersAfterDays) {
+                if (clanPlayer.getClan() == null
+                        || !(!removeInactiveClanOwnersIncludingClan && clanPlayer.getRank().getName()
+                        .equalsIgnoreCase(RankFactory.getOwnerIdentifier()))) {
+                    markedClanPlayers.add(clanPlayer);
+                }
+            }
+        }
+    }
+
+    public List<ClanPlayerImpl> getMarkedClanPlayers() {
+        return markedClanPlayers;
+    }
+}
