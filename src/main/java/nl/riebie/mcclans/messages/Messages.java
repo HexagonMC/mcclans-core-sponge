@@ -187,7 +187,7 @@ public class Messages {
                 Text.builder(clanName).color(BASIC_HIGHLIGHT).build(),
                 Text.builder(" has declined to become allies with your clan").color(BASIC_CHAT_COLOR).build()
         );
-        clan.sendMessage(permission);
+        clan.sendMessage(permission, message);
     }
 
     public static void sendClanBroadcastMessagePlayerHasDeclinedToBecomeAlliesWithClan(ClanImpl clan, String playerName, String clanName,
@@ -201,29 +201,38 @@ public class Messages {
         clan.sendMessage(permission, message);
     }
 
-    // TODO SPONGE: Clan sendMessage message vararg minimum of one
-//    public static void sendClanBroadcastMessageYourClanHasBeenInvitedToBecomeAlliesWithClan(ClanImpl clan, String clanName, String coloredClanTag,
-//                                                                                            Permission permission) {
-//        Text message = Text.join(
-//                Text.builder("Player ").color(BASIC_CHAT_COLOR).build(),
-//                Text.builder(playerName).color(BASIC_HIGHLIGHT).build(),
-//                Text.builder(" has been removed from the clan by ").color(BASIC_CHAT_COLOR).build(),
-//                Text.builder(removerPlayer).color(BASIC_HIGHLIGHT).build()
-//        );
-//        clan.sendMessage("", permission);
-//        clan.sendMessage(BASIC_CHAT_COLOR + "Your clan has been invited to become allies with " + coloredClanTag + " " + BASIC_HIGHLIGHT + clanName,
-//                permission);
-//        clan.sendMessage(BASIC_CHAT_COLOR + "To accept or decline type " + BASIC_HIGHLIGHT + "/clan ally accept" + BASIC_CHAT_COLOR + " or "
-//                + BASIC_HIGHLIGHT + "/clan ally decline", permission);
-//    }
-//
-//    public static void sendYourClanHasBeenInvitedToBecomeAlliesWithClan(ClanPlayerImpl clanPlayer, String clanName, String coloredClanTag) {
-//        clanPlayer.sendMessage("");
-//        clanPlayer.sendMessage(BASIC_CHAT_COLOR + "Your clan has been invited to become allies with " + coloredClanTag + " " + BASIC_HIGHLIGHT
-//                + clanName);
-//        clanPlayer.sendMessage(BASIC_CHAT_COLOR + "To accept or decline type " + BASIC_HIGHLIGHT + "/clan ally accept" + BASIC_CHAT_COLOR + " or "
-//                + BASIC_HIGHLIGHT + "/clan ally decline");
-//    }
+    public static void sendClanBroadcastMessageYourClanHasBeenInvitedToBecomeAlliesWithClan(ClanImpl clan, String clanName, Text coloredClanTag,
+                                                                                            Permission permission) {
+        Text message1 = Text.of("");
+        Text message2 = Text.join(
+                Text.builder("Your clan has been invited to become allies with ").color(BASIC_CHAT_COLOR).build(),
+                coloredClanTag,
+                Text.builder(" " + clanName).color(BASIC_HIGHLIGHT).build()
+        );
+        Text message3 = Text.join(
+                Text.builder("To accept or decline type ").color(BASIC_CHAT_COLOR).build(),
+                Text.builder("/clan ally accept").color(BASIC_HIGHLIGHT).build(),
+                Text.builder(" or ").color(BASIC_CHAT_COLOR).build(),
+                Text.builder("/clan ally decline").color(BASIC_HIGHLIGHT).build()
+        );
+        clan.sendMessage(permission, message1, message2, message3);
+    }
+
+    public static void sendYourClanHasBeenInvitedToBecomeAlliesWithClan(ClanPlayerImpl clanPlayer, String clanName, Text coloredClanTag) {
+        Text message1 = Text.of("");
+        Text message2 = Text.join(
+                Text.builder("Your clan has been invited to become allies with ").color(BASIC_CHAT_COLOR).build(),
+                coloredClanTag,
+                Text.builder(" " + clanName).color(BASIC_HIGHLIGHT).build()
+        );
+        Text message3 = Text.join(
+                Text.builder("To accept or decline type ").color(BASIC_CHAT_COLOR).build(),
+                Text.builder("/clan ally accept").color(BASIC_HIGHLIGHT).build(),
+                Text.builder(" or ").color(BASIC_CHAT_COLOR).build(),
+                Text.builder("/clan ally decline").color(BASIC_HIGHLIGHT).build()
+        );
+        clanPlayer.sendMessage(message1, message2, message3);
+    }
 
     public static void sendClanBroadcastMessageYourClanHasBecomeAlliesWithClan(ClanImpl clan, String allyClanName) {
         Text message = Text.join(

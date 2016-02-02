@@ -8,6 +8,7 @@ import nl.riebie.mcclans.api.enums.Permission;
 import nl.riebie.mcclans.api.exceptions.NotDefaultImplementationException;
 import nl.riebie.mcclans.player.ClanPlayerImpl;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.Location;
 
 import javax.security.auth.login.Configuration;
@@ -487,22 +488,35 @@ public class ClanImpl implements Clan, Cloneable {
         }
     }
 
-    // public void sendClanMessage(String sendingPlayerName, String
-    // sendingPlayerRank, String message) {
-    // sendMessage(ChatColor.GRAY + "[" + ChatColor.DARK_GREEN + "CC" +
-    // ChatColor.GRAY + "] [" + ChatColor.BLUE + sendingPlayerRank +
-    // ChatColor.GRAY
-    // + "] " + ChatColor.DARK_GREEN + sendingPlayerName + ": " +
-    // ChatColor.YELLOW + message);
-    // }
-    //
-    // public void sendAllyMessage(String sendingPlayerName, String
-    // sendingPlayerClanTagColored, String message) {
-    // sendMessage(ChatColor.GRAY + "[" + ChatColor.DARK_GREEN + "AC" +
-    // ChatColor.GRAY + "] " + sendingPlayerClanTagColored + " "
-    // + ChatColor.DARK_GREEN + sendingPlayerName + ": " + ChatColor.GOLD +
-    // message);
-    // }
+    public void sendClanMessage(String sendingPlayerName, String sendingPlayerRank, String message) {
+
+        Text textMessage = Text.join(
+                Text.builder("[").color(TextColors.GRAY).build(),
+                Text.builder("CC").color(TextColors.DARK_GREEN).build(),
+                Text.builder("] [").color(TextColors.GRAY).build(),
+                Text.builder(sendingPlayerRank).color(TextColors.BLUE).build(),
+                Text.builder("] ").color(TextColors.GRAY).build(),
+                Text.builder(sendingPlayerName + ": ").color(TextColors.DARK_GREEN).build(),
+                Text.builder(message).color(TextColors.YELLOW).build()
+        );
+
+        sendMessage(textMessage);
+    }
+
+    public void sendAllyMessage(String sendingPlayerName, Text sendingPlayerClanTagColored, String message) {
+
+        Text textMessage = Text.join(
+                Text.builder("[").color(TextColors.GRAY).build(),
+                Text.builder("AC").color(TextColors.DARK_GREEN).build(),
+                Text.builder("] [").color(TextColors.GRAY).build(),
+                sendingPlayerClanTagColored,
+                Text.builder("] ").color(TextColors.GRAY).build(),
+                Text.builder(sendingPlayerName + ": ").color(TextColors.DARK_GREEN).build(),
+                Text.builder(message).color(TextColors.GOLD).build()
+        );
+
+        sendMessage(textMessage);
+    }
 
     @Override
     public List<Clan> getAllies() {
