@@ -8,6 +8,7 @@ import nl.riebie.mcclans.api.enums.Permission;
 import nl.riebie.mcclans.api.exceptions.NotDefaultImplementationException;
 import nl.riebie.mcclans.config.Config;
 import nl.riebie.mcclans.database.TaskForwarder;
+import nl.riebie.mcclans.events.EventDispatcher;
 import nl.riebie.mcclans.player.ClanPlayerImpl;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
@@ -301,8 +302,7 @@ public class ClanImpl implements Clan, Cloneable {
     public void setOwner(ClanPlayer clanPlayer) {
         if (clanPlayer instanceof ClanPlayerImpl) {
             ClanPlayerImpl clanPlayerImpl = (ClanPlayerImpl) clanPlayer;
-            // TODO SPONGE:
-            // EventDispatcher.getInstance().dispatchClanOwnerChangeEvent(this, owner, clanPlayerImpl);
+            EventDispatcher.getInstance().dispatchClanOwnerChangeEvent(this, owner, clanPlayerImpl);
             this.owner = clanPlayerImpl;
             TaskForwarder.sendUpdateClan(this);
         } else {
@@ -401,8 +401,7 @@ public class ClanImpl implements Clan, Cloneable {
             ClanPlayerImpl clanPlayerImpl = (ClanPlayerImpl) player;
             members.add(clanPlayerImpl);
             TaskForwarder.sendUpdateClanPlayer(clanPlayerImpl);
-            // TODO SPONGE:
-//            EventDispatcher.getInstance().dispatchClanMemberJoinEvent(this, clanPlayerImpl);
+            EventDispatcher.getInstance().dispatchClanMemberJoinEvent(this, clanPlayerImpl);
         } else {
             throw new NotDefaultImplementationException(player.getClass());
         }
@@ -719,7 +718,7 @@ public class ClanImpl implements Clan, Cloneable {
             // TODO SPONGE: TextColor
 //            this.tagColor = tagColor;
 //            return this;
-            return null;
+            return this;
         }
 
         public Builder acceptAllyInvites(boolean acceptAllyInvites) {

@@ -273,4 +273,8 @@ public class Config {
             return map;
         }
     }
+
+    public static void setValue(String key, Object value) {
+        sConfig.put(key, value);
+    }
 }

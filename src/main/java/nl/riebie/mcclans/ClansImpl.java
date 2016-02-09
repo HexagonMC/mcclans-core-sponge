@@ -12,8 +12,11 @@ import nl.riebie.mcclans.clan.RankImpl;
 import nl.riebie.mcclans.comparators.ClanKdrComparator;
 import nl.riebie.mcclans.config.Config;
 import nl.riebie.mcclans.database.TaskForwarder;
+import nl.riebie.mcclans.events.ClanPlayerKillEvent;
+import nl.riebie.mcclans.events.EventDispatcher;
 import nl.riebie.mcclans.player.ClanInvite;
 import nl.riebie.mcclans.player.ClanPlayerImpl;
+import org.spongepowered.api.event.Listener;
 
 import javax.security.auth.login.Configuration;
 import java.util.*;
@@ -42,21 +45,21 @@ public class ClansImpl implements Clans {
         }
         return instance;
     }
-// TODO SPONGE: @EventHandler? Custom event listening
-//    @EventHandler
-//    public void onClanPlayerKill(ClanPlayerKillEvent event) {
-//        updateClanTagCache();
-//    }
-//
-//    @EventHandler
-//    public void onMemberJoin(ClanMemberJoinEvent event) {
-//        updateClanTagCache();
-//    }
-//
-//    @EventHandler
-//    public void onMemberLeave(ClanMemberLeaveEvent event) {
-//        updateClanTagCache();
-//    }
+    
+    @Listener
+    public void onClanPlayerKill(ClanPlayerKillEvent event) {
+        updateClanTagCache();
+    }
+
+    @Listener
+    public void onMemberJoin(ClanMemberJoinEvent event) {
+        updateClanTagCache();
+    }
+
+    @Listener
+    public void onMemberLeave(ClanMemberLeaveEvent event) {
+        updateClanTagCache();
+    }
 
     public void updateClanTagCache() {
         firstClan = null;
@@ -157,8 +160,7 @@ public class ClansImpl implements Clans {
                 ownerImpl.setRank(newClan.getRank(RankFactory.getOwnerIdentifier()));
                 ownerImpl.setClan(newClan);
                 clans.put(tag.toLowerCase(), newClan);
-// TODO SPONGE:
-//                EventDispatcher.getInstance().dispatchClanCreateEvent(newClan);
+                EventDispatcher.getInstance().dispatchClanCreateEvent(newClan);
                 TaskForwarder.sendInsertClan(newClan);
                 updateClanTagCache();
                 return newClan;
