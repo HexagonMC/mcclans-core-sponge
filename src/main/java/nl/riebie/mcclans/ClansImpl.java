@@ -16,7 +16,11 @@ import nl.riebie.mcclans.events.ClanPlayerKillEvent;
 import nl.riebie.mcclans.events.EventDispatcher;
 import nl.riebie.mcclans.player.ClanInvite;
 import nl.riebie.mcclans.player.ClanPlayerImpl;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.profile.GameProfile;
+import org.spongepowered.api.service.user.UserStorageService;
 
 import javax.security.auth.login.Configuration;
 import java.util.*;
@@ -45,7 +49,7 @@ public class ClansImpl implements Clans {
         }
         return instance;
     }
-    
+
     @Listener
     public void onClanPlayerKill(ClanPlayerKillEvent event) {
         updateClanTagCache();
@@ -211,11 +215,12 @@ public class ClansImpl implements Clans {
     }
 
     public ClanPlayerImpl getClanPlayer(String playerName) {
-// TODO SPONGE: UUIDCacher not needed, UserStorage or something https://github.com/SpongePowered/SpongeAPI/blob/master/src/main/java/org/spongepowered/api/service/user/UserStorageService.java#L47
-//        UUID uuid = Main.getPlugin().getUuidCacher().getByName(playerName);
-//        if (uuid != null) {
-//            return getClanPlayer(uuid);
-//        }
+        //TODO check if this works
+        UserStorageService storage = Sponge.getGame().getServiceManager().provide(UserStorageService.class).get();
+        Optional<User> user = storage.get(playerName);
+        if (user.isPresent()) {
+            return getClanPlayer(user.get().getUniqueId());
+        }
         return null;
     }
 

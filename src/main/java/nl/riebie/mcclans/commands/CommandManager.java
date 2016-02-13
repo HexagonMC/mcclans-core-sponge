@@ -1,5 +1,6 @@
 package nl.riebie.mcclans.commands;
 
+import nl.riebie.mcclans.ClansImpl;
 import nl.riebie.mcclans.api.CommandSender;
 import nl.riebie.mcclans.commands.FilledParameters.*;
 import nl.riebie.mcclans.commands.annotations.ChildGroup;
@@ -103,8 +104,8 @@ public class CommandManager {
         }
     }
 
-    public void executeCommand(String[] args) {
-        CommandSender commandSender = getCommandSender("henk");
+    public void executeCommand(String commandSenderName, String[] args) {
+        CommandSender commandSender = getCommandSender(commandSenderName);
         String firstParam = args[0];
         int page = 0;
         if (firstParam.equals("page")) {
@@ -157,7 +158,6 @@ public class CommandManager {
     }
 
     private CommandSender getCommandSender(String playerName) {
-        //TODO retrieve a real CommandSender from a list
-        return new ClanPlayerImpl.Builder(0, UUID.randomUUID(), "Henk").build();
+        return ClansImpl.getInstance().getClanPlayer(playerName);
     }
 }
