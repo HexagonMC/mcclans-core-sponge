@@ -1,5 +1,10 @@
 package nl.riebie.mcclans.commands.annotations;
 
+import nl.riebie.mcclans.commands.constraints.length.EmptyLengthConstraint;
+import nl.riebie.mcclans.commands.constraints.length.LengthConstraint;
+import nl.riebie.mcclans.commands.constraints.regex.EmptyRegexConstraint;
+import nl.riebie.mcclans.commands.constraints.regex.RegexConstraint;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -15,9 +20,7 @@ public @interface Parameter {
 
     boolean multiline() default false;
 
-    int minimalLength() default -1;
+    Class<? extends LengthConstraint> length() default EmptyLengthConstraint.class;
 
-    int maximalLength() default -1;
-
-    String regex() default "";
+    Class<? extends RegexConstraint> regex() default EmptyRegexConstraint.class;
 }

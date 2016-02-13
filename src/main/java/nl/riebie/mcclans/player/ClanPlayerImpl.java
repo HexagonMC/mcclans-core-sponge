@@ -10,6 +10,7 @@ import nl.riebie.mcclans.clan.RankImpl;
 import nl.riebie.mcclans.config.Config;
 import nl.riebie.mcclans.database.TaskForwarder;
 import nl.riebie.mcclans.enums.PlayerChatState;
+import nl.riebie.mcclans.utils.UUIDUtils;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
@@ -91,15 +92,11 @@ public class ClanPlayerImpl implements ClanPlayer, Cloneable, CommandSender {
 
     @Override
     public String getName() {
-        // TODO SPONGE: Bukkit.getPlayer RWEALLY??
-//        Player player = Bukkit.getPlayer(this.uuid);
-//        if (player != null) {
-//            lastKnownName = player.getName();
-//            return player.getName();
-//        } else {
-//            return lastKnownName;
-//        }
-        return null;
+        String name = UUIDUtils.getName(uuid);
+        if (name == null) {
+            name = lastKnownName;
+        }
+        return name;
     }
 
     @Override

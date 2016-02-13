@@ -1,4 +1,4 @@
-package nl.riebie.mcclans.commands.validators;
+package nl.riebie.mcclans.commands.parsers;
 
 
 import nl.riebie.mcclans.commands.FilledParameters.NormalFilledParameter;

@@ -1,4 +1,4 @@
-package nl.riebie.mcclans.commands.validators;
+package nl.riebie.mcclans.commands.parsers;
 
 import nl.riebie.mcclans.commands.FilledParameters.NormalFilledParameter;
 
@@ -11,7 +11,7 @@ public class StringParser implements ParameterParser<String> {
     public ParseResult<String> parseValue(String value, NormalFilledParameter parameter) {
         if (parameter.getMaximalLength() == -1 || value.length() <= parameter.getMaximalLength()) {
             if (parameter.getMinimalLength() == -1 || value.length() >= parameter.getMinimalLength()) {
-                if(parameter.getRegex().equals("") || value.matches(parameter.getRegex())) {
+                if(parameter.getRegex() == null || value.matches(parameter.getRegex())) {
                     return ParseResult.newSuccessResult(value);
                 } else{
                     return ParseResult.newErrorResult(String.format("Value should (%s)", parameter.getRegex()));

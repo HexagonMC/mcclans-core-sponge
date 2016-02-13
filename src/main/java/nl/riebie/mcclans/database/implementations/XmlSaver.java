@@ -105,7 +105,8 @@ public class XmlSaver extends DataSaver {
         clansWriter.writeEndElement();
 
         clansWriter.writeStartElement("tagColor");
-        clansWriter.writeCharacters(clan.getTagColor());
+        //TODO SPONGE!
+//        clansWriter.writeCharacters(clan.getTagColor());
         clansWriter.writeEndElement();
 
         clansWriter.writeStartElement("allowAllyInvites");

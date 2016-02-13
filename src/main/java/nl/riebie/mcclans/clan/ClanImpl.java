@@ -11,6 +11,7 @@ import nl.riebie.mcclans.database.TaskForwarder;
 import nl.riebie.mcclans.events.EventDispatcher;
 import nl.riebie.mcclans.player.ClanPlayerImpl;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
@@ -442,10 +443,10 @@ public class ClanImpl implements Clan, Cloneable {
     }
 
     @Override
-    public String getTagColor() {
+    public TextColor getTagColor() {
         // TODO SPONGE: TextColor
         // return this.tagColor;
-        return null;
+        return TextColors.BLUE;
     }
 
     @Override

@@ -1,4 +1,4 @@
-package nl.riebie.mcclans.commands.validators;
+package nl.riebie.mcclans.commands.parsers;
 
 /**
  * Created by Mirko on 19/01/2016.

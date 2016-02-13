@@ -1,6 +1,6 @@
 package nl.riebie.mcclans.commands;
 
-import nl.riebie.mcclans.commands.implementations.ExampleCommands;
+import nl.riebie.mcclans.commands.implementations.ClanCommands;
 import org.spongepowered.api.Server;
 import org.spongepowered.api.command.CommandCallable;
 import org.spongepowered.api.command.CommandException;
@@ -27,12 +27,11 @@ public class CommandHandler implements CommandCallable {
     public CommandHandler(Server server) {
         this.server = server;
         commandManager = new CommandManager();
-        commandManager.registerCommandStructure("clan", ExampleCommands.class);
+        commandManager.registerCommandStructure("clan", ClanCommands.class);
     }
 
     public CommandResult process(CommandSource source, String arguments) throws CommandException {
-        String name = source.getName();
-        commandManager.executeCommand(name, arguments.split(" "));
+        commandManager.executeCommand(source, arguments.split(" "));
         return CommandResult.success();
     }
 

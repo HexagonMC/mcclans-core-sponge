@@ -3,6 +3,7 @@ package nl.riebie.mcclans.api;
 import nl.riebie.mcclans.api.enums.Permission;
 import nl.riebie.mcclans.api.exceptions.NotDefaultImplementationException;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -210,7 +211,7 @@ public interface Clan {
      *
      * @return the color of the tag of this clan
      */
-    public String getTagColor();
+    public TextColor getTagColor();
 
     /**
      * Set the color of the clan tag by text

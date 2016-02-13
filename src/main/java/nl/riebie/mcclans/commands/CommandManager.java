@@ -7,8 +7,12 @@ import nl.riebie.mcclans.commands.annotations.ChildGroup;
 import nl.riebie.mcclans.commands.annotations.Command;
 import nl.riebie.mcclans.commands.annotations.PageParameter;
 import nl.riebie.mcclans.commands.annotations.Parameter;
-import nl.riebie.mcclans.commands.validators.*;
+import nl.riebie.mcclans.commands.parsers.*;
+import nl.riebie.mcclans.commands.constraints.length.LengthConstraint;
+import nl.riebie.mcclans.commands.constraints.regex.RegexConstraint;
 import nl.riebie.mcclans.player.ClanPlayerImpl;
+import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 
 
@@ -97,7 +101,17 @@ public class CommandManager {
                     filledCommand.addPageParameter();
                 } else if (annotation instanceof Parameter) {
                     Parameter parameterValues = (Parameter) annotation;
-                    filledCommand.addParameter(parameterValues.optional(), parameterValues.minimalLength(), parameterValues.maximalLength(), parameterValues.regex(), parameter.getType());
+                    try {
+                        LengthConstraint lengthConstraint = parameterValues.length().newInstance();
+                        RegexConstraint regexConstraint = parameterValues.regex().newInstance();
+                        filledCommand.addParameter(parameterValues.optional(), lengthConstraint.getMinimalLength(),
+                                lengthConstraint.getMaximalLength(), regexConstraint.getRegex(), parameter.getType());
+                    } catch (InstantiationException e) {
+                        e.printStackTrace();
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                    }
+
                 }
             }
         } else {
@@ -105,8 +119,8 @@ public class CommandManager {
         }
     }
 
-    public void executeCommand(String commandSenderName, String[] args) {
-        CommandSender commandSender = getCommandSender(commandSenderName);
+    public void executeCommand(CommandSource commandSource, String[] args) {
+        CommandSender commandSender = getCommandSender(commandSource);
         String firstParam = args[0];
         int page = 0;
         if (firstParam.equals("page")) {
@@ -158,7 +172,14 @@ public class CommandManager {
         }
     }
 
-    private CommandSender getCommandSender(String playerName) {
-        return ClansImpl.getInstance().getClanPlayer(playerName);
+    private CommandSender getCommandSender(CommandSource commandSource) {
+        Player player = (Player) commandSource;
+
+        UUID uuid = player.getUniqueId();
+        ClanPlayerImpl clanPlayer = ClansImpl.getInstance().getClanPlayer(uuid);
+        if (clanPlayer == null) {
+            clanPlayer = ClansImpl.getInstance().createClanPlayer(uuid, player.getName());
+        }
+        return clanPlayer;
     }
 }

@@ -231,7 +231,7 @@ public class Messages {
                 Text.builder(" or ").color(BASIC_CHAT_COLOR).build(),
                 Text.builder("/clan ally decline").color(BASIC_HIGHLIGHT).build()
         );
-        clanPlayer.sendMessage(message1, message2, message3);
+        clanPlayer.sendMessage(Text.of(message1, message2, message3));
     }
 
     public static void sendClanBroadcastMessageYourClanHasBecomeAlliesWithClan(ClanImpl clan, String allyClanName) {
