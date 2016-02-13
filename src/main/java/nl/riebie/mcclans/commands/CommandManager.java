@@ -9,6 +9,7 @@ import nl.riebie.mcclans.commands.annotations.PageParameter;
 import nl.riebie.mcclans.commands.annotations.Parameter;
 import nl.riebie.mcclans.commands.validators.*;
 import nl.riebie.mcclans.player.ClanPlayerImpl;
+import org.spongepowered.api.text.Text;
 
 
 import java.lang.annotation.Annotation;
@@ -144,7 +145,7 @@ public class CommandManager {
                     if (parseResult.isSuccess()) {
                         objects[j] = parseResult.getItem();
                     } else {
-                        System.out.println(parseResult.getErrorMessage());
+                        commandSender.sendMessage(Text.of(parseResult.getErrorMessage()));
                         return;
                     }
                 } else if (parameter instanceof PageFilledParameter) {

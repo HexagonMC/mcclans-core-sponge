@@ -15,10 +15,10 @@ public class FloatParser implements ParameterParser<Float> {
                 if (parameter.getMaximalLength() == -1 || floatValue <= parameter.getMaximalLength()) {
                     return ParseResult.newSuccessResult(floatValue);
                 } else {
-                    return ParseResult.newErrorResult(String.format("number supplied to high (%s/%s)", floatValue, parameter.getMaximalLength()));
+                    return ParseResult.newErrorResult(String.format("number supplied too high (%s/%s)", floatValue, parameter.getMaximalLength()));
                 }
             } else {
-                return ParseResult.newErrorResult(String.format("number supplied to low (%s/%s)", floatValue, parameter.getMinimalLength()));
+                return ParseResult.newErrorResult(String.format("number supplied too low (%s/%s)", floatValue, parameter.getMinimalLength()));
             }
         } catch (NumberFormatException e) {
             return ParseResult.newErrorResult("Supplied parameter is not a Float");

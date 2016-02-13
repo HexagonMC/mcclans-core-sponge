@@ -5,7 +5,7 @@ import java.util.UUID;
 /**
  * Created by K.Volkers on 19-1-2016.
  */
-public interface ClanPlayer extends CommandSender {
+public interface ClanPlayer {
 
     /**
      * Returns the player UUID

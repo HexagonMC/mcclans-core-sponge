@@ -15,10 +15,10 @@ public class DoubleParser implements ParameterParser<Double> {
                 if (parameter.getMaximalLength() == -1 || doubleValue <= parameter.getMaximalLength()) {
                     return ParseResult.newSuccessResult(doubleValue);
                 } else {
-                    return ParseResult.newErrorResult(String.format("number supplied to high (%s/%s)", doubleValue, parameter.getMaximalLength()));
+                    return ParseResult.newErrorResult(String.format("number supplied too high (%s/%s)", doubleValue, parameter.getMaximalLength()));
                 }
             } else {
-                return ParseResult.newErrorResult(String.format("number supplied to low (%s/%s)", doubleValue, parameter.getMinimalLength()));
+                return ParseResult.newErrorResult(String.format("number supplied too low (%s/%s)", doubleValue, parameter.getMinimalLength()));
             }
         } catch (NumberFormatException e) {
             return ParseResult.newErrorResult("Supplied parameter is not a Double");

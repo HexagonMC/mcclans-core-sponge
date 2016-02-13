@@ -17,10 +17,10 @@ public class StringParser implements ParameterParser<String> {
                     return ParseResult.newErrorResult(String.format("Value should (%s)", parameter.getRegex()));
                 }
             } else {
-                return ParseResult.newErrorResult("Supplied parameter to small");
+                return ParseResult.newErrorResult("Supplied parameter too small");
             }
         } else {
-            return ParseResult.newErrorResult("Supplied parameter to long");
+            return ParseResult.newErrorResult("Supplied parameter too long");
         }
     }
 }

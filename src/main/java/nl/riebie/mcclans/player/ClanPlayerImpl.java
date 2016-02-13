@@ -2,6 +2,7 @@ package nl.riebie.mcclans.player;
 
 import nl.riebie.mcclans.api.Clan;
 import nl.riebie.mcclans.api.ClanPlayer;
+import nl.riebie.mcclans.api.CommandSender;
 import nl.riebie.mcclans.api.Rank;
 import nl.riebie.mcclans.api.exceptions.NotDefaultImplementationException;
 import nl.riebie.mcclans.clan.ClanImpl;
@@ -21,7 +22,7 @@ import java.util.UUID;
 /**
  * Created by K.Volkers on 19-1-2016.
  */
-public class ClanPlayerImpl implements ClanPlayer, Cloneable {
+public class ClanPlayerImpl implements ClanPlayer, Cloneable, CommandSender {
 
     private static final float killsHighFactor = 2.0f;
     private static final float killsMediumFactor = 1.0f;
@@ -201,6 +202,7 @@ public class ClanPlayerImpl implements ClanPlayer, Cloneable {
         return clanInvite;
     }
 
+    @Override
     public void sendMessage(Text... message) {
         Optional<Player> playerOpt = Sponge.getServer().getPlayer(uuid);
         if (playerOpt.isPresent() && playerOpt.get().isOnline()) {

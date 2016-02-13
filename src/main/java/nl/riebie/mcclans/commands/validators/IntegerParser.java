@@ -15,10 +15,10 @@ public class IntegerParser implements ParameterParser<Integer> {
                 if (parameter.getMaximalLength() == -1 || intValue <= parameter.getMaximalLength()) {
                     return ParseResult.newSuccessResult(intValue);
                 } else {
-                    return ParseResult.newErrorResult(String.format("number supplied to high (%s/%s)", intValue, parameter.getMaximalLength()));
+                    return ParseResult.newErrorResult(String.format("number supplied too high (%s/%s)", intValue, parameter.getMaximalLength()));
                 }
             } else {
-                return ParseResult.newErrorResult(String.format("number supplied to low (%s/%s)", intValue, parameter.getMinimalLength()));
+                return ParseResult.newErrorResult(String.format("number supplied too low (%s/%s)", intValue, parameter.getMinimalLength()));
             }
         } catch (NumberFormatException e) {
             return ParseResult.newErrorResult("Supplied parameter is not a Integer");
