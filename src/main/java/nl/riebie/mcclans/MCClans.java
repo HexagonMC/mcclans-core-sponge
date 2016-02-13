@@ -21,8 +21,12 @@ import org.spongepowered.api.event.game.state.GameStartedServerEvent;
 import org.spongepowered.api.event.game.state.GameStoppedServerEvent;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.scheduler.Task;
+import org.spongepowered.api.service.ProviderRegistration;
+import org.spongepowered.api.service.economy.EconomyService;
+import org.spongepowered.api.service.user.UserStorageService;
 
 import java.io.File;
+import java.util.Optional;
 
 /**
  * Created by K.Volkers on 8-12-2015.
@@ -30,28 +34,43 @@ import java.io.File;
 @Plugin(id = "nl.riebie.MCClans", name = "MCClans", version = "1.0")
 public class MCClans {
 
-    private static MCClans sPlugin;
+    private static MCClans plugin;
+    private ServiceHelper serviceHelper = new ServiceHelper();
     @Inject
-    private Logger mLogger;
+    private Logger logger;
 
     @Inject
     @ConfigDir(sharedRoot = false)
-    private File mConfigDir;
+    private File configDir;
 
     public File getXmlDataFolder() {
-        return new File(mConfigDir, "data");
+        return new File(configDir, "data");
     }
 
     @Listener
     public void onServerStart(GameStartedServerEvent event) {
-        sPlugin = this;
-        if (!Config.load(mConfigDir)) {
+        plugin = this;
+
+        // Init config
+        if (!Config.load(configDir)) {
             getLogger().error("Config failed to load");
             // todo stop plugin?
             return;
         }
-        // TODO SPONGE reloadSettings stuff
+        // TODO SPONGE reloadSettings stuff?
         //reloadSettings();
+
+        // Init services
+        if (!serviceHelper.initUserStorageService()) {
+            MCClans.getPlugin().getLogger().warn("Could not find UserStorageService during initialization!");
+            // todo stop plugin?
+        }
+        if (Config.getBoolean(Config.USE_ECONOMY) && !serviceHelper.initEconomyService()) {
+            MCClans.getPlugin().getLogger().warn("Could not find EconomyService during initialization! Deactivating economy usage for MCClans");
+            Config.setValue(Config.USE_ECONOMY, false);
+        }
+
+        // Init database/xml
         if (Config.getBoolean(Config.USE_DATABASE) && DBMSType.getType(Config.getString(Config.DBMS_TYPE)).equals(DBMSType.UNRECOGNISED)) {
             Config.setValue(Config.USE_DATABASE, false);
             getLogger().warn("Could not recognise 'dbms-type' in config. Deactivating database usage for MCClans", true);
@@ -101,6 +120,8 @@ public class MCClans {
 //        Bukkit.getServer().getPluginCommand("clan").setExecutor(new ClanCommandExecutor());
 
 //        Sponge.getCommandDispatcher().register(this, CommandFactory.create(), "armorhud");
+
+        // Register listeners and commands
         Sponge.getEventManager().registerListeners(this, ClansImpl.getInstance());
         Sponge.getEventManager().registerListeners(this, new ClientConnectionListener());
         Sponge.getEventManager().registerListeners(this, new UpdateLastPlayerDamageListener());
@@ -193,10 +214,39 @@ public class MCClans {
     }
 
     public static MCClans getPlugin() {
-        return sPlugin;
+        return plugin;
     }
 
     public Logger getLogger() {
-        return mLogger;
+        return logger;
+    }
+
+    public ServiceHelper getServiceHelper() {
+        return serviceHelper;
+    }
+
+    public static class ServiceHelper {
+        public UserStorageService userStorageService;
+        public EconomyService economyService;
+
+        private boolean initUserStorageService() {
+            Optional<ProviderRegistration<UserStorageService>> userStorageOpt = Sponge.getServiceManager().getRegistration(UserStorageService.class);
+            if (userStorageOpt.isPresent()) {
+                userStorageService = userStorageOpt.get().getProvider();
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        private boolean initEconomyService() {
+            Optional<ProviderRegistration<EconomyService>> economyServiceOpt = Sponge.getServiceManager().getRegistration(EconomyService.class);
+            if (economyServiceOpt.isPresent()) {
+                economyService = economyServiceOpt.get().getProvider();
+                return true;
+            } else {
+                return false;
+            }
+        }
     }
 }

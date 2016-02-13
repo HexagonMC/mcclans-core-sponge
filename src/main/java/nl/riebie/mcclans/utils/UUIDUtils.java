@@ -1,9 +1,7 @@
 package nl.riebie.mcclans.utils;
 
 import nl.riebie.mcclans.MCClans;
-import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.User;
-import org.spongepowered.api.service.ProviderRegistration;
 import org.spongepowered.api.service.user.UserStorageService;
 
 import javax.annotation.Nullable;
@@ -22,12 +20,7 @@ public class UUIDUtils {
     }
 
     private UUIDUtils() {
-        Optional<ProviderRegistration<UserStorageService>> userStorageOpt = Sponge.getServiceManager().getRegistration(UserStorageService.class);
-        if (userStorageOpt.isPresent()) {
-            service = userStorageOpt.get().getProvider();
-        } else {
-            MCClans.getPlugin().getLogger().warn("UUIDUtils could not find UserStorageService during initialization!");
-        }
+        service = MCClans.getPlugin().getServiceHelper().userStorageService;
     }
 
     @Nullable
