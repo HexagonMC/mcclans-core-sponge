@@ -66,6 +66,7 @@ public class MCClans {
             // todo stop plugin?
         }
         if (Config.getBoolean(Config.USE_ECONOMY) && !serviceHelper.initEconomyService()) {
+            // todo what if config option 'use economy' is changed and reload is called, economy service not available?
             MCClans.getPlugin().getLogger().warn("Could not find EconomyService during initialization! Deactivating economy usage for MCClans");
             Config.setValue(Config.USE_ECONOMY, false);
         }
