@@ -7,10 +7,7 @@ import nl.riebie.mcclans.database.DatabaseConnectionOwner;
 import nl.riebie.mcclans.database.DatabaseHandler;
 import nl.riebie.mcclans.database.TaskExecutor;
 import nl.riebie.mcclans.enums.DBMSType;
-import nl.riebie.mcclans.listeners.ClientConnectionListener;
-import nl.riebie.mcclans.listeners.FriendlyFireListener;
-import nl.riebie.mcclans.listeners.KillDeathRatioListener;
-import nl.riebie.mcclans.listeners.UpdateLastPlayerDamageListener;
+import nl.riebie.mcclans.listeners.*;
 import nl.riebie.mcclans.utils.FileUtils;
 import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
@@ -124,6 +121,7 @@ public class MCClans {
 
         // Register listeners and commands
         Sponge.getEventManager().registerListeners(this, ClansImpl.getInstance());
+        Sponge.getEventManager().registerListeners(this, new PlayerChatListener());
         Sponge.getEventManager().registerListeners(this, new ClientConnectionListener());
         Sponge.getEventManager().registerListeners(this, new UpdateLastPlayerDamageListener());
         Sponge.getEventManager().registerListeners(this, new FriendlyFireListener());
