@@ -1,6 +1,7 @@
 package nl.riebie.mcclans;
 
 import com.google.inject.Inject;
+import nl.riebie.mcclans.commands.CommandHandler;
 import nl.riebie.mcclans.config.Config;
 import nl.riebie.mcclans.database.DatabaseConnectionOwner;
 import nl.riebie.mcclans.database.DatabaseHandler;
@@ -13,6 +14,7 @@ import nl.riebie.mcclans.listeners.UpdateLastPlayerDamageListener;
 import nl.riebie.mcclans.utils.FileUtils;
 import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.command.CommandManager;
 import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GameStartedServerEvent;
@@ -104,6 +106,9 @@ public class MCClans {
         Sponge.getEventManager().registerListeners(this, new UpdateLastPlayerDamageListener());
         Sponge.getEventManager().registerListeners(this, new FriendlyFireListener());
         Sponge.getEventManager().registerListeners(this, new KillDeathRatioListener());
+
+        CommandManager cmdService = Sponge.getCommandManager();
+        cmdService.register(this, new CommandHandler(Sponge.getServer()), "clan");
     }
 
     public void reloadSettings() {
