@@ -18,7 +18,6 @@ import nl.riebie.mcclans.player.ClanInvite;
 import nl.riebie.mcclans.player.ClanPlayerImpl;
 import org.spongepowered.api.event.Listener;
 
-import javax.security.auth.login.Configuration;
 import java.util.*;
 
 /**
@@ -194,8 +193,8 @@ public class ClansImpl implements Clans {
         }
 
         clans.remove(tag.toLowerCase());
-        // TODO SPONGE
-//        EventDispatcher.getInstance().dispatchClanDisbandEvent(clan);
+
+        EventDispatcher.getInstance().dispatchClanDisbandEvent(clan);
         TaskForwarder.sendDeleteClan(clan.getID());
         updateClanTagCache();
     }

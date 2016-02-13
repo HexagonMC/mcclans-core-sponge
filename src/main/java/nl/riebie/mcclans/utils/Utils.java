@@ -1,11 +1,14 @@
 package nl.riebie.mcclans.utils;
 
 import com.sun.istack.internal.Nullable;
+import nl.riebie.mcclans.config.Config;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
+
+import java.util.List;
 
 /**
  * Created by K.Volkers on 12-1-2016.
@@ -79,5 +82,25 @@ public final class Utils {
                 timeText, Text.of(" "),
                 Text.builder((hours == 1) ? "hour" : "hours").color(textColor).build()
         );
+    }
+
+    public static boolean isWorldBlockedFromAllowingFriendlyFireProtection(String worldName) {
+        List<String> worlds = Config.getList(Config.BLOCKED_WORLDS_FF_PROTECTION, String.class);
+        for (String world : worlds) {
+            if (world.equalsIgnoreCase(worldName)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean isWorldBlockedFromLoggingPlayerKDR(String worldName) {
+        List<String> worlds = Config.getList(Config.BLOCKED_WORLDS_PLAYER_KDR, String.class);
+        for (String world : worlds) {
+            if (world.equalsIgnoreCase(worldName)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

@@ -332,7 +332,7 @@ public class ClanImpl implements Clan, Cloneable {
     }
 
     @Override
-    public String getTagColored() {
+    public Text getTagColored() {
         // TODO SPONGE: TextColor
 //        ChatColor colonColor = ChatColor.GRAY;
 //        if (Configuration.useColoredTagsBasedOnClanKDR) {
@@ -348,7 +348,7 @@ public class ClanImpl implements Clan, Cloneable {
 //            }
 //        }
 //        return colonColor + "[" + getTagColor() + getTag() + colonColor + "]" + ChatColor.RESET;
-        return null;
+        return Text.builder(tag).color(TextColors.DARK_PURPLE).build();
     }
 
     @Override

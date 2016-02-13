@@ -164,7 +164,7 @@ public interface Clan {
      *
      * @return the colored tag of this clan
      */
-    public String getTagColored();
+    public Text getTagColored();
 
     /**
      * Get a rank object with a given name
