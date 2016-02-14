@@ -1,6 +1,7 @@
 package nl.riebie.mcclans.commands.implementations;
 
 import nl.riebie.mcclans.ClansImpl;
+import nl.riebie.mcclans.api.enums.Permission;
 import nl.riebie.mcclans.clan.ClanImpl;
 import nl.riebie.mcclans.commands.annotations.ChildGroup;
 import nl.riebie.mcclans.commands.annotations.Command;
@@ -14,9 +15,13 @@ import nl.riebie.mcclans.comparators.ClanKdrComparator;
 import nl.riebie.mcclans.messages.Messages;
 import nl.riebie.mcclans.player.ClanPlayerImpl;
 import nl.riebie.mcclans.table.HorizontalTable;
+import nl.riebie.mcclans.utils.UUIDUtils;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Created by Mirko on 13/02/2016.
@@ -43,7 +48,7 @@ public class ClanCommands {
         HorizontalTable<ClanImpl> table = new HorizontalTable<>("Clans", 10, (row, clan, i) -> {
             row.setValue("Rank", Text.of(i + 1));
             row.setValue("Clan", Text.join(Text.builder().color(clan.getTagColor()).append(Text.of(clan.getTag())).build(), Text.of(" ", clan.getName())));
-            row.setValue("KDR",Text.of(clan.getKDR()));
+            row.setValue("KDR", Text.of(clan.getKDR()));
             row.setValue("Members", Text.of(clan.getMemberCount()));
 
         });
@@ -57,10 +62,51 @@ public class ClanCommands {
         table.draw(clans, page, clanPlayer);
     }
 
+    @Command(name = "invite")
+    public void clanInviteCommand(ClanPlayerImpl clanPlayer, @Parameter String playerName) {
+        ClanImpl clan = clanPlayer.getClan();
+        Player player = Sponge.getServer().getPlayer(clanPlayer.getUUID()).get();       //TODO add getting CommandSource in CommandHandler
+        if (clan != null) {
+            UUID uuid = UUIDUtils.getUUID(playerName);
+            if (uuid == null) {
+                Messages.sendPlayerNotOnline(player, playerName);
+                return;
+            }
+
+            ClansImpl clansInstance = ClansImpl.getInstance();
+            ClanPlayerImpl invitedClanPlayer = clansInstance.getClanPlayer(uuid);
+            Player invitedPlayer = Sponge.getServer().getPlayer(uuid).get();  //handle optional :)
+            if (invitedClanPlayer == null) {
+                if (invitedPlayer == null) {
+                    Messages.sendPlayerNotOnline(invitedPlayer, playerName);
+                    return;
+                }
+                invitedClanPlayer = clansInstance.createClanPlayer(invitedPlayer.getUniqueId(), invitedPlayer.getName());
+            }
+            String invitedClanPlayerName = invitedClanPlayer.getName();
+
+            if (invitedClanPlayer.getClan() != null) {
+                Messages.sendPlayerAlreadyInClan(player, invitedClanPlayerName);
+            } else if (invitedClanPlayer.getClanInvite() != null) {
+                Messages.sendPlayerAlreadyInvitedByAnotherClan(player, invitedClanPlayerName);
+            } else {
+                invitedClanPlayer.inviteToClan(clan);
+                clan.addInvitedPlayer(invitedClanPlayer);
+                Messages.sendClanBroadcastMessagePlayerInvitedToTheClan(clan, invitedClanPlayerName, player.getName(), Permission.invite);
+                if (invitedPlayer != null && invitedPlayer.isOnline()) {
+                    Messages.sendInvitedToClan(invitedPlayer, clan.getName(), clan.getTagColored());
+                }
+            }
+            invitedClanPlayer.getClanInvite().accept();
+        } else {
+            Messages.sendWarningMessage(player, Messages.YOU_ARE_NOT_IN_A_CLAN);
+        }
+    }
+
     @ChildGroup(ClanChatCommands.class)
     @Command(name = "chat")
-    public void clanChatRootCommand(ClanPlayerImpl clanPlayer){
-        clanPlayer.sendMessage(Text.of("NIET DIT ROOTCOMMAND AANROEPEN,FLIKKER"));
+    public void clanChatRootCommand(ClanPlayerImpl clanPlayer) {
+        clanPlayer.sendMessage(Text.of("NIET DIT ROOTCOMMAND AANROEPEN, FLIKKER"));
     }
 
 }
