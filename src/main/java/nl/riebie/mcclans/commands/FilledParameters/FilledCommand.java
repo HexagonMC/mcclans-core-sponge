@@ -18,7 +18,10 @@ public final class FilledCommand {
     private String description;
     private List<FilledParameter> parameters = new ArrayList<>();
     private List<FilledCommand> children = new ArrayList<>();
+
     private boolean hasPageParameter;
+    private boolean hasOptional;
+    private boolean hasMultiline;
 
     public FilledCommand(String name, Method method, Permission permission, String description) {
         this.method = method;
@@ -40,8 +43,11 @@ public final class FilledCommand {
         children.add(child);
     }
 
-    public void addParameter(boolean optional, int minimalLength, int maximalLength, String regex, Class<?> parameterType) {
-        checkStateAndAddParameter(new NormalFilledParameter(optional, minimalLength, maximalLength, regex, parameterType));
+    public void addParameter(boolean optional, boolean isMultiline, int minimalLength, int maximalLength, String regex, Class<?> parameterType) {
+        checkStateAndAddParameter(new NormalFilledParameter(optional, isMultiline, minimalLength, maximalLength, regex, parameterType));
+        if (optional) {
+            hasOptional = true;
+        }
     }
 
     public void addParameter(Class<?> parameterType) {
@@ -54,6 +60,12 @@ public final class FilledCommand {
         checkStateAndAddParameter(new CommandSenderFilledParameter());
     }
 
+
+    public void addCommandSourceParameter() {
+
+        checkStateAndAddParameter(new CommandSourceFilledParameter());
+    }
+
     public void addPageParameter() {
         checkStateAndAddParameter(new PageFilledParameter());
         hasPageParameter = true;
@@ -61,7 +73,11 @@ public final class FilledCommand {
 
     private void checkStateAndAddParameter(FilledParameter parameter) {
         if (hasPageParameter) {
-            throw new IllegalStateException("the PageParameter should be the last parameter in a command");
+            throw new IllegalStateException("The PageParameter should always be the last parameter in a command");
+        } else if (hasOptional) {
+            throw new IllegalStateException("Only the last parameter can be optional");
+        } else if (hasMultiline) {
+            throw new IllegalStateException("Only the last parameter can be multiline");
         }
 
         parameters.add(parameter);
@@ -88,4 +104,5 @@ public final class FilledCommand {
     public boolean isHasPageParameter() {
         return hasPageParameter;
     }
+
 }

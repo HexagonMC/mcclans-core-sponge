@@ -11,9 +11,9 @@ public class StringParser implements ParameterParser<String> {
     public ParseResult<String> parseValue(String value, NormalFilledParameter parameter) {
         if (parameter.getMaximalLength() == -1 || value.length() <= parameter.getMaximalLength()) {
             if (parameter.getMinimalLength() == -1 || value.length() >= parameter.getMinimalLength()) {
-                if(parameter.getRegex() == null || value.matches(parameter.getRegex())) {
+                if ("".equals(parameter.getRegex()) || value.matches(parameter.getRegex())) {
                     return ParseResult.newSuccessResult(value);
-                } else{
+                } else {
                     return ParseResult.newErrorResult(String.format("Value should (%s)", parameter.getRegex()));
                 }
             } else {

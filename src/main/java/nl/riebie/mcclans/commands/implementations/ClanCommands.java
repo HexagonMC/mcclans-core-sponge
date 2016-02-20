@@ -7,16 +7,16 @@ import nl.riebie.mcclans.commands.annotations.ChildGroup;
 import nl.riebie.mcclans.commands.annotations.Command;
 import nl.riebie.mcclans.commands.annotations.PageParameter;
 import nl.riebie.mcclans.commands.annotations.Parameter;
-import nl.riebie.mcclans.commands.constraints.length.ClanNameLengthConstraint;
-import nl.riebie.mcclans.commands.constraints.length.ClanTagLengthConstraint;
-import nl.riebie.mcclans.commands.constraints.regex.ClanNameRegexConstraint;
-import nl.riebie.mcclans.commands.constraints.regex.ClanTagRegexConstraint;
+import nl.riebie.mcclans.commands.constraints.length.LengthConstraints;
+import nl.riebie.mcclans.commands.constraints.regex.RegexConstraint;
+import nl.riebie.mcclans.commands.constraints.regex.RegexConstraints;
 import nl.riebie.mcclans.comparators.ClanKdrComparator;
 import nl.riebie.mcclans.messages.Messages;
 import nl.riebie.mcclans.player.ClanPlayerImpl;
 import nl.riebie.mcclans.table.HorizontalTable;
 import nl.riebie.mcclans.utils.UUIDUtils;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 
@@ -32,8 +32,8 @@ public class ClanCommands {
     @Command(name = "create", description = CLAN_CREATE_DESCRIPTION)
     public void clanCreateCommand(
             ClanPlayerImpl clanPlayer,
-            @Parameter(length = ClanTagLengthConstraint.class, regex = ClanTagRegexConstraint.class) String clanTag,
-            @Parameter(length = ClanNameLengthConstraint.class, regex = ClanNameRegexConstraint.class) String clanName) {
+            @Parameter(length = LengthConstraints.CLAN_TAG, regex = RegexConstraints.CLAN_TAG) String clanTag,
+            @Parameter(length = LengthConstraints.CLAN_NAME, regex = RegexConstraints.CLAN_NAME) String clanName) {
         ClansImpl clansImpl = ClansImpl.getInstance();
         if (clansImpl.tagIsFree(clanTag)) {
             ClanImpl clanImpl = clansImpl.createClan(clanTag, clanName, clanPlayer);
@@ -63,9 +63,9 @@ public class ClanCommands {
     }
 
     @Command(name = "invite")
-    public void clanInviteCommand(ClanPlayerImpl clanPlayer, @Parameter String playerName) {
+    public void clanInviteCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer, @Parameter String playerName) {
         ClanImpl clan = clanPlayer.getClan();
-        Player player = Sponge.getServer().getPlayer(clanPlayer.getUUID()).get();       //TODO add getting CommandSource in CommandHandler
+        Player player = (Player) commandSource;       //TODO add check if it is a player
         if (clan != null) {
             UUID uuid = UUIDUtils.getUUID(playerName);
             if (uuid == null) {

@@ -88,6 +88,8 @@ public class CommandManager {
     private void handleParameter(java.lang.reflect.Parameter parameter, FilledCommand filledCommand) {
         if (CommandSender.class.isAssignableFrom(parameter.getType())) {
             filledCommand.addCommandSenderParameter();
+        } else if (CommandSource.class.isAssignableFrom(parameter.getType())) {
+            filledCommand.addCommandSourceParameter();
         } else {
             handleAnnotatedParameter(parameter, filledCommand);
         }
@@ -101,16 +103,11 @@ public class CommandManager {
                     filledCommand.addPageParameter();
                 } else if (annotation instanceof Parameter) {
                     Parameter parameterValues = (Parameter) annotation;
-                    try {
-                        LengthConstraint lengthConstraint = parameterValues.length().newInstance();
-                        RegexConstraint regexConstraint = parameterValues.regex().newInstance();
-                        filledCommand.addParameter(parameterValues.optional(), lengthConstraint.getMinimalLength(),
-                                lengthConstraint.getMaximalLength(), regexConstraint.getRegex(), parameter.getType());
-                    } catch (InstantiationException e) {
-                        e.printStackTrace();
-                    } catch (IllegalAccessException e) {
-                        e.printStackTrace();
-                    }
+
+                    LengthConstraint lengthConstraint = parameterValues.length();
+                    RegexConstraint regexConstraint = parameterValues.regex();
+                    filledCommand.addParameter(parameterValues.optional(), parameterValues.multiline(), lengthConstraint.getMinimalLength(),
+                            lengthConstraint.getMaximalLength(), regexConstraint.getRegex(), parameter.getType());
 
                 }
             }
@@ -146,11 +143,16 @@ public class CommandManager {
             }
             List<FilledParameter> parameters = filledCommand.getParameters();
             Object[] objects = new Object[parameters.size()];
+            int argOffset = i;
             for (int j = 0; j < parameters.size(); j++) {
-                int index = (i - 1) + j;
+                int index = argOffset + j;
                 FilledParameter parameter = parameters.get(j);
                 if (parameter instanceof CommandSenderFilledParameter) {
                     objects[j] = commandSender;
+                    argOffset--;
+                } else if (parameter instanceof CommandSourceFilledParameter) {
+                    objects[j] = commandSource;
+                    argOffset--;
                 } else if (parameter instanceof NormalFilledParameter) {
                     NormalFilledParameter normalFilledParameter = (NormalFilledParameter) parameter;
                     Class<?> type = normalFilledParameter.getParameterType();
