@@ -2,19 +2,20 @@ package nl.riebie.mcclans.listeners;
 
 import nl.riebie.mcclans.ClansImpl;
 import nl.riebie.mcclans.api.enums.Permission;
+import nl.riebie.mcclans.channels.AllyMessageChannel;
+import nl.riebie.mcclans.channels.ClanMessageChannel;
 import nl.riebie.mcclans.clan.ClanImpl;
 import nl.riebie.mcclans.config.Config;
 import nl.riebie.mcclans.enums.PlayerChatState;
 import nl.riebie.mcclans.messages.Messages;
 import nl.riebie.mcclans.player.ClanPlayerImpl;
-import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.message.MessageChannelEvent;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.channel.MessageChannel;
 import org.spongepowered.api.text.channel.MutableMessageChannel;
-import org.spongepowered.api.text.format.TextColors;
 
 import java.util.Optional;
 
@@ -23,7 +24,7 @@ import java.util.Optional;
  */
 public class PlayerChatListener {
 
-    @Listener
+    @Listener(order = Order.LATE)
     public void onMessageChannelChat(MessageChannelEvent.Chat event) {
         if (event.isCancelled()) {
             return;
@@ -56,12 +57,12 @@ public class PlayerChatListener {
         }
 
         // TODO SPONGE which message to get, getMessage() or getRawMessage()?
-//        Optional<Text> messageOpt = event.getMessage();
-//        if (!messageOpt.isPresent()) {
-//            return;
-//        }
-//        Text message = messageOpt.get();
-        Text message = event.getRawMessage();
+        Optional<Text> messageOpt = event.getMessage();
+        if (!messageOpt.isPresent()) {
+            return;
+        }
+        Text message = messageOpt.get();
+        //Text message = event.getRawMessage();
 
         ClanImpl clan = clanPlayer.getClan();
         MutableMessageChannel channel = messageChannelOpt.get().asMutable();
@@ -69,10 +70,9 @@ public class PlayerChatListener {
         switch (chatState) {
             case GLOBAL:
                 if (Config.getBoolean(Config.USE_CHAT_CLAN_TAGS)) {
-
                     Text newMessage = Text.join(
                             clanPlayer.getClan().getTagColored(),
-                            Text.of(" " + player.getName() + " "),
+                            Text.of(" "),
                             message
                     );
                     event.setMessage(newMessage);
@@ -80,24 +80,25 @@ public class PlayerChatListener {
                 break;
             case CLAN:
                 if (clanPlayer.getRank().hasPermission(Permission.clanchat)) {
-                    Text newMessage = Text.join(
-                            Text.builder("[").color(TextColors.GRAY).build(),
-                            Text.builder("CC").color(TextColors.YELLOW).build(),
-                            Text.builder("] [").color(TextColors.GRAY).build(),
-                            Text.builder(clanPlayer.getRank().getName()).color(TextColors.BLUE).build(),
-                            Text.builder("] ").color(TextColors.GRAY).build(),
-                            Text.of(player.getName() + " "),
-                            message.toBuilder().color(TextColors.YELLOW).build()
-                    );
-                    event.setMessage(newMessage);
-
-                    channel.clearMembers();
-                    for (ClanPlayerImpl recipient : clan.getMembersImpl()) {
-                        Optional<Player> recipientPlayerOpt = Sponge.getServer().getPlayer(recipient.getUUID());
-                        if (recipientPlayerOpt.isPresent()) {
-                            channel.addMember(recipientPlayerOpt.get());
-                        }
-                    }
+                    event.setChannel(ClanMessageChannel.getFor(clanPlayer));
+//                    Text newMessage = Text.join(
+//                            Text.builder("[").color(TextColors.GRAY).build(),
+//                            Text.builder("CC").color(TextColors.YELLOW).build(),
+//                            Text.builder("] [").color(TextColors.GRAY).build(),
+//                            Text.builder(clanPlayer.getRank().getName()).color(TextColors.BLUE).build(),
+//                            Text.builder("] ").color(TextColors.GRAY).build(),
+//                            Text.of(player.getName() + ": "),
+//                            message.toBuilder().color(TextColors.YELLOW).build()
+//                    );
+//                    event.setMessage(newMessage);
+//
+//                    channel.clearMembers();
+//                    for (ClanPlayerImpl recipient : clan.getMembersImpl()) {
+//                        Optional<Player> recipientPlayerOpt = Sponge.getServer().getPlayer(recipient.getUUID());
+//                        if (recipientPlayerOpt.isPresent()) {
+//                            channel.addMember(recipientPlayerOpt.get());
+//                        }
+//                    }
                 } else {
                     event.setCancelled(true);
                     clanPlayer.setChatState(PlayerChatState.GLOBAL);
@@ -106,32 +107,33 @@ public class PlayerChatListener {
                 break;
             case ALLY:
                 if (clanPlayer.getRank().hasPermission(Permission.allychat)) {
-                    Text newMessage = Text.join(
-                            Text.builder("[").color(TextColors.GRAY).build(),
-                            Text.builder("AC").color(TextColors.GOLD).build(),
-                            Text.builder("] [").color(TextColors.GRAY).build(),
-                            clan.getTagColored(),
-                            Text.builder("] ").color(TextColors.GRAY).build(),
-                            Text.of(player.getName() + " "),
-                            message.toBuilder().color(TextColors.GOLD).build()
-                    );
-                    event.setMessage(newMessage);
-
-                    channel.clearMembers();
-                    for (ClanPlayerImpl recipient : clan.getMembersImpl()) {
-                        Optional<Player> recipientPlayerOpt = Sponge.getServer().getPlayer(recipient.getUUID());
-                        if (recipientPlayerOpt.isPresent()) {
-                            channel.addMember(recipientPlayerOpt.get());
-                        }
-                    }
-                    for (ClanImpl ally : clan.getAlliesImpl()) {
-                        for (ClanPlayerImpl recipient : ally.getMembersImpl()) {
-                            Optional<Player> recipientPlayerOpt = Sponge.getServer().getPlayer(recipient.getUUID());
-                            if (recipientPlayerOpt.isPresent()) {
-                                channel.addMember(recipientPlayerOpt.get());
-                            }
-                        }
-                    }
+                    event.setChannel(AllyMessageChannel.getFor(clanPlayer));
+//                    Text newMessage = Text.join(
+//                            Text.builder("[").color(TextColors.GRAY).build(),
+//                            Text.builder("AC").color(TextColors.GOLD).build(),
+//                            Text.builder("] [").color(TextColors.GRAY).build(),
+//                            clan.getTagColored(),
+//                            Text.builder("] ").color(TextColors.GRAY).build(),
+//                            Text.of(player.getName() + ": "),
+//                            message.toBuilder().color(TextColors.GOLD).build()
+//                    );
+//                    event.setMessage(newMessage);
+//
+//                    channel.clearMembers();
+//                    for (ClanPlayerImpl recipient : clan.getMembersImpl()) {
+//                        Optional<Player> recipientPlayerOpt = Sponge.getServer().getPlayer(recipient.getUUID());
+//                        if (recipientPlayerOpt.isPresent()) {
+//                            channel.addMember(recipientPlayerOpt.get());
+//                        }
+//                    }
+//                    for (ClanImpl ally : clan.getAlliesImpl()) {
+//                        for (ClanPlayerImpl recipient : ally.getMembersImpl()) {
+//                            Optional<Player> recipientPlayerOpt = Sponge.getServer().getPlayer(recipient.getUUID());
+//                            if (recipientPlayerOpt.isPresent()) {
+//                                channel.addMember(recipientPlayerOpt.get());
+//                            }
+//                        }
+//                    }
                 } else {
                     event.setCancelled(true);
                     clanPlayer.setChatState(PlayerChatState.GLOBAL);

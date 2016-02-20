@@ -334,22 +334,25 @@ public class ClanImpl implements Clan, Cloneable {
 
     @Override
     public Text getTagColored() {
-        // TODO SPONGE: TextColor
-//        ChatColor colonColor = ChatColor.GRAY;
-//        if (Configuration.useColoredTagsBasedOnClanKDR) {
-//            ClanImpl firstClan = ClansImpl.getInstance().getFirstClan();
-//            ClanImpl secondClan = ClansImpl.getInstance().getSecondClan();
-//            ClanImpl thirdClan = ClansImpl.getInstance().getThirdClan();
-//            if (firstClan != null && firstClan.getTag().equalsIgnoreCase(getTag())) {
-//                colonColor = ChatColor.DARK_RED;
-//            } else if (secondClan != null && secondClan.getTag().equalsIgnoreCase(getTag())) {
-//                colonColor = ChatColor.GOLD;
-//            } else if (thirdClan != null && thirdClan.getTag().equalsIgnoreCase(getTag())) {
-//                colonColor = ChatColor.DARK_BLUE;
-//            }
-//        }
-//        return colonColor + "[" + getTagColor() + getTag() + colonColor + "]" + ChatColor.RESET;
-        return Text.builder(tag).color(TextColors.DARK_PURPLE).build();
+        TextColor colonColor = TextColors.GRAY;
+        if (Config.getBoolean(Config.USE_COLORED_TAGS_BASED_ON_CLAN_KDR)) {
+            ClanImpl firstClan = ClansImpl.getInstance().getFirstClan();
+            ClanImpl secondClan = ClansImpl.getInstance().getSecondClan();
+            ClanImpl thirdClan = ClansImpl.getInstance().getThirdClan();
+            if (firstClan != null && firstClan.getTag().equalsIgnoreCase(getTag())) {
+                colonColor = TextColors.DARK_RED;
+            } else if (secondClan != null && secondClan.getTag().equalsIgnoreCase(getTag())) {
+                colonColor = TextColors.GOLD;
+            } else if (thirdClan != null && thirdClan.getTag().equalsIgnoreCase(getTag())) {
+                colonColor = TextColors.DARK_BLUE;
+            }
+        }
+
+        return Text.join(
+                Text.builder("[").color(colonColor).build(),
+                Text.builder(tag).color(TextColors.DARK_PURPLE).build(),
+                Text.builder("]").color(colonColor).build()
+        );
     }
 
     @Override
