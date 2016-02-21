@@ -1,12 +1,5 @@
 package nl.riebie.mcclans.database.interfaces;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.UUID;
-
 import nl.riebie.mcclans.ClansImpl;
 import nl.riebie.mcclans.MCClans;
 import nl.riebie.mcclans.clan.ClanImpl;
@@ -15,10 +8,13 @@ import nl.riebie.mcclans.clan.RankImpl;
 import nl.riebie.mcclans.config.Config;
 import nl.riebie.mcclans.player.ClanPlayerImpl;
 import nl.riebie.mcclans.player.LastOnlineImpl;
+import nl.riebie.mcclans.utils.Utils;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.Location;
 
-import javax.security.auth.login.Configuration;
+import java.util.*;
+import java.util.Map.Entry;
 
 public abstract class DataLoader {
 
@@ -71,10 +67,10 @@ public abstract class DataLoader {
 
     protected abstract void loadAllies();
 
-    protected void loadedClan(int clanID, String clanTag, String clanName, int ownerID, String tagColor, boolean allowAllyInvites,
+    protected void loadedClan(int clanID, String clanTag, String clanName, int ownerID, String tagColorId, boolean allowAllyInvites,
                               boolean ffProtection, long creationTime, String homeWorld, double homeX, double homeY, double homeZ, float homeYaw, float homePitch,
                               int homeSetTimes, long homeLastSetTimeStamp) {
-        ClanImpl clan = new ClanImpl.Builder(clanID, clanTag, clanName).tagColor(tagColor).acceptAllyInvites(allowAllyInvites)
+        ClanImpl clan = new ClanImpl.Builder(clanID, clanTag, clanName).tagColor(Utils.getTextColorById(tagColorId, TextColors.DARK_PURPLE)).acceptAllyInvites(allowAllyInvites)
                 .ffProtection(ffProtection).creationTime(creationTime).homeSetTimes(homeSetTimes).homeLastSetTimeStamp(homeLastSetTimeStamp).build();
         if (homeWorld != null && Sponge.getServer().getWorld(UUID.fromString(homeWorld)).isPresent()) {
             // TODO SPONGE homeYaw, homePitch

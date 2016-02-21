@@ -1,15 +1,5 @@
 package nl.riebie.mcclans.database.implementations;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Comparator;
-
-import javax.security.auth.login.Configuration;
-import javax.xml.stream.XMLOutputFactory;
-import javax.xml.stream.XMLStreamWriter;
-
 import nl.riebie.mcclans.MCClans;
 import nl.riebie.mcclans.clan.ClanImpl;
 import nl.riebie.mcclans.clan.RankImpl;
@@ -19,6 +9,14 @@ import nl.riebie.mcclans.player.ClanPlayerImpl;
 import nl.riebie.mcclans.utils.FileUtils;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
+
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamWriter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Comparator;
 
 public class XmlSaver extends DataSaver {
 
@@ -105,8 +103,7 @@ public class XmlSaver extends DataSaver {
         clansWriter.writeEndElement();
 
         clansWriter.writeStartElement("tagColor");
-        //TODO SPONGE!
-//        clansWriter.writeCharacters(clan.getTagColor());
+        clansWriter.writeCharacters(clan.getTagColor().getId());
         clansWriter.writeEndElement();
 
         clansWriter.writeStartElement("allowAllyInvites");

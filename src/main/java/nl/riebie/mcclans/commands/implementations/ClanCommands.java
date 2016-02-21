@@ -29,7 +29,7 @@ public class ClanCommands {
     @Command(name = "test")
     public void clanTestCommand(ClanPlayerImpl clanPlayer, @Parameter String test, @OptionalParameter(Integer.class) Optional<Integer> optionalMessage) {
         String message = test + " ";
-        if(optionalMessage.isPresent()){
+        if (optionalMessage.isPresent()) {
             int value = optionalMessage.get();
             message += value;
         }
@@ -54,7 +54,13 @@ public class ClanCommands {
 
         HorizontalTable<ClanImpl> table = new HorizontalTable<>("Clans", 10, (row, clan, i) -> {
             row.setValue("Rank", Text.of(i + 1));
-            row.setValue("Clan", Text.join(Text.builder().color(clan.getTagColor()).append(Text.of(clan.getTag())).build(), Text.of(" ", clan.getName())));
+            row.setValue(
+                    "Clan",
+                    Text.join(
+                            clan.getTagColored(),
+                            Text.of(" ", clan.getName())
+                    )
+            );
             row.setValue("KDR", Text.of(clan.getKDR()));
             row.setValue("Members", Text.of(clan.getMemberCount()));
 

@@ -1,8 +1,5 @@
 package nl.riebie.mcclans.database.implementations;
 
-import java.sql.PreparedStatement;
-import java.util.UUID;
-
 import nl.riebie.mcclans.api.enums.Permission;
 import nl.riebie.mcclans.clan.ClanImpl;
 import nl.riebie.mcclans.clan.RankImpl;
@@ -13,6 +10,9 @@ import nl.riebie.mcclans.database.interfaces.DataSaver;
 import nl.riebie.mcclans.player.ClanPlayerImpl;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
+
+import java.sql.PreparedStatement;
+import java.util.UUID;
 
 public class DatabaseSaver extends DataSaver {
 
@@ -122,8 +122,7 @@ public class DatabaseSaver extends DataSaver {
         String tag = clan.getTag();
         String name = clan.getName();
         int ownerID = clan.getOwner().getID();
-        //TODO SPONGE
-//        String tagColor = clan.getTagColor();
+        String tagColorId = clan.getTagColor().getId();
         boolean allowAllyInvites = clan.isAllowingAllyInvites();
         boolean ffProtection = clan.isFfProtected();
         long creationTime = clan.getCreationDate().getTime();
@@ -147,7 +146,7 @@ public class DatabaseSaver extends DataSaver {
         long homeLastSetTimeStamp = clan.getHomeSetTimeStamp();
 
         return QueryGenerator.createInsertQuery("mcc_clans", databaseConnectionOwner.getConnection()).value("clan_id", clanID).value("clantag", tag)
-                .value("clanname", name).value("clanplayer_id_owner", ownerID).value("tagcolor", "")//TODO tagcolor -> SPONGE
+                .value("clanname", name).value("clanplayer_id_owner", ownerID).value("tagcolor", tagColorId)
                 .value("allow_ally_invites", allowAllyInvites).value("clanhome_world", clanHomeWorld).value("clanhome_x", clanHomeX)
                 .value("clanhome_y", clanHomeY).value("clanhome_z", clanHomeZ).value("clanhome_yaw", clanHomeYaw)
                 .value("clanhome_pitch", clanHomePitch).value("clanhome_set_times", homeSetTimes)

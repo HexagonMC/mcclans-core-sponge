@@ -1,10 +1,10 @@
 package nl.riebie.mcclans.database.implementations;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
 import nl.riebie.mcclans.database.DatabaseConnectionOwner;
 import nl.riebie.mcclans.database.interfaces.DataLoader;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public class DatabaseLoader extends DataLoader {
 
@@ -30,7 +30,7 @@ public class DatabaseLoader extends DataLoader {
 					String clanTag = clansResultSet.getString("clantag");
 					String clanName = clansResultSet.getString("clanname");
 					int ownerID = clansResultSet.getInt("clanplayer_id_owner");
-					String tagColor = clansResultSet.getString("tagcolor");
+					String tagColorId = clansResultSet.getString("tagcolor");
 					boolean allowAllyInvites = clansResultSet.getBoolean("allow_ally_invites");
 					boolean ffProtection = clansResultSet.getBoolean("ff_protection");
 					long creationTime = clansResultSet.getLong("creation_time");
@@ -45,7 +45,7 @@ public class DatabaseLoader extends DataLoader {
 					int homeSetTimes = clansResultSet.getInt("clanhome_set_times");
 					long homeLastSetTimeStamp = clansResultSet.getLong("clanhome_set_timestamp");
 
-					super.loadedClan(clanID, clanTag, clanName, ownerID, tagColor, allowAllyInvites, ffProtection, creationTime, homeWorld, homeX,
+					super.loadedClan(clanID, clanTag, clanName, ownerID, tagColorId, allowAllyInvites, ffProtection, creationTime, homeWorld, homeX,
 							homeY, homeZ, homeYaw, homePitch, homeSetTimes, homeLastSetTimeStamp);
 				}
 			} catch (SQLException e) {

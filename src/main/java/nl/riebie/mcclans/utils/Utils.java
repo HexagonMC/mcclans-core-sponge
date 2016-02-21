@@ -19,14 +19,42 @@ public final class Utils {
         // Private constructor
     }
 
-    public static TextColor getTextColorByName(String colorName) {
-//        for (TextColor chatColor : TextColors.values()) {
-//            if (chatColor.name().equalsIgnoreCase(colorName)) {
-//                return chatColor;
-//            }
-//        }
-        // TODO SPONGE: FIX MEH TIS NOT A FOCKIN ENUM
-        return null;
+    public static TextColor getTextColorById(String textColorId, TextColor fallbackColor) {
+        if (TextColors.AQUA.getId().equalsIgnoreCase(textColorId)) {
+            return TextColors.AQUA;
+        } else if (TextColors.BLACK.getId().equalsIgnoreCase(textColorId)) {
+            return TextColors.BLACK;
+        } else if (TextColors.BLUE.getId().equalsIgnoreCase(textColorId)) {
+            return TextColors.BLUE;
+        } else if (TextColors.DARK_AQUA.getId().equalsIgnoreCase(textColorId)) {
+            return TextColors.DARK_AQUA;
+        } else if (TextColors.DARK_BLUE.getId().equalsIgnoreCase(textColorId)) {
+            return TextColors.DARK_BLUE;
+        } else if (TextColors.DARK_GRAY.getId().equalsIgnoreCase(textColorId)) {
+            return TextColors.DARK_GRAY;
+        } else if (TextColors.DARK_GREEN.getId().equalsIgnoreCase(textColorId)) {
+            return TextColors.DARK_GREEN;
+        } else if (TextColors.DARK_PURPLE.getId().equalsIgnoreCase(textColorId)) {
+            return TextColors.DARK_PURPLE;
+        } else if (TextColors.DARK_RED.getId().equalsIgnoreCase(textColorId)) {
+            return TextColors.DARK_RED;
+        } else if (TextColors.GOLD.getId().equalsIgnoreCase(textColorId)) {
+            return TextColors.GOLD;
+        } else if (TextColors.GRAY.getId().equalsIgnoreCase(textColorId)) {
+            return TextColors.GRAY;
+        } else if (TextColors.GREEN.getId().equalsIgnoreCase(textColorId)) {
+            return TextColors.GREEN;
+        } else if (TextColors.LIGHT_PURPLE.getId().equalsIgnoreCase(textColorId)) {
+            return TextColors.LIGHT_PURPLE;
+        } else if (TextColors.RED.getId().equalsIgnoreCase(textColorId)) {
+            return TextColors.RED;
+        } else if (TextColors.WHITE.getId().equalsIgnoreCase(textColorId)) {
+            return TextColors.WHITE;
+        } else if (TextColors.YELLOW.getId().equalsIgnoreCase(textColorId)) {
+            return TextColors.YELLOW;
+        } else {
+            return fallbackColor;
+        }
     }
 
     public static Text formatLocation(@Nullable Location<World> location) {

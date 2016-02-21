@@ -1,8 +1,8 @@
 package nl.riebie.mcclans.database.implementations;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import nl.riebie.mcclans.MCClans;
+import nl.riebie.mcclans.database.interfaces.DataLoader;
+import nl.riebie.mcclans.utils.FileUtils;
 
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
@@ -10,10 +10,9 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
-
-import nl.riebie.mcclans.MCClans;
-import nl.riebie.mcclans.database.interfaces.DataLoader;
-import nl.riebie.mcclans.utils.FileUtils;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 
 public class XmlLoader extends DataLoader {
 
@@ -88,7 +87,7 @@ public class XmlLoader extends DataLoader {
         String clanTag = null;
         String clanName = null;
         int ownerID = -1;
-        String tagColor = null;
+        String tagColorId = null;
         boolean allowAllyInvites = true;
         boolean ffProtection = true;
         long creationTime = 0;
@@ -125,7 +124,7 @@ public class XmlLoader extends DataLoader {
                         ownerID = Integer.parseInt(xmlEvent.asCharacters().getData());
                     } else if (startElement.getName().getLocalPart().equals("tagColor")) {
                         xmlEvent = xmlEventReader.nextEvent();
-                        tagColor = xmlEvent.asCharacters().getData();
+                        tagColorId = xmlEvent.asCharacters().getData();
                     } else if (startElement.getName().getLocalPart().equals("allowAllyInvites")) {
                         xmlEvent = xmlEventReader.nextEvent();
                         allowAllyInvites = Boolean.parseBoolean(xmlEvent.asCharacters().getData());
@@ -169,7 +168,7 @@ public class XmlLoader extends DataLoader {
                 if (xmlEvent.isEndElement()) {
                     EndElement endElement = xmlEvent.asEndElement();
                     if (endElement.getName().getLocalPart().equals("clan")) {
-                        super.loadedClan(clanID, clanTag, clanName, ownerID, tagColor, allowAllyInvites, ffProtection, creationTime, homeWorld,
+                        super.loadedClan(clanID, clanTag, clanName, ownerID, tagColorId, allowAllyInvites, ffProtection, creationTime, homeWorld,
                                 homeX, homeY, homeZ, homeYaw, homePitch, homeSetTimes, homeLastSetTimeStamp);
                     }
                 }

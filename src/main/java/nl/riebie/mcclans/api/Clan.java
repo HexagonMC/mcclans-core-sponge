@@ -214,11 +214,11 @@ public interface Clan {
     public TextColor getTagColor();
 
     /**
-     * Set the color of the clan tag by text
+     * Set the color of the clan tag
      *
-     * @param textColor the name of the color to be set
+     * @param textColor the the color to be set
      */
-    public boolean setTagColor(String textColor);
+    public boolean setTagColor(TextColor textColor);
 
     /**
      * Get the clan of the given clanTag if it is an ally of this clan

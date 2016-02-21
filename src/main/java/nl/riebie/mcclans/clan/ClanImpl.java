@@ -30,8 +30,7 @@ public class ClanImpl implements Clan, Cloneable {
     private Location home;
     private int homeSetTimes = 0;
     private long homeLastSetTimeStamp = -1;
-    // TODO SPONGE: TextColor
-    // private String tagColor = ChatColor.DARK_PURPLE.toString();
+    private TextColor tagColor = TextColors.DARK_PURPLE;
     private String tag;
     private HashMap<String, RankImpl> ranks = new HashMap<String, RankImpl>();
     private List<ClanPlayerImpl> members = new ArrayList<ClanPlayerImpl>();
@@ -48,8 +47,7 @@ public class ClanImpl implements Clan, Cloneable {
         this.tag = builder.tag;
         this.name = builder.name;
         this.owner = builder.owner;
-        // TODO SPONGE:
-        // this.tagColor = builder.tagColor;
+        this.tagColor = builder.tagColor;
         this.allowAllyInvites = builder.acceptAllyInvites;
         this.home = builder.home;
         this.homeLastSetTimeStamp = builder.homeLastSetTimeStamp;
@@ -350,7 +348,7 @@ public class ClanImpl implements Clan, Cloneable {
 
         return Text.join(
                 Text.builder("[").color(colonColor).build(),
-                Text.builder(tag).color(TextColors.DARK_PURPLE).build(),
+                Text.builder(tag).color(tagColor).build(),
                 Text.builder("]").color(colonColor).build()
         );
     }
@@ -419,8 +417,7 @@ public class ClanImpl implements Clan, Cloneable {
             member.setRank(null);
 
             members.remove(member);
-            // TODO SPONGE:
-//            EventDispatcher.getInstance().dispatchClanMemberLeaveEvent(this, member);
+            EventDispatcher.getInstance().dispatchClanMemberLeaveEvent(this, member);
             TaskForwarder.sendUpdateClanPlayer(member);
         }
     }
@@ -447,15 +444,12 @@ public class ClanImpl implements Clan, Cloneable {
 
     @Override
     public TextColor getTagColor() {
-        // TODO SPONGE: TextColor
-        // return this.tagColor;
-        return TextColors.BLUE;
+        return this.tagColor;
     }
 
     @Override
-    public boolean setTagColor(String chatColor) {
-        // TODO SPONGE:
-//        this.tagColor = chatColor;
+    public boolean setTagColor(TextColor tagColor) {
+        this.tagColor = tagColor;
         TaskForwarder.sendUpdateClan(this);
         return true;
     }
@@ -680,8 +674,7 @@ public class ClanImpl implements Clan, Cloneable {
         private Location home;
         private int homeSetTimes = 0;
         private long homeLastSetTimeStamp = -1;
-        // TODO SPONGE: TextColor
-        // private String tagColor = ChatColor.DARK_PURPLE.toString();
+        private TextColor tagColor = TextColors.DARK_PURPLE;
         private String tag;
         private boolean acceptAllyInvites = true;
         private Date creationDate = new Date();
@@ -718,10 +711,8 @@ public class ClanImpl implements Clan, Cloneable {
             return this;
         }
 
-        public Builder tagColor(String tagColor) {
-            // TODO SPONGE: TextColor
-//            this.tagColor = tagColor;
-//            return this;
+        public Builder tagColor(TextColor tagColor) {
+            this.tagColor = tagColor;
             return this;
         }
 
