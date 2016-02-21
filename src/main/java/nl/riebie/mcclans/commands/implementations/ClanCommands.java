@@ -3,12 +3,8 @@ package nl.riebie.mcclans.commands.implementations;
 import nl.riebie.mcclans.ClansImpl;
 import nl.riebie.mcclans.api.enums.Permission;
 import nl.riebie.mcclans.clan.ClanImpl;
-import nl.riebie.mcclans.commands.annotations.ChildGroup;
-import nl.riebie.mcclans.commands.annotations.Command;
-import nl.riebie.mcclans.commands.annotations.PageParameter;
-import nl.riebie.mcclans.commands.annotations.Parameter;
+import nl.riebie.mcclans.commands.annotations.*;
 import nl.riebie.mcclans.commands.constraints.length.LengthConstraints;
-import nl.riebie.mcclans.commands.constraints.regex.RegexConstraint;
 import nl.riebie.mcclans.commands.constraints.regex.RegexConstraints;
 import nl.riebie.mcclans.comparators.ClanKdrComparator;
 import nl.riebie.mcclans.messages.Messages;
@@ -21,6 +17,7 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -28,6 +25,16 @@ import java.util.UUID;
  */
 public class ClanCommands {
     private final static String CLAN_CREATE_DESCRIPTION = "Create a clan";
+
+    @Command(name = "test")
+    public void clanTestCommand(ClanPlayerImpl clanPlayer, @Parameter String test, @OptionalParameter(Integer.class) Optional<Integer> optionalMessage) {
+        String message = test + " ";
+        if(optionalMessage.isPresent()){
+            int value = optionalMessage.get();
+            message += value;
+        }
+        clanPlayer.sendMessage(Text.of(message));
+    }
 
     @Command(name = "create", description = CLAN_CREATE_DESCRIPTION)
     public void clanCreateCommand(

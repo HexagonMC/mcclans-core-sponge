@@ -9,11 +9,13 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Created by Mirko on 16/01/2016.
+ * Created by Mirko on 21/02/2016.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.PARAMETER)
-public @interface Parameter {
+public @interface OptionalParameter {
+    Class<?> value();
+
     boolean multiline() default false;
 
     LengthConstraints length() default LengthConstraints.EMPTY;

@@ -7,6 +7,4 @@ import nl.riebie.mcclans.commands.FilledParameters.NormalFilledParameter;
  */
 public interface ParameterParser<T> {
     ParseResult<T> parseValue(String value, NormalFilledParameter parameter);
-
-    ParseResult<T> addPreviousValue(T prev);
 }

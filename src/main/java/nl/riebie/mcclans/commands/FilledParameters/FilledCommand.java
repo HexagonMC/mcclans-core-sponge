@@ -30,6 +30,10 @@ public final class FilledCommand {
         this.name = name;
     }
 
+    public String getName() {
+        return name;
+    }
+
     public FilledCommand getChild(String name) {
         for (FilledCommand command : children) {
             if (command.name.equals(name)) {
@@ -43,9 +47,10 @@ public final class FilledCommand {
         children.add(child);
     }
 
-    public void addParameter(boolean optional, boolean isMultiline, int minimalLength, int maximalLength, String regex, Class<?> parameterType) {
-        checkStateAndAddParameter(new NormalFilledParameter(optional, isMultiline, minimalLength, maximalLength, regex, parameterType));
-        if (optional) {
+    public void addParameter(Class<?> optional, boolean isMultiline, int minimalLength, int maximalLength, String regex, Class<?> parameterType) {
+        NormalFilledParameter normalFilledParameter = new NormalFilledParameter(optional, isMultiline, minimalLength, maximalLength, regex, parameterType);
+        checkStateAndAddParameter(normalFilledParameter);
+        if (normalFilledParameter.isOptional()) {
             hasOptional = true;
         }
     }

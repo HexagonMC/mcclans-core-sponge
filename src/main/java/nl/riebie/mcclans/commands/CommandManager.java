@@ -3,10 +3,7 @@ package nl.riebie.mcclans.commands;
 import nl.riebie.mcclans.ClansImpl;
 import nl.riebie.mcclans.api.CommandSender;
 import nl.riebie.mcclans.commands.FilledParameters.*;
-import nl.riebie.mcclans.commands.annotations.ChildGroup;
-import nl.riebie.mcclans.commands.annotations.Command;
-import nl.riebie.mcclans.commands.annotations.PageParameter;
-import nl.riebie.mcclans.commands.annotations.Parameter;
+import nl.riebie.mcclans.commands.annotations.*;
 import nl.riebie.mcclans.commands.parsers.*;
 import nl.riebie.mcclans.commands.constraints.length.LengthConstraint;
 import nl.riebie.mcclans.commands.constraints.regex.RegexConstraint;
@@ -18,10 +15,7 @@ import org.spongepowered.api.text.Text;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Created by Mirko on 16/01/2016.
@@ -103,12 +97,33 @@ public class CommandManager {
                     filledCommand.addPageParameter();
                 } else if (annotation instanceof Parameter) {
                     Parameter parameterValues = (Parameter) annotation;
-
+                    Set<Class<?>> validParametersList = parameterValidatorMap.keySet();
+                    if (!validParametersList.contains(parameter.getType())) {
+                        StringBuilder stringBuilder = new StringBuilder();
+                        boolean first = true;
+                        for (Class<?> validType : validParametersList) {
+                            if (!first) {
+                                stringBuilder.append(", ");
+                            }
+                            stringBuilder.append(validType.getSimpleName());
+                            first = false;
+                        }
+                        throw new IllegalArgumentException(String.format("Parameter '%s' should be of one of the following types: %s", parameter.getName(), stringBuilder.toString()));
+                    }
                     LengthConstraint lengthConstraint = parameterValues.length();
                     RegexConstraint regexConstraint = parameterValues.regex();
-                    filledCommand.addParameter(parameterValues.optional(), parameterValues.multiline(), lengthConstraint.getMinimalLength(),
+                    filledCommand.addParameter(null, parameterValues.multiline(), lengthConstraint.getMinimalLength(),
                             lengthConstraint.getMaximalLength(), regexConstraint.getRegex(), parameter.getType());
 
+                } else if (annotation instanceof OptionalParameter) {
+                    OptionalParameter parameterValues = (OptionalParameter) annotation;
+                    if (parameter.getType() != Optional.class) {
+                        throw new IllegalArgumentException(String.format("Optional parameter '%s' should be of the Optional type", parameter.getName()));
+                    }
+                    LengthConstraint lengthConstraint = parameterValues.length();
+                    RegexConstraint regexConstraint = parameterValues.regex();
+                    filledCommand.addParameter(parameterValues.value(), parameterValues.multiline(), lengthConstraint.getMinimalLength(),
+                            lengthConstraint.getMaximalLength(), regexConstraint.getRegex(), parameter.getType());
                 }
             }
         } else {
@@ -119,7 +134,7 @@ public class CommandManager {
     public void executeCommand(CommandSource commandSource, String[] args) {
         CommandSender commandSender = getCommandSender(commandSource);
         String firstParam = args[0];
-        int page = 0;
+        int page = 1;
         if (firstParam.equals("page")) {
             FilledCommand filledCommand = lastExecutedPageCommand.get(commandSender);
             Object[] objects = lastExecutedPageCommandData.get(commandSender);
@@ -155,18 +170,42 @@ public class CommandManager {
                     argOffset--;
                 } else if (parameter instanceof NormalFilledParameter) {
                     NormalFilledParameter normalFilledParameter = (NormalFilledParameter) parameter;
+
                     Class<?> type = normalFilledParameter.getParameterType();
-                    ParameterParser<?> parser = parameterValidatorMap.get(type);
-                    ParseResult<?> parseResult = parser.parseValue(args[index], normalFilledParameter);
-                    if (parseResult.isSuccess()) {
-                        objects[j] = parseResult.getItem();
+                    if (normalFilledParameter.isOptional()) {
+                        type = normalFilledParameter.getOptionalType();
+                        if (index < args.length) {
+                            ParameterParser<?> parser = parameterValidatorMap.get(type);
+                            ParseResult<?> parseResult = parser.parseValue(args[index], normalFilledParameter);
+                            if (parseResult.isSuccess()) {
+                                objects[j] = Optional.of(parseResult.getItem());
+                            } else {
+                                commandSender.sendMessage(Text.of(parseResult.getErrorMessage()));
+                                return;
+                            }
+                        } else {
+                            objects[j] = Optional.empty();
+                        }
                     } else {
-                        commandSender.sendMessage(Text.of(parseResult.getErrorMessage()));
-                        return;
+                        ParameterParser<?> parser = parameterValidatorMap.get(type);
+                        ParseResult<?> parseResult = parser.parseValue(args[index], normalFilledParameter);
+                        if (parseResult.isSuccess()) {
+                            objects[j] = parseResult.getItem();
+                        } else {
+                            commandSender.sendMessage(Text.of(parseResult.getErrorMessage()));
+                            return;
+                        }
                     }
                 } else if (parameter instanceof PageFilledParameter) {
                     lastExecutedPageCommand.put(commandSender, filledCommand);
                     lastExecutedPageCommandData.put(commandSender, objects);
+                    if (index < args.length) {
+                        IntegerParser integerParser = new IntegerParser();
+                        ParseResult<Integer> parseResult = integerParser.parseValue(args[index], new NormalFilledParameter(Integer.class));
+                        if (parseResult.isSuccess()) {
+                            page = parseResult.getItem();
+                        }
+                    }
                     objects[j] = page;
                 }
             }
