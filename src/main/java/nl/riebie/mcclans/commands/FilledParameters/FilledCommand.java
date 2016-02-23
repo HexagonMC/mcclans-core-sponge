@@ -110,4 +110,7 @@ public final class FilledCommand {
         return hasPageParameter;
     }
 
+    public Permission getPermission() {
+        return permission;
+    }
 }
