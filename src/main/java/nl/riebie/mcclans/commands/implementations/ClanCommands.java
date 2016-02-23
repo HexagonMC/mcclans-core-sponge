@@ -66,7 +66,7 @@ public class ClanCommands {
     public void clanCreateCommand(
             ClanPlayerImpl clanPlayer,
             @Parameter(length = LengthConstraints.CLAN_TAG, regex = RegexConstraints.CLAN_TAG) String clanTag,
-            @Parameter(length = LengthConstraints.CLAN_NAME, regex = RegexConstraints.CLAN_NAME) String clanName) {
+            @Multiline @Parameter(length = LengthConstraints.CLAN_NAME, regex = RegexConstraints.CLAN_NAME) String clanName) {
         ClansImpl clansImpl = ClansImpl.getInstance();
         if (clansImpl.tagIsFree(clanTag)) {
             ClanImpl clanImpl = clansImpl.createClan(clanTag, clanName, clanPlayer);
