@@ -12,6 +12,7 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.channel.MessageChannel;
 
 import java.util.Optional;
 
@@ -20,59 +21,67 @@ import java.util.Optional;
  */
 public class ClanChatCommands {
     @Command(name = "clan")
-    public void clanChatRootCommand(ClanPlayerImpl clanPlayer, @OptionalParameter(String.class) Optional<String> message) {
-//        if (parameters.isOptionalUsed("message")) {
-        if (clanPlayer.getTempChatState() == null) {
-            Optional<Player> playerOpt = Sponge.getServer().getPlayer(clanPlayer.getUUID());
-            if (!playerOpt.isPresent()) {
-                return;
+    public void clanChatRootCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer, @OptionalParameter(String.class) Optional<String> messageOpt) {
+        if (messageOpt.isPresent()) {
+            String message = messageOpt.get();
+            if (clanPlayer.getTempChatState() == null) {
+                clanPlayer.setTempChatState(PlayerChatState.CLAN);
+                ClanMessageChannel.getFor(clanPlayer).send(commandSource, Text.of(message));
+                clanPlayer.setTempChatState(null);
             }
-            Player player = playerOpt.get();
-
-            clanPlayer.setTempChatState(PlayerChatState.CLAN);
-            ClanMessageChannel.getFor(clanPlayer).send(player, Text.of(message));
-            clanPlayer.setTempChatState(null);
-
-            //Sponge.getServer().getBroadcastChannel().send(player, Text.of(message));
-            // TODO SPONGE ERRYTHIN IN DIS CLASS
-
+        } else {
+            PlayerChatState chatState = clanPlayer.getChatState();
+            if (chatState.equals(PlayerChatState.CLAN)) {
+                clanPlayer.setChatState(PlayerChatState.GLOBAL);
+                Messages.sendNowTalkingInGlobal(commandSource);
+            } else {
+                clanPlayer.setChatState(PlayerChatState.CLAN);
+                Messages.sendNowTalkingInClanChat(commandSource);
+            }
         }
-//        } else {
-//            PlayerChatState chatState = clanPlayer.getChatState();
-//            if (chatState.equals(PlayerChatState.CLAN)) {
-//                clanPlayer.setChatState(PlayerChatState.GLOBAL);
-//                Messages.sendNowTalkingInGlobal(sender);
-//            } else {
-//                clanPlayer.setChatState(PlayerChatState.CLAN);
-//                Messages.sendNowTalkingInClanChat(sender);
-//            }
-//        }
     }
 
     @Command(name = "ally")
-    public void allyChatRootCommand(CommandSource sender, ClanPlayerImpl clanPlayer, @OptionalParameter(String.class) Optional<String> optionalMessage) {
+    public void allyChatRootCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer, @OptionalParameter(String.class) Optional<String> optionalMessage) {
         if (optionalMessage.isPresent()) {
             String message = optionalMessage.get();
             if (clanPlayer.getTempChatState() == null) {
-                Optional<Player> playerOpt = Sponge.getServer().getPlayer(clanPlayer.getUUID());
-                if (!playerOpt.isPresent()) {
-                    return;
-                }
-                Player player = playerOpt.get();
-
                 clanPlayer.setTempChatState(PlayerChatState.ALLY);
-                AllyMessageChannel.getFor(clanPlayer).send(player, Text.of(message));
+                AllyMessageChannel.getFor(clanPlayer).send(commandSource, Text.of(message));
                 clanPlayer.setTempChatState(null);
             }
         } else {
             PlayerChatState chatState = clanPlayer.getChatState();
             if (chatState.equals(PlayerChatState.ALLY)) {
                 clanPlayer.setChatState(PlayerChatState.GLOBAL);
-                Messages.sendNowTalkingInGlobal(sender);
+                Messages.sendNowTalkingInGlobal(commandSource);
             } else {
                 clanPlayer.setChatState(PlayerChatState.ALLY);
-                Messages.sendNowTalkingInAllyChat(sender);
+                Messages.sendNowTalkingInAllyChat(commandSource);
             }
+        }
+    }
+
+    @Command(name = "global")
+    public void globalChatRootCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer, @OptionalParameter(String.class) Optional<String> optionalMessage) {
+        if (optionalMessage.isPresent()) {
+            String message = optionalMessage.get();
+            if (clanPlayer.getTempChatState() == null) {
+                clanPlayer.setTempChatState(PlayerChatState.GLOBAL);
+                MessageChannel messageChannel = Sponge.getServer().getBroadcastChannel();
+                // TODO not fake out <name> message
+                messageChannel.send(
+                        commandSource,
+                        Text.join(
+                                (clanPlayer.getClan() == null) ? Text.of("") : Text.join(clanPlayer.getClan().getTagColored(), Text.of(" ")),
+                                Text.of("<", commandSource.getName(), "> ", message)
+                        )
+                );
+                clanPlayer.setTempChatState(null);
+            }
+        } else {
+            clanPlayer.setChatState(PlayerChatState.GLOBAL);
+            Messages.sendNowTalkingInGlobal(commandSource);
         }
     }
 }
