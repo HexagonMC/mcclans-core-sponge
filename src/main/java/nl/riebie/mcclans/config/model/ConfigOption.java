@@ -1,13 +1,12 @@
 package nl.riebie.mcclans.config.model;
 
-import com.sun.istack.internal.NotNull;
-import com.sun.istack.internal.Nullable;
 import nl.riebie.mcclans.config.constraints.MaximumNumberConstraint;
 import nl.riebie.mcclans.config.constraints.MinimumNumberConstraint;
 import nl.riebie.mcclans.config.constraints.OneOfStringConstraint;
 import nl.riebie.mcclans.config.types.*;
 import nl.riebie.mcclans.utils.MessageBoolean;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -25,7 +24,7 @@ public class ConfigOption {
     private Type mType;
     private List<Constraint> mConstraints;
 
-    public ConfigOption(@NotNull String key, @Nullable String comment, @NotNull Object value, @NotNull Object valueIfConstraintFailed, @NotNull Type type, @NotNull List<Constraint> constraints) {
+    public ConfigOption(String key, @Nullable String comment, Object value, Object valueIfConstraintFailed, Type type, List<Constraint> constraints) {
         this.key = key;
         this.comment = comment;
         this.value = value;
@@ -60,7 +59,7 @@ public class ConfigOption {
         return comment != null && comment.length() != 0;
     }
 
-    public static Builder builder(@NotNull String key, @NotNull Object value) {
+    public static Builder builder(String key, Object value) {
         return new Builder(key, value);
     }
 
@@ -72,7 +71,7 @@ public class ConfigOption {
         private Type mType;
         private List<Constraint> mConstraints = new ArrayList<>();
 
-        private Builder(@NotNull String key, @NotNull Object value) {
+        private Builder(String key, Object value) {
             this.mKey = key;
             this.mValue = value;
             this.mType = Type.inferType(value);
@@ -113,7 +112,7 @@ public class ConfigOption {
             return this;
         }
 
-        public Builder addConstraints(@NotNull Constraint... constraints) {
+        public Builder addConstraints(Constraint... constraints) {
             mConstraints.addAll(Arrays.asList(constraints));
             return this;
         }
