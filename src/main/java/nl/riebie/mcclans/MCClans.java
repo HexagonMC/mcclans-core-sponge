@@ -28,7 +28,7 @@ import java.util.Optional;
 /**
  * Created by K.Volkers on 8-12-2015.
  */
-@Plugin(id = "nl.riebie.MCClans", name = "MCClans", version = "1.0")
+@Plugin(id = "nl.riebie.MCClans", name = "MCClans", version = "0.1")
 public class MCClans {
 
     private static MCClans plugin;

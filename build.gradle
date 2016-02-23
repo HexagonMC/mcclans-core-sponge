@@ -1,5 +1,5 @@
 group 'nl.riebie'
-version '1.0'
+version '0.1'
 
 apply plugin: 'java'
 

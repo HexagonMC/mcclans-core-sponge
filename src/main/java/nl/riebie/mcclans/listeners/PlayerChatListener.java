@@ -62,7 +62,7 @@ public class PlayerChatListener {
             return;
         }
         Text message = messageOpt.get();
-        //Text message = event.getRawMessage();
+//        Text message = event.getRawMessage();
 
         ClanImpl clan = clanPlayer.getClan();
         MutableMessageChannel channel = messageChannelOpt.get().asMutable();
@@ -80,6 +80,7 @@ public class PlayerChatListener {
                 break;
             case CLAN:
                 if (clanPlayer.getRank().hasPermission(Permission.clanchat)) {
+                    event.setMessage(event.getRawMessage());
                     event.setChannel(ClanMessageChannel.getFor(clanPlayer));
 //                    Text newMessage = Text.join(
 //                            Text.builder("[").color(TextColors.GRAY).build(),
@@ -107,6 +108,7 @@ public class PlayerChatListener {
                 break;
             case ALLY:
                 if (clanPlayer.getRank().hasPermission(Permission.allychat)) {
+                    event.setMessage(event.getRawMessage());
                     event.setChannel(AllyMessageChannel.getFor(clanPlayer));
 //                    Text newMessage = Text.join(
 //                            Text.builder("[").color(TextColors.GRAY).build(),
