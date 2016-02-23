@@ -4,6 +4,7 @@ import nl.riebie.mcclans.api.Clan;
 import nl.riebie.mcclans.api.ClanPlayer;
 import nl.riebie.mcclans.api.CommandSender;
 import nl.riebie.mcclans.api.Rank;
+import nl.riebie.mcclans.api.enums.Permission;
 import nl.riebie.mcclans.api.exceptions.NotDefaultImplementationException;
 import nl.riebie.mcclans.clan.ClanImpl;
 import nl.riebie.mcclans.clan.RankImpl;
@@ -205,6 +206,15 @@ public class ClanPlayerImpl implements ClanPlayer, Cloneable, CommandSender {
         if (playerOpt.isPresent() && playerOpt.get().isOnline()) {
             playerOpt.get().sendMessages(message);
         }
+    }
+
+    @Override
+    public boolean checkPermission(Permission permission) {
+        Rank rank = getRank();
+        if (rank != null) {
+            return rank.hasPermission(permission);
+        }
+        return true;
     }
 
     public int addKillHigh() {

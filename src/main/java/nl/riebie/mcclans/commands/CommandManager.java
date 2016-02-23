@@ -8,6 +8,7 @@ import nl.riebie.mcclans.commands.annotations.*;
 import nl.riebie.mcclans.commands.parsers.*;
 import nl.riebie.mcclans.commands.constraints.length.LengthConstraint;
 import nl.riebie.mcclans.commands.constraints.regex.RegexConstraint;
+import nl.riebie.mcclans.messages.Messages;
 import nl.riebie.mcclans.player.ClanPlayerImpl;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.Player;
@@ -177,6 +178,10 @@ public class CommandManager {
 
         FilledCommand filledCommand = filledCommandMap.get(firstParam);
 
+        if(!commandSender.checkPermission(filledCommand.getPermission())){
+            Messages.sendYouDoNotHaveTheRequiredPermission(commandSource, Permission.allychat.name());
+            return;
+        }
         if (filledCommand != null) {
             int i;
             for (i = 1; i < args.length; i++) {

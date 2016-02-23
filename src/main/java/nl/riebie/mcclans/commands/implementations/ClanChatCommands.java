@@ -1,5 +1,6 @@
 package nl.riebie.mcclans.commands.implementations;
 
+import nl.riebie.mcclans.api.enums.Permission;
 import nl.riebie.mcclans.channels.AllyMessageChannel;
 import nl.riebie.mcclans.channels.ClanMessageChannel;
 import nl.riebie.mcclans.commands.annotations.Command;
@@ -21,8 +22,8 @@ import java.util.Optional;
  * Created by Mirko on 14/02/2016.
  */
 public class ClanChatCommands {
-    @Command(name = "clan")
-    public void clanChatCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer,  @Multiline @OptionalParameter(String.class) Optional<String> messageOpt) {
+    @Command(name = "clan", permission = Permission.clanchat)
+    public void clanChatCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer, @Multiline @OptionalParameter(String.class) Optional<String> messageOpt) {
         if (messageOpt.isPresent()) {
             String message = messageOpt.get();
             if (clanPlayer.getTempChatState() == null) {
@@ -42,7 +43,7 @@ public class ClanChatCommands {
         }
     }
 
-    @Command(name = "ally")
+    @Command(name = "ally", permission = Permission.allychat)
     public void allyChatCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer, @Multiline @OptionalParameter(String.class) Optional<String> optionalMessage) {
         if (optionalMessage.isPresent()) {
             String message = optionalMessage.get();
