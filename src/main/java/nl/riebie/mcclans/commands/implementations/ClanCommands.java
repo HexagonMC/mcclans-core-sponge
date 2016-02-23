@@ -66,7 +66,7 @@ public class ClanCommands {
     public void clanCreateCommand(
             ClanPlayerImpl clanPlayer,
             @Parameter(length = LengthConstraints.CLAN_TAG, regex = RegexConstraints.CLAN_TAG) String clanTag,
-            @Parameter(length = LengthConstraints.CLAN_NAME, regex = RegexConstraints.CLAN_NAME) String clanName) {
+            @Multiline @Parameter(length = LengthConstraints.CLAN_NAME, regex = RegexConstraints.CLAN_NAME) String clanName) {
         ClansImpl clansImpl = ClansImpl.getInstance();
         if (clansImpl.tagIsFree(clanTag)) {
             ClanImpl clanImpl = clansImpl.createClan(clanTag, clanName, clanPlayer);
@@ -75,7 +75,7 @@ public class ClanCommands {
     }
 
     @Command(name = "list")
-    public void clanChatCommand(ClanPlayerImpl clanPlayer, @PageParameter int page) {
+    public void clanListCommand(ClanPlayerImpl clanPlayer, @PageParameter int page) {
         List<ClanImpl> clans = ClansImpl.getInstance().getClanImpls();
 
         HorizontalTable<ClanImpl> table = new HorizontalTable<>("Clans", 10, (row, clan, i) -> {
@@ -145,7 +145,7 @@ public class ClanCommands {
     @ChildGroup(ClanChatCommands.class)
     @Command(name = "chat")
     public void clanChatRootCommand(ClanPlayerImpl clanPlayer) {
-        clanPlayer.sendMessage(Text.of("NIET DIT ROOTCOMMAND AANROEPEN, FLIKKER"));
+        clanPlayer.sendMessage(Text.of("TODO"));
     }
 
 }

@@ -3,6 +3,7 @@ package nl.riebie.mcclans.commands.implementations;
 import nl.riebie.mcclans.channels.AllyMessageChannel;
 import nl.riebie.mcclans.channels.ClanMessageChannel;
 import nl.riebie.mcclans.commands.annotations.Command;
+import nl.riebie.mcclans.commands.annotations.Multiline;
 import nl.riebie.mcclans.commands.annotations.OptionalParameter;
 import nl.riebie.mcclans.commands.annotations.Parameter;
 import nl.riebie.mcclans.enums.PlayerChatState;
@@ -21,7 +22,7 @@ import java.util.Optional;
  */
 public class ClanChatCommands {
     @Command(name = "clan")
-    public void clanChatRootCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer, @OptionalParameter(String.class) Optional<String> messageOpt) {
+    public void clanChatRootCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer,  @Multiline @OptionalParameter(String.class) Optional<String> messageOpt) {
         if (messageOpt.isPresent()) {
             String message = messageOpt.get();
             if (clanPlayer.getTempChatState() == null) {
@@ -42,7 +43,7 @@ public class ClanChatCommands {
     }
 
     @Command(name = "ally")
-    public void allyChatRootCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer, @OptionalParameter(String.class) Optional<String> optionalMessage) {
+    public void allyChatRootCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer, @Multiline @OptionalParameter(String.class) Optional<String> optionalMessage) {
         if (optionalMessage.isPresent()) {
             String message = optionalMessage.get();
             if (clanPlayer.getTempChatState() == null) {
@@ -63,7 +64,7 @@ public class ClanChatCommands {
     }
 
     @Command(name = "global")
-    public void globalChatRootCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer, @OptionalParameter(String.class) Optional<String> optionalMessage) {
+    public void globalChatRootCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer, @Multiline @OptionalParameter(String.class) Optional<String> optionalMessage) {
         if (optionalMessage.isPresent()) {
             String message = optionalMessage.get();
             if (clanPlayer.getTempChatState() == null) {
