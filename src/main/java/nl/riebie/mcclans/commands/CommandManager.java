@@ -177,9 +177,9 @@ public class CommandManager {
         }
 
         FilledCommand filledCommand = filledCommandMap.get(firstParam);
-
-        if(!commandSender.checkPermission(filledCommand.getPermission())){
-            Messages.sendYouDoNotHaveTheRequiredPermission(commandSource, Permission.allychat.name());
+        Permission permission = filledCommand.getPermission();
+        if (permission != Permission.none && !commandSender.checkPermission(permission)) {
+            Messages.sendYouDoNotHaveTheRequiredPermission(commandSource, permission.name());
             return;
         }
         if (filledCommand != null) {

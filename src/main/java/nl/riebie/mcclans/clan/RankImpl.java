@@ -40,7 +40,7 @@ public class RankImpl implements Rank {
 
     @Override
     public List<Permission> getPermissions() {
-        return new ArrayList<Permission>(permissions);
+        return new ArrayList<>(permissions);
     }
 
     public String getPermissionsAsString() {
