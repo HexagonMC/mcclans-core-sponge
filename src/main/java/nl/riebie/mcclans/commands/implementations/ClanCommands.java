@@ -27,8 +27,8 @@ public class ClanCommands {
     private final static String CLAN_CREATE_DESCRIPTION = "Create a clan";
 
     @Command(name = "test")
-    public void clanTestCommand(ClanPlayerImpl clanPlayer, @Parameter String test, @OptionalParameter(Integer.class) Optional<Integer> optionalMessage) {
-        String message = test + " ";
+    public void clanTestCommand(ClanPlayerImpl clanPlayer, @Parameter Permission test, @OptionalParameter(Integer.class) Optional<Integer> optionalMessage) {
+        String message = test.toString() + " ";
         if (optionalMessage.isPresent()) {
             int value = optionalMessage.get();
             message += value;
