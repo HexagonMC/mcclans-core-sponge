@@ -22,7 +22,7 @@ import java.util.Optional;
  */
 public class ClanChatCommands {
     @Command(name = "clan")
-    public void clanChatRootCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer,  @Multiline @OptionalParameter(String.class) Optional<String> messageOpt) {
+    public void clanChatCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer,  @Multiline @OptionalParameter(String.class) Optional<String> messageOpt) {
         if (messageOpt.isPresent()) {
             String message = messageOpt.get();
             if (clanPlayer.getTempChatState() == null) {
@@ -43,7 +43,7 @@ public class ClanChatCommands {
     }
 
     @Command(name = "ally")
-    public void allyChatRootCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer, @Multiline @OptionalParameter(String.class) Optional<String> optionalMessage) {
+    public void allyChatCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer, @Multiline @OptionalParameter(String.class) Optional<String> optionalMessage) {
         if (optionalMessage.isPresent()) {
             String message = optionalMessage.get();
             if (clanPlayer.getTempChatState() == null) {
@@ -64,7 +64,7 @@ public class ClanChatCommands {
     }
 
     @Command(name = "global")
-    public void globalChatRootCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer, @Multiline @OptionalParameter(String.class) Optional<String> optionalMessage) {
+    public void globalChatCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer, @Multiline @OptionalParameter(String.class) Optional<String> optionalMessage) {
         if (optionalMessage.isPresent()) {
             String message = optionalMessage.get();
             if (clanPlayer.getTempChatState() == null) {

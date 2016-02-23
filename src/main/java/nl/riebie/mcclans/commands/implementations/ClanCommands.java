@@ -148,4 +148,34 @@ public class ClanCommands {
         clanPlayer.sendMessage(Text.of("TODO"));
     }
 
+    @Command(name = "disband")
+    public void clanDisbandCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer) {
+        ClansImpl clansImpl = ClansImpl.getInstance();
+        ClanImpl clan = clanPlayer.getClan();
+        Messages.sendBroadcastMessageClanDisbandedBy(clan.getName(), clan.getTagColored(), commandSource.getName());
+        clansImpl.disbandClan(clan.getTag());
+    }
+
+    @Command(name = "remove")
+    public void clanRemoveCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer, @Parameter String playerName) {
+        ClanImpl clan = clanPlayer.getClan();
+        if (clan != null) {
+            ClanPlayerImpl toBeRemovedClanPlayer = clan.getMember(playerName);
+            if (toBeRemovedClanPlayer != null) {
+                if (playerName.equalsIgnoreCase(clanPlayer.getName())) {
+                    Messages.sendWarningMessage(commandSource, Messages.YOU_CANNOT_REMOVE_YOURSELF_FROM_THE_CLAN);
+                } else if (playerName.equalsIgnoreCase(clan.getOwner().getName())) {
+                    Messages.sendWarningMessage(commandSource, Messages.YOU_CANNOT_REMOVE_THE_OWNER_FROM_THE_CLAN);
+                } else {
+                    clan.removeMember(toBeRemovedClanPlayer.getName());
+                    Messages.sendClanBroadcastMessagePlayerRemovedFromTheClanBy(clan, toBeRemovedClanPlayer.getName(), clanPlayer.getName());
+                    Messages.sendYouHaveBeenRemovedFromClan(toBeRemovedClanPlayer, clan.getName());
+                }
+            } else {
+                Messages.sendPlayerNotAMemberOfThisClan(commandSource, playerName);
+            }
+        } else {
+            Messages.sendWarningMessage(commandSource, Messages.YOU_ARE_NOT_IN_A_CLAN);
+        }
+    }
 }
