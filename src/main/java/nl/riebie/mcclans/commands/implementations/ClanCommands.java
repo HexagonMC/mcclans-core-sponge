@@ -1,20 +1,28 @@
 package nl.riebie.mcclans.commands.implementations;
 
 import nl.riebie.mcclans.ClansImpl;
+import nl.riebie.mcclans.api.ClanPlayer;
+import nl.riebie.mcclans.api.CommandSender;
 import nl.riebie.mcclans.api.enums.Permission;
 import nl.riebie.mcclans.clan.ClanImpl;
 import nl.riebie.mcclans.commands.annotations.*;
 import nl.riebie.mcclans.commands.constraints.length.LengthConstraints;
 import nl.riebie.mcclans.commands.constraints.regex.RegexConstraints;
 import nl.riebie.mcclans.comparators.ClanKdrComparator;
+import nl.riebie.mcclans.comparators.MemberComparator;
 import nl.riebie.mcclans.messages.Messages;
+import nl.riebie.mcclans.player.ClanInvite;
 import nl.riebie.mcclans.player.ClanPlayerImpl;
 import nl.riebie.mcclans.table.HorizontalTable;
+import nl.riebie.mcclans.table.Row;
+import nl.riebie.mcclans.table.TableAdapter;
 import nl.riebie.mcclans.utils.UUIDUtils;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.format.TextColor;
+import org.spongepowered.api.text.format.TextColors;
 
 import java.util.List;
 import java.util.Optional;
@@ -136,7 +144,6 @@ public class ClanCommands {
                     Messages.sendInvitedToClan(invitedPlayer, clan.getName(), clan.getTagColored());
                 }
             }
-            invitedClanPlayer.getClanInvite().accept();
         } else {
             Messages.sendWarningMessage(player, Messages.YOU_ARE_NOT_IN_A_CLAN);
         }
@@ -177,5 +184,81 @@ public class ClanCommands {
         } else {
             Messages.sendWarningMessage(commandSource, Messages.YOU_ARE_NOT_IN_A_CLAN);
         }
+    }
+
+    @Command(name = "accept")
+    public void clanAcceptCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer) {
+        ClanInvite clanInvite = clanPlayer.getClanInvite();
+        if (clanInvite == null) {
+            Messages.sendWarningMessage(commandSource, Messages.NO_PENDING_CLAN_INVITE);
+        } else {
+            Messages.sendBasicMessage(commandSource, Messages.CLAN_INVITE_ACCEPTED);
+            clanInvite.accept();
+        }
+    }
+
+    @Command(name = "decline")
+    public void clanDeclineCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer) {
+        ClanInvite clanInvite = clanPlayer.getClanInvite();
+        if (clanInvite == null) {
+            Messages.sendWarningMessage(commandSource, Messages.NO_PENDING_CLAN_INVITE);
+        } else {
+            Messages.sendBasicMessage(commandSource, Messages.CLAN_INVITE_DECLINED);
+            clanInvite.decline();
+        }
+    }
+
+    @Command(name = "roster")
+    public void clanRosterCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer, Optional<String> clanTagOpt, @PageParameter int page) {
+        ClanImpl clan;
+        if (clanTagOpt.isPresent()) {
+            String clanTag = clanTagOpt.get();
+            clan = ClansImpl.getInstance().getClan(clanTag.toLowerCase());
+            if (clan != null) {
+                printRoster(clanPlayer, clan, page);
+            } else {
+                Messages.sendWarningMessage(commandSource, Messages.CLAN_DOES_NOT_EXIST);
+            }
+        } else {
+            if (commandSource instanceof Player) {
+                clan = clanPlayer.getClan();
+                if (clan != null) {
+                    printRoster(clanPlayer, clan, page);
+                } else {
+                    Messages.sendWarningMessage(commandSource, Messages.YOU_ARE_NOT_IN_A_CLAN);
+                }
+            } else {
+                Messages.sendWarningMessage(commandSource, Messages.YOU_NEED_TO_BE_A_PLAYER_TO_PERFORM_THIS_COMMAND);
+            }
+        }
+    }
+
+    private void printRoster(ClanPlayerImpl clanPlayer, ClanImpl clan, int page) {
+        List<ClanPlayerImpl> members = clan.getMembersImpl();
+        java.util.Collections.sort(members, new MemberComparator());
+
+        HorizontalTable<ClanPlayerImpl> table = new HorizontalTable<ClanPlayerImpl>("Clan roster " + clan.getName(), 10,
+                new TableAdapter<ClanPlayerImpl>() {
+
+                    @Override
+                    public void fillRow(Row row, ClanPlayerImpl member, int index) {
+                        Optional<Player> playerOpt = Sponge.getServer().getPlayer(member.getUUID());
+                        row.setValue("Player", Text.of(member.getName()));
+                        row.setValue("Rank", Text.builder(member.getRank().getName()).color(TextColors.BLUE).build()); // todo get rank colored from Rank
+                        Text lastOnlineMessage;
+                        if (playerOpt.isPresent() && playerOpt.get().isOnline()) {
+                            lastOnlineMessage = Text.builder("Online").color(TextColors.GREEN).build();
+                        } else {
+                            lastOnlineMessage = Text.of(member.getLastOnline().getDifferenceInText());
+                        }
+                        row.setValue("Last Online", lastOnlineMessage);
+
+                    }
+                });
+        table.defineColumn("Player", 30);
+        table.defineColumn("Rank", 20);
+        table.defineColumn("Last Online", 30);
+
+        table.draw(members, page, clanPlayer);
     }
 }
