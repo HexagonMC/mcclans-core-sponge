@@ -141,7 +141,6 @@ public class CommandManager {
                     RegexConstraint regexConstraint = parameterValues.regex();
 
 
-
                     filledCommand.addParameter(parameterValues.value(), multiline, listType, lengthConstraint.getMinimalLength(),
                             lengthConstraint.getMaximalLength(), regexConstraint.getRegex(), parameter.getType());
                 }
@@ -227,18 +226,18 @@ public class CommandManager {
                                     ParameterParser<String> parser = (ParameterParser<String>) parameterValidatorMap.get(String.class);
                                     StringBuilder stringBuilder = new StringBuilder();
                                     for (int pIndex = index; pIndex < args.length; pIndex++) {
-                                        ParseResult<String> result = parser.parseValue(args[pIndex], normalFilledParameter);
-                                        if (result.isSuccess()) {
-                                            if (pIndex != index) {
-                                                stringBuilder.append(" ");
-                                            }
-                                            stringBuilder.append(result.getItem());
-                                        } else {
-                                            commandSender.sendMessage(Text.of(result.getErrorMessage()));
-                                            return;
+                                        if (pIndex != index) {
+                                            stringBuilder.append(" ");
                                         }
+                                        stringBuilder.append(args[pIndex]);
                                     }
-                                    objects[j] = Optional.of(stringBuilder.toString());
+                                    ParseResult<String> result = parser.parseValue(stringBuilder.toString(), normalFilledParameter);
+                                    if (result.isSuccess()) {
+                                        objects[j] = Optional.of(result.getItem());
+                                    } else {
+                                        commandSender.sendMessage(Text.of(result.getErrorMessage()));
+                                        return;
+                                    }
                                 }
                             } else {
                                 ParameterParser<?> parser = parameterValidatorMap.get(type);
@@ -273,19 +272,23 @@ public class CommandManager {
                             } else {
                                 ParameterParser<String> parser = (ParameterParser<String>) parameterValidatorMap.get(String.class);
                                 StringBuilder stringBuilder = new StringBuilder();
-                                for (int pIndex = index; pIndex < args.length; pIndex++) {
-                                    ParseResult<String> result = parser.parseValue(args[pIndex], normalFilledParameter);
-                                    if (result.isSuccess()) {
-                                        if (pIndex != index) {
-                                            stringBuilder.append(" ");
-                                        }
-                                        stringBuilder.append(result.getItem());
-                                    } else {
-                                        commandSender.sendMessage(Text.of(result.getErrorMessage()));
-                                        return;
-                                    }
+                                if (index >= args.length) {
+                                    commandSender.sendMessage(Text.of("Parameter should be supplied")); //TODO real error message
+                                    return;
                                 }
-                                objects[j] = stringBuilder.toString();
+                                for (int pIndex = index; pIndex < args.length; pIndex++) {
+                                    if (pIndex != index) {
+                                        stringBuilder.append(" ");
+                                    }
+                                    stringBuilder.append(args[pIndex]);
+                                }
+                                ParseResult<String> result = parser.parseValue(stringBuilder.toString(), normalFilledParameter);
+                                if (result.isSuccess()) {
+                                    objects[j] = result.getItem();
+                                } else {
+                                    commandSender.sendMessage(Text.of(result.getErrorMessage()));
+                                    return;
+                                }
                             }
                         } else {
                             ParameterParser<?> parser = parameterValidatorMap.get(type);
