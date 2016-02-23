@@ -2,6 +2,7 @@ package nl.riebie.mcclans.commands;
 
 import nl.riebie.mcclans.ClansImpl;
 import nl.riebie.mcclans.api.CommandSender;
+import nl.riebie.mcclans.api.enums.Permission;
 import nl.riebie.mcclans.commands.FilledParameters.*;
 import nl.riebie.mcclans.commands.annotations.*;
 import nl.riebie.mcclans.commands.parsers.*;
@@ -34,6 +35,7 @@ public class CommandManager {
         registerParameterValidator(new DoubleParser(), double.class, Double.class);
         registerParameterValidator(new FloatParser(), float.class, Float.class);
         registerParameterValidator(new BooleanParser(), boolean.class, Boolean.class);
+        registerParameterValidator(new PermissionParser(), Permission.class);
     }
 
     private static void registerParameterValidator(ParameterParser<?> parser, Class<?>... classes) {
@@ -99,20 +101,11 @@ public class CommandManager {
                     Parameter parameterValues = (Parameter) annotation;
                     Set<Class<?>> validParametersList = parameterValidatorMap.keySet();
                     if (!validParametersList.contains(parameter.getType())) {
-                        StringBuilder stringBuilder = new StringBuilder();
-                        boolean first = true;
-                        for (Class<?> validType : validParametersList) {
-                            if (!first) {
-                                stringBuilder.append(", ");
-                            }
-                            stringBuilder.append(validType.getSimpleName());
-                            first = false;
-                        }
-                        throw new IllegalArgumentException(String.format("Parameter '%s' should be of one of the following types: %s", parameter.getName(), stringBuilder.toString()));
+                        throw new IllegalArgumentException(String.format("Parameter '%s' should be of one of the following types: %s", parameter.getName(), getValidParametersString(validParametersList)));
                     }
                     LengthConstraint lengthConstraint = parameterValues.length();
                     RegexConstraint regexConstraint = parameterValues.regex();
-                    filledCommand.addParameter(null, parameterValues.multiline(), lengthConstraint.getMinimalLength(),
+                    filledCommand.addParameter(null, false, lengthConstraint.getMinimalLength(),
                             lengthConstraint.getMaximalLength(), regexConstraint.getRegex(), parameter.getType());
 
                 } else if (annotation instanceof OptionalParameter) {
@@ -120,15 +113,45 @@ public class CommandManager {
                     if (parameter.getType() != Optional.class) {
                         throw new IllegalArgumentException(String.format("Optional parameter '%s' should be of the Optional type", parameter.getName()));
                     }
+                    Set<Class<?>> validParametersList = parameterValidatorMap.keySet();
+                    if (!validParametersList.contains(parameterValues.value())) {
+                        throw new IllegalArgumentException(String.format("The generic type of the Optional parameter '%s' should be of one of the following types: %s", parameter.getName(), getValidParametersString(validParametersList)));
+                    }
                     LengthConstraint lengthConstraint = parameterValues.length();
                     RegexConstraint regexConstraint = parameterValues.regex();
-                    filledCommand.addParameter(parameterValues.value(), parameterValues.multiline(), lengthConstraint.getMinimalLength(),
+                    filledCommand.addParameter(parameterValues.value(), false, lengthConstraint.getMinimalLength(),
+                            lengthConstraint.getMaximalLength(), regexConstraint.getRegex(), parameter.getType());
+                } else if (annotation instanceof Multiline){
+                    Multiline multilineParameter = (Multiline) annotation;
+                    if (parameter.getType() != String.class && parameter.getType() != List.class) {
+                        throw new IllegalArgumentException(String.format("Multiline parameter '%s' should either be a String or a List", parameter.getName()));
+                    }
+                    Set<Class<?>> validParametersList = parameterValidatorMap.keySet();
+                    if (!validParametersList.contains(multilineParameter.listType())) {
+                        throw new IllegalArgumentException(String.format("The generic type of the Optional parameter '%s' should be of one of the following types: %s", parameter.getName(), getValidParametersString(validParametersList)));
+                    }
+                    LengthConstraint lengthConstraint = multilineParameter.length();
+                    RegexConstraint regexConstraint = multilineParameter.regex();
+                    filledCommand.addParameter(null, true, lengthConstraint.getMinimalLength(),
                             lengthConstraint.getMaximalLength(), regexConstraint.getRegex(), parameter.getType());
                 }
             }
         } else {
             filledCommand.addParameter(parameter.getType());
         }
+    }
+
+    private String getValidParametersString(Set<Class<?>> validParametersList) {
+        StringBuilder stringBuilder = new StringBuilder();
+        boolean first = true;
+        for (Class<?> validType : validParametersList) {
+            if (!first) {
+                stringBuilder.append(", ");
+            }
+            stringBuilder.append(validType.getSimpleName());
+            first = false;
+        }
+        return stringBuilder.toString();
     }
 
     public void executeCommand(CommandSource commandSource, String[] args) {

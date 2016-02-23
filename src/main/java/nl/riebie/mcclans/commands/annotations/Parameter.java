@@ -14,7 +14,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.PARAMETER)
 public @interface Parameter {
-    boolean multiline() default false;
 
     LengthConstraints length() default LengthConstraints.EMPTY;
 
