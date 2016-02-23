@@ -27,13 +27,39 @@ public class ClanCommands {
     private final static String CLAN_CREATE_DESCRIPTION = "Create a clan";
 
     @Command(name = "test")
-    public void clanTestCommand(ClanPlayerImpl clanPlayer, @Parameter Permission test, @OptionalParameter(Integer.class) Optional<Integer> optionalMessage) {
-        String message = test.toString() + " ";
-        if (optionalMessage.isPresent()) {
-            int value = optionalMessage.get();
-            message += value;
+    public void clanTestCommand(ClanPlayerImpl clanPlayer, @Multiline(listType = Permission.class) @Parameter List<Permission> test) {
+        String message = "";
+        for (Permission permission : test) {
+            message += permission.toString();
         }
         clanPlayer.sendMessage(Text.of(message));
+    }
+
+    @Command(name = "hoi")
+    public void clanHoiCommand(ClanPlayerImpl clanPlayer, @Multiline @Parameter String test) {
+        clanPlayer.sendMessage(Text.of(test));
+    }
+
+    @Command(name = "optlist")
+    public void clanOptListCommand(ClanPlayerImpl clanPlayer, @Multiline(listType = Permission.class) @OptionalParameter(List.class) Optional<List<Permission>> test) {
+        if (test.isPresent()) {
+            String message = "";
+            for (Permission permission : test.get()) {
+                message += permission.toString();
+            }
+            clanPlayer.sendMessage(Text.of(message));
+        } else {
+            clanPlayer.sendMessage(Text.of("leeg"));
+        }
+    }
+
+    @Command(name = "opt")
+    public void clanOptCommand(ClanPlayerImpl clanPlayer, @Multiline @OptionalParameter(String.class) Optional<String> test) {
+        if (test.isPresent()) {
+            clanPlayer.sendMessage(Text.of(test.get()));
+        } else {
+            clanPlayer.sendMessage(Text.of("leeg"));
+        }
     }
 
     @Command(name = "create", description = CLAN_CREATE_DESCRIPTION)

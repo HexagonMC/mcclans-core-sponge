@@ -99,14 +99,26 @@ public class CommandManager {
                     filledCommand.addPageParameter();
                 } else if (annotation instanceof Parameter) {
                     Parameter parameterValues = (Parameter) annotation;
+
                     Set<Class<?>> validParametersList = parameterValidatorMap.keySet();
-                    if (!validParametersList.contains(parameter.getType())) {
+                    Multiline multilineParameter = parameter.getAnnotation(Multiline.class);
+                    Class<?> listType = null;
+                    boolean multiline = false;
+                    if (multilineParameter != null) {
+                        listType = multilineParameter.listType();
+                        multiline = true;
+                    }
+
+                    if (!validParametersList.contains(parameter.getType()) && !(multiline && (listType != null || parameter.getType() == String.class))) {     //TODO check if listType is a valid parameter
                         throw new IllegalArgumentException(String.format("Parameter '%s' should be of one of the following types: %s", parameter.getName(), getValidParametersString(validParametersList)));
                     }
                     LengthConstraint lengthConstraint = parameterValues.length();
                     RegexConstraint regexConstraint = parameterValues.regex();
-                    filledCommand.addParameter(null, false, lengthConstraint.getMinimalLength(),
+
+
+                    filledCommand.addParameter(null, multiline, listType, lengthConstraint.getMinimalLength(),
                             lengthConstraint.getMaximalLength(), regexConstraint.getRegex(), parameter.getType());
+
 
                 } else if (annotation instanceof OptionalParameter) {
                     OptionalParameter parameterValues = (OptionalParameter) annotation;
@@ -114,25 +126,23 @@ public class CommandManager {
                         throw new IllegalArgumentException(String.format("Optional parameter '%s' should be of the Optional type", parameter.getName()));
                     }
                     Set<Class<?>> validParametersList = parameterValidatorMap.keySet();
-                    if (!validParametersList.contains(parameterValues.value())) {
+                    Multiline multilineParameter = parameter.getAnnotation(Multiline.class);
+                    Class<?> listType = null;
+                    boolean multiline = false;
+                    if (multilineParameter != null) {
+                        listType = multilineParameter.listType();
+                        multiline = true;
+                    }
+
+                    if (!validParametersList.contains(parameterValues.value()) && !(multiline && (listType != null || parameterValues.value() == String.class))) {
                         throw new IllegalArgumentException(String.format("The generic type of the Optional parameter '%s' should be of one of the following types: %s", parameter.getName(), getValidParametersString(validParametersList)));
                     }
                     LengthConstraint lengthConstraint = parameterValues.length();
                     RegexConstraint regexConstraint = parameterValues.regex();
-                    filledCommand.addParameter(parameterValues.value(), false, lengthConstraint.getMinimalLength(),
-                            lengthConstraint.getMaximalLength(), regexConstraint.getRegex(), parameter.getType());
-                } else if (annotation instanceof Multiline){
-                    Multiline multilineParameter = (Multiline) annotation;
-                    if (parameter.getType() != String.class && parameter.getType() != List.class) {
-                        throw new IllegalArgumentException(String.format("Multiline parameter '%s' should either be a String or a List", parameter.getName()));
-                    }
-                    Set<Class<?>> validParametersList = parameterValidatorMap.keySet();
-                    if (!validParametersList.contains(multilineParameter.listType())) {
-                        throw new IllegalArgumentException(String.format("The generic type of the Optional parameter '%s' should be of one of the following types: %s", parameter.getName(), getValidParametersString(validParametersList)));
-                    }
-                    LengthConstraint lengthConstraint = multilineParameter.length();
-                    RegexConstraint regexConstraint = multilineParameter.regex();
-                    filledCommand.addParameter(null, true, lengthConstraint.getMinimalLength(),
+
+
+
+                    filledCommand.addParameter(parameterValues.value(), multiline, listType, lengthConstraint.getMinimalLength(),
                             lengthConstraint.getMaximalLength(), regexConstraint.getRegex(), parameter.getType());
                 }
             }
@@ -198,25 +208,94 @@ public class CommandManager {
                     if (normalFilledParameter.isOptional()) {
                         type = normalFilledParameter.getOptionalType();
                         if (index < args.length) {
-                            ParameterParser<?> parser = parameterValidatorMap.get(type);
-                            ParseResult<?> parseResult = parser.parseValue(args[index], normalFilledParameter);
-                            if (parseResult.isSuccess()) {
-                                objects[j] = Optional.of(parseResult.getItem());
+                            if (normalFilledParameter.isMultiline()) {
+                                Class<?> listType = normalFilledParameter.getListType();
+                                if (listType != Void.class) {
+                                    ParameterParser<?> parser = parameterValidatorMap.get(listType);
+                                    List<Object> parameterList = new ArrayList<>();
+                                    for (int pIndex = index; pIndex < args.length; pIndex++) {
+                                        ParseResult<?> result = parser.parseValue(args[pIndex], normalFilledParameter);
+                                        if (result.isSuccess()) {
+                                            parameterList.add(result.getItem());
+                                        } else {
+                                            commandSender.sendMessage(Text.of(result.getErrorMessage()));
+                                            return;
+                                        }
+                                    }
+                                    objects[j] = Optional.of(parameterList);
+                                } else {
+                                    ParameterParser<String> parser = (ParameterParser<String>) parameterValidatorMap.get(String.class);
+                                    StringBuilder stringBuilder = new StringBuilder();
+                                    for (int pIndex = index; pIndex < args.length; pIndex++) {
+                                        ParseResult<String> result = parser.parseValue(args[pIndex], normalFilledParameter);
+                                        if (result.isSuccess()) {
+                                            if (pIndex != index) {
+                                                stringBuilder.append(" ");
+                                            }
+                                            stringBuilder.append(result.getItem());
+                                        } else {
+                                            commandSender.sendMessage(Text.of(result.getErrorMessage()));
+                                            return;
+                                        }
+                                    }
+                                    objects[j] = Optional.of(stringBuilder.toString());
+                                }
                             } else {
-                                commandSender.sendMessage(Text.of(parseResult.getErrorMessage()));
-                                return;
+                                ParameterParser<?> parser = parameterValidatorMap.get(type);
+                                ParseResult<?> parseResult = parser.parseValue(args[index], normalFilledParameter);
+
+                                if (parseResult.isSuccess()) {
+                                    objects[j] = Optional.of(parseResult.getItem());
+                                } else {
+                                    commandSender.sendMessage(Text.of(parseResult.getErrorMessage()));
+                                    return;
+                                }
                             }
                         } else {
                             objects[j] = Optional.empty();
                         }
                     } else {
-                        ParameterParser<?> parser = parameterValidatorMap.get(type);
-                        ParseResult<?> parseResult = parser.parseValue(args[index], normalFilledParameter);
-                        if (parseResult.isSuccess()) {
-                            objects[j] = parseResult.getItem();
+                        if (normalFilledParameter.isMultiline()) {
+                            Class<?> listType = normalFilledParameter.getListType();
+                            if (listType != Void.class) {
+                                ParameterParser<?> parser = parameterValidatorMap.get(listType);
+                                List<Object> parameterList = new ArrayList<>();
+                                for (int pIndex = index; pIndex < args.length; pIndex++) {
+                                    ParseResult<?> result = parser.parseValue(args[pIndex], normalFilledParameter);
+                                    if (result.isSuccess()) {
+                                        parameterList.add(result.getItem());
+                                    } else {
+                                        commandSender.sendMessage(Text.of(result.getErrorMessage()));
+                                        return;
+                                    }
+                                }
+                                objects[j] = parameterList;
+                            } else {
+                                ParameterParser<String> parser = (ParameterParser<String>) parameterValidatorMap.get(String.class);
+                                StringBuilder stringBuilder = new StringBuilder();
+                                for (int pIndex = index; pIndex < args.length; pIndex++) {
+                                    ParseResult<String> result = parser.parseValue(args[pIndex], normalFilledParameter);
+                                    if (result.isSuccess()) {
+                                        if (pIndex != index) {
+                                            stringBuilder.append(" ");
+                                        }
+                                        stringBuilder.append(result.getItem());
+                                    } else {
+                                        commandSender.sendMessage(Text.of(result.getErrorMessage()));
+                                        return;
+                                    }
+                                }
+                                objects[j] = stringBuilder.toString();
+                            }
                         } else {
-                            commandSender.sendMessage(Text.of(parseResult.getErrorMessage()));
-                            return;
+                            ParameterParser<?> parser = parameterValidatorMap.get(type);
+                            ParseResult<?> parseResult = parser.parseValue(args[index], normalFilledParameter);
+                            if (parseResult.isSuccess()) {
+                                objects[j] = parseResult.getItem();
+                            } else {
+                                commandSender.sendMessage(Text.of(parseResult.getErrorMessage()));
+                                return;
+                            }
                         }
                     }
                 } else if (parameter instanceof PageFilledParameter) {

@@ -5,6 +5,7 @@ package nl.riebie.mcclans.commands.FilledParameters;
  */
 public class NormalFilledParameter implements FilledParameter {
 
+    private Class<?> listType;
     private int minimalLength = -1;
     private int maximalLength = -1;
     private boolean multiline = false;
@@ -12,8 +13,9 @@ public class NormalFilledParameter implements FilledParameter {
     private Class<?> parameterType;
     private Class<?> optionalType;
 
-    public NormalFilledParameter(Class<?> optional, boolean multiline, int minimalLength, int maximalLength, String regex, Class<?> parameterType) {
+    public NormalFilledParameter(Class<?> optional, boolean multiline, Class<?> listType, int minimalLength, int maximalLength, String regex, Class<?> parameterType) {
         this.optionalType = optional;
+        this.listType = listType;
         this.minimalLength = minimalLength;
         this.maximalLength = maximalLength;
         this.multiline = multiline;
@@ -53,4 +55,7 @@ public class NormalFilledParameter implements FilledParameter {
         return parameterType;
     }
 
+    public Class<?> getListType() {
+        return listType;
+    }
 }
