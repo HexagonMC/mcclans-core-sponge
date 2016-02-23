@@ -177,11 +177,7 @@ public class CommandManager {
         }
 
         FilledCommand filledCommand = filledCommandMap.get(firstParam);
-        Permission permission = filledCommand.getPermission();
-        if (permission != Permission.none && !commandSender.checkPermission(permission)) {
-            Messages.sendYouDoNotHaveTheRequiredPermission(commandSource, permission.name());
-            return;
-        }
+
         if (filledCommand != null) {
             int i;
             for (i = 1; i < args.length; i++) {
@@ -192,6 +188,12 @@ public class CommandManager {
                 } else {
                     filledCommand = child;
                 }
+            }
+
+            Permission permission = filledCommand.getPermission();
+            if (permission != Permission.none && !commandSender.checkPermission(permission)) {
+                Messages.sendYouDoNotHaveTheRequiredPermission(commandSource, permission.name());
+                return;
             }
             List<FilledParameter> parameters = filledCommand.getParameters();
             Object[] objects = new Object[parameters.size()];
