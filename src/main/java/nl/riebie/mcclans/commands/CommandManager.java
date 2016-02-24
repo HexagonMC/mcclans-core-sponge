@@ -311,14 +311,7 @@ public class CommandManager {
                 } else if (parameter instanceof PageFilledParameter) {
                     lastExecutedPageCommand.put(commandSender, filledCommand);
                     lastExecutedPageCommandData.put(commandSender, objects);
-                    if (index < args.length) {
-                        IntegerParser integerParser = new IntegerParser();
-                        ParseResult<Integer> parseResult = integerParser.parseValue(args[index], new NormalFilledParameter(Integer.class));
-                        if (parseResult.isSuccess()) {
-                            page = parseResult.getItem();
-                        }
-                    }
-                    objects[j] = page;
+                    objects[j] = 1;
                 }
             }
             filledCommand.execute(commandStructureMap.get(filledCommand), objects);

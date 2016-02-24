@@ -76,12 +76,14 @@ public final class FilledCommand {
         hasPageParameter = true;
     }
 
+    //TODO fix that a page parameter doesn't really have to be the last parameter
+    //TODO also fix crash when a parameter isn't marked by anything special in a command
     private void checkStateAndAddParameter(FilledParameter parameter) {
         if (hasPageParameter) {
             throw new IllegalStateException("The PageParameter should always be the last parameter in a command");
-        } else if (hasOptional) {
+        } else if (hasOptional && !(parameter instanceof PageFilledParameter)) {
             throw new IllegalStateException("Only the last parameter can be optional");
-        } else if (hasMultiline) {
+        } else if (hasMultiline && !(parameter instanceof PageFilledParameter)) {
             throw new IllegalStateException("Only the last parameter can be multiline");
         }
 
