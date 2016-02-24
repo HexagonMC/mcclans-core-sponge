@@ -1,14 +1,13 @@
 package nl.riebie.mcclans.commands.implementations;
 
 import nl.riebie.mcclans.ClansImpl;
-import nl.riebie.mcclans.api.ClanPlayer;
-import nl.riebie.mcclans.api.CommandSender;
 import nl.riebie.mcclans.api.enums.Permission;
 import nl.riebie.mcclans.clan.ClanImpl;
 import nl.riebie.mcclans.commands.annotations.*;
 import nl.riebie.mcclans.commands.constraints.length.LengthConstraints;
 import nl.riebie.mcclans.commands.constraints.regex.RegexConstraints;
 import nl.riebie.mcclans.comparators.ClanKdrComparator;
+import nl.riebie.mcclans.comparators.ClanPlayerKdrComparator;
 import nl.riebie.mcclans.comparators.MemberComparator;
 import nl.riebie.mcclans.messages.Messages;
 import nl.riebie.mcclans.player.ClanInvite;
@@ -16,12 +15,12 @@ import nl.riebie.mcclans.player.ClanPlayerImpl;
 import nl.riebie.mcclans.table.HorizontalTable;
 import nl.riebie.mcclans.table.Row;
 import nl.riebie.mcclans.table.TableAdapter;
+import nl.riebie.mcclans.table.VerticalTable;
 import nl.riebie.mcclans.utils.UUIDUtils;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.format.TextColors;
 
 import java.util.List;
@@ -260,5 +259,105 @@ public class ClanCommands {
         table.defineColumn("Last Online", 30);
 
         table.draw(members, page, clanPlayer);
+    }
+
+    @Command(name = "leaderboard")
+    public void clanLeaderboardCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer, @PageParameter int page) {
+        List<ClanPlayerImpl> clanPlayers = ClansImpl.getInstance().getClanPlayerImpls();
+
+        HorizontalTable<ClanPlayerImpl> table = new HorizontalTable<ClanPlayerImpl>("Players", 10, new TableAdapter<ClanPlayerImpl>() {
+
+            @Override
+            public void fillRow(Row row, ClanPlayerImpl clanPlayer, int i) {
+                Text clanTag = Text.builder("None").color(TextColors.GRAY).build();
+                ClanImpl clan = clanPlayer.getClan();
+                if (clan != null) {
+                    clanTag = clan.getTagColored();
+                }
+
+                row.setValue("Rank", Text.of(String.valueOf(i + 1)));
+                row.setValue("Name", Text.of(clanPlayer.getName()));
+                row.setValue("Clan", clanTag);
+                row.setValue("KDR", Text.of(String.valueOf(clanPlayer.getKDR())));
+
+            }
+        });
+        table.defineColumn("Rank", 10);
+        table.defineColumn("Name", 40);
+        table.defineColumn("Clan", 15);
+        table.defineColumn("KDR", 15);
+
+        table.setComparator(new ClanPlayerKdrComparator());
+
+        table.draw(clanPlayers, page, clanPlayer);
+    }
+
+    @Command(name = "info")
+    public void clanInfoCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer, @Parameter Optional<String> clanTagOpt, @PageParameter int page) {
+        ClansImpl clansImpl = ClansImpl.getInstance();
+        if (clanTagOpt.isPresent()) {
+            String clanTag = clanTagOpt.get();
+            ClanImpl clan = clansImpl.getClan(clanTag);
+            if (clan != null) {
+                printInfo(clanPlayer, clan);
+            } else {
+                Messages.sendWarningMessage(commandSource, Messages.CLAN_DOES_NOT_EXIST);
+            }
+        } else {
+            if (commandSource instanceof Player) {
+                ClanImpl clan = clanPlayer.getClan();
+                if (clan != null) {
+                    printInfo(clanPlayer, clan);
+                } else {
+                    Messages.sendWarningMessage(commandSource, Messages.YOU_ARE_NOT_IN_A_CLAN);
+                }
+            } else {
+                Messages.sendWarningMessage(commandSource, Messages.YOU_NEED_TO_BE_A_PLAYER_TO_PERFORM_THIS_COMMAND);
+            }
+        }
+    }
+
+    private void printInfo(ClanPlayerImpl clanPlayer, ClanImpl clan) {
+        VerticalTable table = new VerticalTable(" Clan info " + clan.getTag(), 0);
+        table.setValue("Clan", Text.join(clan.getTagColored(), Text.of(" " + clan.getName())));
+        table.setValue("Owner", Text.of(clan.getOwner().getName()));
+        table.setValue("Members", Text.of(String.valueOf(clan.getMembers().size())));
+        table.setValue("Allies", generateAllyList(clan));
+        table.setValue("Kills", formatKdr(clan.getKills(), clan.getKillsHigh(), clan.getKillsMedium(), clan.getKillsLow()));
+        table.setValue("Deaths", formatKdr(clan.getDeaths(), clan.getDeathsHigh(), clan.getDeathsMedium(), clan.getDeathsLow()));
+        table.setValue("KDR", Text.of(String.valueOf(clan.getKDR())));
+        table.setValue("Created", Text.of(clan.getCreationDateUserFriendly()));
+        table.draw(clanPlayer, 0);
+    }
+
+    // TODO make more efficient
+    private Text generateAllyList(ClanImpl clan) {
+        Text allyList = null;
+        for (ClanImpl ally : clan.getAlliesImpl()) {
+            if (allyList == null) {
+                allyList = Text.of();
+            } else {
+                allyList.toBuilder().append(Text.of(", ")).build();
+            }
+            allyList.toBuilder().append(ally.getTagColored()).build();
+        }
+        if (allyList == null) {
+            allyList = Text.builder("None").color(TextColors.GRAY).build();
+        }
+        return allyList;
+    }
+
+    // TODO move to utils?
+    private Text formatKdr(int total, int high, int medium, int low) {
+        return Text.join(
+                Text.of(String.valueOf(total)),
+                Text.builder(" [").color(TextColors.GRAY).build(),
+                Text.of(String.valueOf(high)),
+                Text.builder(" : ").color(TextColors.GRAY).build(),
+                Text.of(String.valueOf(medium)),
+                Text.builder(" : ").color(TextColors.GRAY).build(),
+                Text.of(String.valueOf(low)),
+                Text.builder("]").color(TextColors.GRAY).build()
+        );
     }
 }
