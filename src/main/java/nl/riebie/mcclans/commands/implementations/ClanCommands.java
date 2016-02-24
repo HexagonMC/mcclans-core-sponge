@@ -208,7 +208,7 @@ public class ClanCommands {
     }
 
     @Command(name = "roster")
-    public void clanRosterCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer, Optional<String> clanTagOpt, @PageParameter int page) {
+    public void clanRosterCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer, @OptionalParameter(String.class) Optional<String> clanTagOpt, @PageParameter int page) {
         ClanImpl clan;
         if (clanTagOpt.isPresent()) {
             String clanTag = clanTagOpt.get();
