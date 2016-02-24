@@ -293,7 +293,7 @@ public class ClanCommands {
     }
 
     @Command(name = "info")
-    public void clanInfoCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer, @Parameter Optional<String> clanTagOpt, @PageParameter int page) {
+    public void clanInfoCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer, @OptionalParameter(String.class) Optional<String> clanTagOpt, @PageParameter int page) {
         ClansImpl clansImpl = ClansImpl.getInstance();
         if (clanTagOpt.isPresent()) {
             String clanTag = clanTagOpt.get();
