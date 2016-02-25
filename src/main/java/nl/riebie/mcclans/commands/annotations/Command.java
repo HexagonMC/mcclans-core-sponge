@@ -17,4 +17,5 @@ public @interface Command {
     String parent() default "";
     String description() default "";
     Permission permission() default Permission.none;
+    boolean isPlayerOnly() default false;
 }
