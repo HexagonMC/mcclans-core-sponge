@@ -1,31 +1,44 @@
 package nl.riebie.mcclans.commands.implementations;
 
 import nl.riebie.mcclans.ClansImpl;
+import nl.riebie.mcclans.MCClans;
+import nl.riebie.mcclans.api.CommandSender;
 import nl.riebie.mcclans.api.enums.Permission;
 import nl.riebie.mcclans.clan.ClanImpl;
+import nl.riebie.mcclans.clan.RankFactory;
+import nl.riebie.mcclans.clan.RankImpl;
 import nl.riebie.mcclans.commands.annotations.*;
 import nl.riebie.mcclans.commands.constraints.length.LengthConstraints;
 import nl.riebie.mcclans.commands.constraints.regex.RegexConstraints;
 import nl.riebie.mcclans.comparators.ClanKdrComparator;
 import nl.riebie.mcclans.comparators.ClanPlayerKdrComparator;
 import nl.riebie.mcclans.comparators.MemberComparator;
+import nl.riebie.mcclans.config.Config;
 import nl.riebie.mcclans.messages.Messages;
+import nl.riebie.mcclans.player.ClanHomeTeleportTask;
 import nl.riebie.mcclans.player.ClanInvite;
 import nl.riebie.mcclans.player.ClanPlayerImpl;
+import nl.riebie.mcclans.player.LastClanHomeTeleport;
 import nl.riebie.mcclans.table.HorizontalTable;
 import nl.riebie.mcclans.table.Row;
 import nl.riebie.mcclans.table.TableAdapter;
 import nl.riebie.mcclans.table.VerticalTable;
 import nl.riebie.mcclans.utils.UUIDUtils;
+import nl.riebie.mcclans.utils.Utils;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by Mirko on 13/02/2016.
@@ -71,13 +84,37 @@ public class ClanCommands {
 
     @Command(name = "create", description = CLAN_CREATE_DESCRIPTION)
     public void clanCreateCommand(
+            CommandSource commandSource,
             ClanPlayerImpl clanPlayer,
             @Parameter(length = LengthConstraints.CLAN_TAG, regex = RegexConstraints.CLAN_TAG) String clanTag,
             @Multiline @Parameter(length = LengthConstraints.CLAN_NAME, regex = RegexConstraints.CLAN_NAME) String clanName) {
         ClansImpl clansImpl = ClansImpl.getInstance();
-        if (clansImpl.tagIsFree(clanTag)) {
-            ClanImpl clanImpl = clansImpl.createClan(clanTag, clanName, clanPlayer);
-            Messages.sendBroadcastMessageClanCreatedBy(clanImpl.getName(), clanImpl.getTagColored(), clanPlayer.getName());
+        if (clanPlayer.getClan() == null) {
+            if (clansImpl.tagIsFree(clanTag)) {
+                if (Config.getBoolean(Config.USE_ECONOMY)) {
+                    commandSource.sendMessage(Text.of("Economy integration not implemented"));
+                    // TODO SPONGE economy integration
+//                    double clanCreationCost = Configuration.clanCreationCost;
+//                    String currencyName = EconomyHandler.getInstance().getCurrencyName();
+//                    if (EconomyHandler.getInstance().enoughCurrency(clanPlayer.getName(), clanCreationCost)) {
+//                        ClanImpl clanImpl = clansImpl.createClan(clanTag, clanName, clanPlayer);
+//                        Messages.sendBroadcastMessageClanCreatedBy(clanImpl.getName(), clanImpl.getTagColored(), clanPlayer.getName());
+//                        if (clanCreationCost != 0) {
+//                            EconomyHandler.getInstance().chargePlayer(clanPlayer.getName(), clanCreationCost);
+//                            Messages.sendYouWereChargedCurrency(commandSource, clanCreationCost, currencyName);
+//                        }
+//                    } else {
+//                        Messages.sendYouDoNotHaveEnoughCurrency(commandSource, clanCreationCost, currencyName);
+//                    }
+                } else {
+                    ClanImpl clanImpl = clansImpl.createClan(clanTag, clanName, clanPlayer);
+                    Messages.sendBroadcastMessageClanCreatedBy(clanImpl.getName(), clanImpl.getTagColored(), clanPlayer.getName());
+                }
+            } else {
+                Messages.sendWarningMessage(commandSource, Messages.CLANTAG_EXISTS_ALREADY);
+            }
+        } else {
+            Messages.sendWarningMessage(commandSource, Messages.YOU_ARE_ALREADY_IN_A_CLAN);
         }
     }
 
@@ -110,8 +147,9 @@ public class ClanCommands {
 
     @Command(name = "invite")
     public void clanInviteCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer, @Parameter String playerName) {
+        // TODO SPONGE: Check if command is properly and fully implemented
         ClanImpl clan = clanPlayer.getClan();
-        Player player = (Player) commandSource;       //TODO add check if it is a player
+        Player player = (Player) commandSource;       // TODO SPONGE add check if it is a player
         if (clan != null) {
             UUID uuid = UUIDUtils.getUUID(playerName);
             if (uuid == null) {
@@ -121,7 +159,7 @@ public class ClanCommands {
 
             ClansImpl clansInstance = ClansImpl.getInstance();
             ClanPlayerImpl invitedClanPlayer = clansInstance.getClanPlayer(uuid);
-            Player invitedPlayer = Sponge.getServer().getPlayer(uuid).get();  //handle optional :)
+            Player invitedPlayer = Sponge.getServer().getPlayer(uuid).get();  // TODO SPONGE handle optional :)
             if (invitedClanPlayer == null) {
                 if (invitedPlayer == null) {
                     Messages.sendPlayerNotOnline(invitedPlayer, playerName);
@@ -293,7 +331,7 @@ public class ClanCommands {
     }
 
     @Command(name = "info")
-    public void clanInfoCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer, @OptionalParameter(String.class) Optional<String> clanTagOpt, @PageParameter int page) {
+    public void clanInfoCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer, @OptionalParameter(String.class) Optional<String> clanTagOpt) {
         ClansImpl clansImpl = ClansImpl.getInstance();
         if (clanTagOpt.isPresent()) {
             String clanTag = clanTagOpt.get();
@@ -330,7 +368,7 @@ public class ClanCommands {
         table.draw(clanPlayer, 0);
     }
 
-    // TODO make more efficient
+    // TODO SPONGE make more efficient
     private Text generateAllyList(ClanImpl clan) {
         Text allyList = null;
         for (ClanImpl ally : clan.getAlliesImpl()) {
@@ -347,7 +385,7 @@ public class ClanCommands {
         return allyList;
     }
 
-    // TODO move to utils?
+    // TODO SPONGE move to utils?
     private Text formatKdr(int total, int high, int medium, int low) {
         return Text.join(
                 Text.of(String.valueOf(total)),
@@ -359,5 +397,180 @@ public class ClanCommands {
                 Text.of(String.valueOf(low)),
                 Text.builder("]").color(TextColors.GRAY).build()
         );
+    }
+
+    @Command(name = "resign")
+    public void clanResignCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer) {
+        RankImpl rank = clanPlayer.getRank();
+        ClanImpl clan = clanPlayer.getClan();
+        if (rank.getName().equals(RankFactory.getOwnerIdentifier())) {
+            Messages.sendWarningMessage(commandSource, Messages.YOU_CANNOT_RESIGN_FROM_THE_CLAN_AS_THE_OWNER);
+        } else {
+            clan.removeMember(clanPlayer.getName());
+            Messages.sendSuccessfullyResignedFromClan(commandSource, clan.getName());
+            Messages.sendClanBroadcastMessagePlayerResignedFromTheClan(clan, clanPlayer.getName());
+        }
+    }
+
+    @Command(name = "coords")
+    public void clanCoordsCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer, @PageParameter int page) {
+        ClanImpl clan = clanPlayer.getClan();
+        List<Player> onlineMembers = new ArrayList<Player>();
+        List<ClanPlayerImpl> members = clan.getMembersImpl();
+        for (ClanPlayerImpl member : members) {
+            Optional<Player> playerOpt = Sponge.getServer().getPlayer(member.getUUID());
+            if (!playerOpt.isPresent() && playerOpt.get().isOnline()) {
+                onlineMembers.add(playerOpt.get());
+            }
+        }
+        java.util.Collections.sort(members, new MemberComparator());
+
+        HorizontalTable<Player> table = new HorizontalTable<Player>("Clan coordinates " + clan.getName(), 10, new TableAdapter<Player>() {
+
+            @Override
+            public void fillRow(Row row, Player player, int index) {
+                if (player.isOnline()) {
+                    Location<World> location = player.getLocation();
+                    row.setValue("Player", Text.of(player.getName()));
+                    row.setValue("Location", Utils.formatLocation(location));
+
+                }
+            }
+        });
+        table.defineColumn("Player", 30);
+        table.defineColumn("Location", 30);
+
+        table.draw(onlineMembers, page, clanPlayer);
+    }
+
+    @Command(name = "coords")
+    public void clanCoordsCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer, @OptionalParameter(String.class) Optional<String> clanTagOpt, @PageParameter int page) {
+        ClanImpl clan;
+        if (clanTagOpt.isPresent()) {
+            clan = ClansImpl.getInstance().getClan(clanTagOpt.get().toLowerCase());
+            if (clan != null) {
+                printCoords(clanPlayer, clan, page);
+            } else {
+                Messages.sendWarningMessage(commandSource, Messages.CLAN_DOES_NOT_EXIST);
+            }
+        } else {
+            if (commandSource instanceof Player) {
+                clan = clanPlayer.getClan();
+                if (clan != null) {
+                    printCoords(clanPlayer, clan, page);
+                } else {
+                    Messages.sendWarningMessage(commandSource, Messages.YOU_ARE_NOT_IN_A_CLAN);
+                }
+            } else {
+                Messages.sendWarningMessage(commandSource, Messages.YOU_NEED_TO_BE_A_PLAYER_TO_PERFORM_THIS_COMMAND);
+            }
+        }
+    }
+
+    private void printCoords(CommandSender sender, ClanImpl clan, int page) {
+        List<ClanPlayerImpl> members = clan.getMembersImpl();
+        java.util.Collections.sort(members, new MemberComparator());
+
+        HorizontalTable<ClanPlayerImpl> table = new HorizontalTable<ClanPlayerImpl>("Clan statistics " + clan.getName(), 10,
+                new TableAdapter<ClanPlayerImpl>() {
+
+                    @Override
+                    public void fillRow(Row row, ClanPlayerImpl member, int index) {
+                        row.setValue("Player", Text.of(member.getName()));
+                        row.setValue("KDR", Text.of(String.valueOf(member.getKDR())));
+                        row.setValue("Kills", formatKdr(member.getKills(), member.getKillsHigh(), member.getKillsMedium(), member.getKillsLow()));
+                        row.setValue("Deaths", formatKdr(member.getDeaths(), member.getDeathsHigh(), member.getDeathsMedium(), member.getDeathsLow()));
+
+                    }
+                });
+        table.defineColumn("Player", 25);
+        table.defineColumn("KDR", 10);
+        table.defineColumn("Kills", 20);
+        table.defineColumn("Deaths", 20);
+
+        table.draw(members, page, sender);
+    }
+
+    @Command(name = "home")
+    public void clanHomeCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer) {
+        Player player = (Player) commandSource;
+        Location<World> teleportLocation = clanPlayer.getClan().getHome();
+        if (teleportLocation == null) {
+            Messages.sendWarningMessage(commandSource, Messages.CLAN_HOME_LOCATION_IS_NOT_SET);
+        } else if (player != null) {
+            LastClanHomeTeleport lastClanHomeTeleport = clanPlayer.getLastClanHomeTeleport();
+            if (lastClanHomeTeleport == null || lastClanHomeTeleport.canPlayerTeleport()) {
+                Location<World> currentPlayerLocation = player.getLocation();
+                Location<World> lastTeleportInitiationLocation = clanPlayer.getLastTeleportInitiationLocation();
+                if (lastTeleportInitiationLocation == null
+                        || !lastTeleportInitiationLocation.getExtent().getName().equalsIgnoreCase(currentPlayerLocation.getExtent().getName())
+                        || lastTeleportInitiationLocation.getPosition().distance(currentPlayerLocation.getPosition()) != 0) {
+                    if (Config.getBoolean(Config.USE_ECONOMY)) {
+                        commandSource.sendMessage(Text.of("Economy integration not implemented"));
+                        // TODO SPONGE economy impl
+//                        double teleportCost = Configuration.teleportCost;
+//                        String currencyName = EconomyHandler.getInstance().getCurrencyName();
+//                        if (EconomyHandler.getInstance().enoughCurrency(clanPlayer.getName(), teleportCost)) {
+//                            startTeleportTask(player, clanPlayer, teleportLocation, currentPlayerLocation);
+//                        } else {
+//                            Messages.sendYouDoNotHaveEnoughCurrency(player, teleportCost, currencyName);
+//                        }
+                    } else {
+                        startTeleportTask(player, clanPlayer, teleportLocation, currentPlayerLocation);
+                    }
+                } else {
+                    Messages.sendWarningMessage(commandSource, Messages.YOU_NEED_TO_MOVE_BEFORE_ATTEMPTING_ANOTHER_TELEPORT);
+                }
+            } else {
+                Messages.sendYouCanTeleportInXSeconds(commandSource, lastClanHomeTeleport.secondsBeforePlayerCanTeleport());
+            }
+        }
+    }
+
+    private void startTeleportTask(Player player, ClanPlayerImpl clanPlayer, Location<World> teleportLocation, Location<World> currentPlayerLocation) {
+        clanPlayer.setLastTeleportInitiationLocation(currentPlayerLocation);
+        Task.Builder taskBuilder = Sponge.getScheduler().createTaskBuilder();
+        taskBuilder.interval(1, TimeUnit.SECONDS).execute(
+                new ClanHomeTeleportTask(player, clanPlayer, teleportLocation, Config.getInteger(Config.TELEPORT_DELAY_SECONDS), false)
+        ).submit(MCClans.getPlugin());
+    }
+
+    @Command(name = "sethome")
+    public void clanSetHomeCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer) {
+        Player player = (Player) commandSource;
+        ClanImpl clan = clanPlayer.getClan();
+        long setTimeDifference = (System.currentTimeMillis() - clan.getHomeSetTimeStamp()) / 1000;
+        if (clan.getHomeSetTimeStamp() == -1 || setTimeDifference > Config.getInteger(Config.RE_SET_CLANHOME_COOLDOWN_SECONDS)) {
+            if (Config.getBoolean(Config.USE_ECONOMY)) {
+                commandSource.sendMessage(Text.of("Economy integration not implemented"));
+                // TODO SPONGE economy integration
+//                double setClanhomeBaseCost = Config.getDouble(Config.SET_CLANHOME_COST);
+//                double reSetClanhomeCostIncrease = Config.getDouble(Config.RE_SET_CLANHOME_COST_INCREASE);
+//                int homeSetTimes = clan.getHomeSetTimes();
+//                double setClanhomeCost = setClanhomeBaseCost + (homeSetTimes * reSetClanhomeCostIncrease);
+//                String currencyName = EconomyHandler.getInstance().getCurrencyName();
+//                if (EconomyHandler.getInstance().enoughCurrency(clanPlayer.getName(), setClanhomeCost)) {
+//                    EconomyHandler.getInstance().chargePlayer(clanPlayer.getName(), setClanhomeCost);
+//                    setHome(player, clanPlayer, setClanhomeCost, currencyName);
+//                } else {
+//                    Messages.sendYouDoNotHaveEnoughCurrency(player, setClanhomeCost, currencyName);
+//                }
+            } else {
+                setHome(player, clanPlayer, 0, "");
+            }
+        } else {
+            Messages.sendCannotSetClanhomeForAnotherXTime(commandSource, Config.getInteger(Config.RE_SET_CLANHOME_COOLDOWN_SECONDS) - setTimeDifference);
+        }
+    }
+
+    private void setHome(Player player, ClanPlayerImpl clanPlayer, double setClanhomeCost, String currencyName) {
+        Location<World> location = player.getLocation();
+        clanPlayer.getClan().setHome(location);
+        clanPlayer.getClan().increaseHomeSetTimes();
+        clanPlayer.getClan().setHomeSetTimeStamp(System.currentTimeMillis());
+        Messages.sendBasicMessage(player, Messages.CLAN_HOME_LOCATION_SET);
+        if (setClanhomeCost != 0) {
+            Messages.sendYouWereChargedCurrency(player, setClanhomeCost, currencyName);
+        }
     }
 }

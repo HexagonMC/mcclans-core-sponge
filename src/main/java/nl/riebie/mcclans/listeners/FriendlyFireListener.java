@@ -6,8 +6,10 @@ import nl.riebie.mcclans.config.Config;
 import nl.riebie.mcclans.messages.Messages;
 import nl.riebie.mcclans.player.ClanPlayerImpl;
 import nl.riebie.mcclans.utils.Utils;
+import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.cause.entity.damage.source.EntityDamageSource;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
 
 import java.util.Optional;
@@ -28,13 +30,20 @@ public class FriendlyFireListener {
         if (!(event.getTargetEntity() instanceof Player)) {
             return;
         }
-        Optional<Player> damagerOpt = event.getCause().first(Player.class);
-        if (!damagerOpt.isPresent()) {
-            return;
-        }
 
         Player victim = (Player) event.getTargetEntity();
-        Player damager = damagerOpt.get();
+        Player damager = null;
+        Optional<EntityDamageSource> optDamageSource = event.getCause().first(EntityDamageSource.class);
+        if (optDamageSource.isPresent()) {
+            EntityDamageSource damageSource = optDamageSource.get();
+            Entity entityDamager = damageSource.getSource();
+            if (entityDamager instanceof Player) {
+                damager = (Player) entityDamager;
+            }
+        }
+        if (damager == null) {
+            return;
+        }
 
         handleDamageEntity(event, victim, damager);
     }

@@ -9,8 +9,10 @@ import nl.riebie.mcclans.player.KillDeathFactorHandler;
 import nl.riebie.mcclans.player.LastPlayerDamage;
 import nl.riebie.mcclans.utils.UUIDUtils;
 import nl.riebie.mcclans.utils.Utils;
+import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.cause.entity.damage.source.EntityDamageSource;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
 
 import java.util.Optional;
@@ -30,7 +32,15 @@ public class KillDeathRatioListener {
             return;
         }
         Player victim = (Player) event.getTargetEntity();
-        Optional<Player> killerOpt = event.getCause().first(Player.class);
+        Player killer = null;
+        Optional<EntityDamageSource> optDamageSource = event.getCause().first(EntityDamageSource.class);
+        if (optDamageSource.isPresent()) {
+            EntityDamageSource damageSource = optDamageSource.get();
+            Entity entityKiller = damageSource.getSource();
+            if (entityKiller instanceof Player) {
+                killer = (Player) entityKiller;
+            }
+        }
 
         if (Utils.isWorldBlockedFromLoggingPlayerKDR(victim.getWorld().getName())) {
             return;
@@ -42,13 +52,13 @@ public class KillDeathRatioListener {
         }
 
         UUID killerUUID = null;
-        if (killerOpt.isPresent()) {
-            killerUUID = killerOpt.get().getUniqueId();
-        } else {
+        if (killer == null) {
             LastPlayerDamage lastPlayerDamage = victimClanPlayer.getLastPlayerDamage();
             if (lastPlayerDamage != null && !lastPlayerDamage.isDamageExpired() && isValidDeathCauseWhenNoKiller()) {
                 killerUUID = lastPlayerDamage.getDamagerUUID();
             }
+        } else {
+            killerUUID = killer.getUniqueId();
         }
 
         if (killerUUID == null) {
