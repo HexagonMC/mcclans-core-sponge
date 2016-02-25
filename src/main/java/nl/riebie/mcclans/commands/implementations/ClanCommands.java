@@ -33,43 +33,7 @@ import java.util.UUID;
 public class ClanCommands {
     private final static String CLAN_CREATE_DESCRIPTION = "Create a clan";
 
-    @Command(name = "test")
-    public void clanTestCommand(ClanPlayerImpl clanPlayer, @Multiline(listType = Permission.class) @Parameter List<Permission> test) {
-        String message = "";
-        for (Permission permission : test) {
-            message += permission.toString();
-        }
-        clanPlayer.sendMessage(Text.of(message));
-    }
-
-    @Command(name = "hoi")
-    public void clanHoiCommand(ClanPlayerImpl clanPlayer, @Multiline @Parameter String test) {
-        clanPlayer.sendMessage(Text.of(test));
-    }
-
-    @Command(name = "optlist")
-    public void clanOptListCommand(ClanPlayerImpl clanPlayer, @Multiline(listType = Permission.class) @OptionalParameter(List.class) Optional<List<Permission>> test) {
-        if (test.isPresent()) {
-            String message = "";
-            for (Permission permission : test.get()) {
-                message += permission.toString();
-            }
-            clanPlayer.sendMessage(Text.of(message));
-        } else {
-            clanPlayer.sendMessage(Text.of("leeg"));
-        }
-    }
-
-    @Command(name = "opt")
-    public void clanOptCommand(ClanPlayerImpl clanPlayer, @Multiline @OptionalParameter(String.class) Optional<String> test) {
-        if (test.isPresent()) {
-            clanPlayer.sendMessage(Text.of(test.get()));
-        } else {
-            clanPlayer.sendMessage(Text.of("leeg"));
-        }
-    }
-
-    @Command(name = "create", description = CLAN_CREATE_DESCRIPTION)
+    @Command(name = "create", isPlayerOnly = true, description = CLAN_CREATE_DESCRIPTION)
     public void clanCreateCommand(
             ClanPlayerImpl clanPlayer,
             @Parameter(length = LengthConstraints.CLAN_TAG, regex = RegexConstraints.CLAN_TAG) String clanTag,
@@ -82,7 +46,7 @@ public class ClanCommands {
     }
 
     @Command(name = "list")
-    public void clanListCommand(ClanPlayerImpl clanPlayer, @PageParameter int page) {
+    public void clanListCommand(CommandSource commandSource, @PageParameter int page) {
         List<ClanImpl> clans = ClansImpl.getInstance().getClanImpls();
 
         HorizontalTable<ClanImpl> table = new HorizontalTable<>("Clans", 10, (row, clan, i) -> {
@@ -105,7 +69,7 @@ public class ClanCommands {
 
         table.setComparator(new ClanKdrComparator());
 
-        table.draw(clans, page, clanPlayer);
+        table.draw(clans, page, commandSource);
     }
 
     @Command(name = "invite")
@@ -214,7 +178,7 @@ public class ClanCommands {
             String clanTag = clanTagOpt.get();
             clan = ClansImpl.getInstance().getClan(clanTag.toLowerCase());
             if (clan != null) {
-                printRoster(clanPlayer, clan, page);
+                printRoster(commandSource, clanPlayer, clan, page);
             } else {
                 Messages.sendWarningMessage(commandSource, Messages.CLAN_DOES_NOT_EXIST);
             }
@@ -222,7 +186,7 @@ public class ClanCommands {
             if (commandSource instanceof Player) {
                 clan = clanPlayer.getClan();
                 if (clan != null) {
-                    printRoster(clanPlayer, clan, page);
+                    printRoster(commandSource, clanPlayer, clan, page);
                 } else {
                     Messages.sendWarningMessage(commandSource, Messages.YOU_ARE_NOT_IN_A_CLAN);
                 }
@@ -232,11 +196,11 @@ public class ClanCommands {
         }
     }
 
-    private void printRoster(ClanPlayerImpl clanPlayer, ClanImpl clan, int page) {
+    private void printRoster(CommandSource commandSource, ClanPlayerImpl clanPlayer, ClanImpl clan, int page) {
         List<ClanPlayerImpl> members = clan.getMembersImpl();
         java.util.Collections.sort(members, new MemberComparator());
 
-        HorizontalTable<ClanPlayerImpl> table = new HorizontalTable<ClanPlayerImpl>("Clan roster " + clan.getName(), 10,
+        HorizontalTable<ClanPlayerImpl> table = new HorizontalTable<>("Clan roster " + clan.getName(), 10,
                 new TableAdapter<ClanPlayerImpl>() {
 
                     @Override
@@ -258,7 +222,7 @@ public class ClanCommands {
         table.defineColumn("Rank", 20);
         table.defineColumn("Last Online", 30);
 
-        table.draw(members, page, clanPlayer);
+        table.draw(members, page, commandSource);
     }
 
     @Command(name = "leaderboard")
@@ -289,7 +253,7 @@ public class ClanCommands {
 
         table.setComparator(new ClanPlayerKdrComparator());
 
-        table.draw(clanPlayers, page, clanPlayer);
+        table.draw(clanPlayers, page, commandSource);
     }
 
     @Command(name = "info")
@@ -299,7 +263,7 @@ public class ClanCommands {
             String clanTag = clanTagOpt.get();
             ClanImpl clan = clansImpl.getClan(clanTag);
             if (clan != null) {
-                printInfo(clanPlayer, clan);
+                printInfo(commandSource, clan);
             } else {
                 Messages.sendWarningMessage(commandSource, Messages.CLAN_DOES_NOT_EXIST);
             }
@@ -307,7 +271,7 @@ public class ClanCommands {
             if (commandSource instanceof Player) {
                 ClanImpl clan = clanPlayer.getClan();
                 if (clan != null) {
-                    printInfo(clanPlayer, clan);
+                    printInfo(commandSource, clan);
                 } else {
                     Messages.sendWarningMessage(commandSource, Messages.YOU_ARE_NOT_IN_A_CLAN);
                 }
@@ -317,7 +281,7 @@ public class ClanCommands {
         }
     }
 
-    private void printInfo(ClanPlayerImpl clanPlayer, ClanImpl clan) {
+    private void printInfo(CommandSource commandSource, ClanImpl clan) {
         VerticalTable table = new VerticalTable(" Clan info " + clan.getTag(), 0);
         table.setValue("Clan", Text.join(clan.getTagColored(), Text.of(" " + clan.getName())));
         table.setValue("Owner", Text.of(clan.getOwner().getName()));
@@ -327,7 +291,7 @@ public class ClanCommands {
         table.setValue("Deaths", formatKdr(clan.getDeaths(), clan.getDeathsHigh(), clan.getDeathsMedium(), clan.getDeathsLow()));
         table.setValue("KDR", Text.of(String.valueOf(clan.getKDR())));
         table.setValue("Created", Text.of(clan.getCreationDateUserFriendly()));
-        table.draw(clanPlayer, 0);
+        table.draw(commandSource, 0);
     }
 
     // TODO make more efficient

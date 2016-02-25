@@ -11,6 +11,7 @@ import nl.riebie.mcclans.commands.constraints.regex.RegexConstraint;
 import nl.riebie.mcclans.messages.Messages;
 import nl.riebie.mcclans.player.ClanPlayerImpl;
 import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.command.source.ConsoleSource;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 
@@ -65,7 +66,7 @@ public class CommandManager {
     private void handleMethod(Method method, Object commandStructureInstance, FilledCommand parent) {
         Command commandAnnotation = method.getAnnotation(Command.class);
         if (commandAnnotation != null) {
-            FilledCommand filledCommand = new FilledCommand(commandAnnotation.name(), method, commandAnnotation.permission(), commandAnnotation.description());
+            FilledCommand filledCommand = new FilledCommand(commandAnnotation.name(), method, commandAnnotation.permission(), commandAnnotation.description(), commandAnnotation.isPlayerOnly());
             commandStructureMap.put(filledCommand, commandStructureInstance);
             if (parent == null) {
                 filledCommandMap.put(commandAnnotation.name(), filledCommand);
@@ -167,7 +168,7 @@ public class CommandManager {
     public void executeCommand(CommandSource commandSource, String[] args) {
         CommandSender commandSender = getCommandSender(commandSource);
         String firstParam = args[0];
-        int page = 1;
+
         if (firstParam.equals("page")) {
             FilledCommand filledCommand = lastExecutedPageCommand.get(commandSender);
             Object[] objects = lastExecutedPageCommandData.get(commandSender);
@@ -188,6 +189,11 @@ public class CommandManager {
                 } else {
                     filledCommand = child;
                 }
+            }
+
+            if (filledCommand.isPlayerOnly() && !(commandSource instanceof Player)) {
+                commandSource.sendMessage(Text.of("This command can only be used by players"));
+                return;
             }
 
             Permission permission = filledCommand.getPermission();
@@ -319,13 +325,21 @@ public class CommandManager {
     }
 
     private CommandSender getCommandSender(CommandSource commandSource) {
-        Player player = (Player) commandSource;
 
-        UUID uuid = player.getUniqueId();
-        ClanPlayerImpl clanPlayer = ClansImpl.getInstance().getClanPlayer(uuid);
-        if (clanPlayer == null) {
-            clanPlayer = ClansImpl.getInstance().createClanPlayer(uuid, player.getName());
+        if (commandSource instanceof Player) {
+            Player player = (Player) commandSource;
+
+            UUID uuid = player.getUniqueId();
+            ClanPlayerImpl clanPlayer = ClansImpl.getInstance().getClanPlayer(uuid);
+            if (clanPlayer == null) {
+                clanPlayer = ClansImpl.getInstance().createClanPlayer(uuid, player.getName());
+            }
+
+            return clanPlayer;
+        } else if (commandSource instanceof ConsoleSource) {
+            ConsoleSource consoleSource = (ConsoleSource) commandSource;
+            return new ConsoleSender(consoleSource);
         }
-        return clanPlayer;
+        return null;
     }
 }

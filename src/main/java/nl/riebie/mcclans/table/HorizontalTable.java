@@ -7,6 +7,7 @@ import java.util.List;
 
 import nl.riebie.mcclans.api.CommandSender;
 import nl.riebie.mcclans.messages.Messages;
+import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.format.TextStyles;
@@ -19,7 +20,7 @@ public class HorizontalTable<T> {
     private String tableName;
     private String message;
     private List<T> items;
-    private CommandSender sender;
+    private CommandSource sender;
 
     private List<Row> rows = new ArrayList<>();
     private List<Column> columns = new ArrayList<>();
@@ -53,7 +54,7 @@ public class HorizontalTable<T> {
         this.message = message;
     }
 
-    public void draw(List<T> items, int page, CommandSender sender) {
+    public void draw(List<T> items, int page, CommandSource sender) {
         this.page = page;
         this.items = items;
         this.sender = sender;
@@ -248,22 +249,22 @@ public class HorizontalTable<T> {
     class MessageCallback {
 
         private final List<Text> message;
-        private final CommandSender sender;
+        private final CommandSource sender;
 
-        public MessageCallback(Text message, CommandSender sender) {
+        public MessageCallback(Text message, CommandSource sender) {
             this.message = new ArrayList<>();
             this.message.add(message);
             this.sender = sender;
 
         }
 
-        public MessageCallback(List<Text> message, CommandSender sender) {
+        public MessageCallback(List<Text> message, CommandSource sender) {
             this.message = message;
             this.sender = sender;
         }
 
         public void send() {
-            sender.sendMessage(message.toArray(new Text[message.size()]));
+            sender.sendMessages(message.toArray(new Text[message.size()]));
         }
     }
 
