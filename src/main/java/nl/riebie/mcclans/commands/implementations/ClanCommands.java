@@ -2,7 +2,6 @@ package nl.riebie.mcclans.commands.implementations;
 
 import nl.riebie.mcclans.ClansImpl;
 import nl.riebie.mcclans.MCClans;
-import nl.riebie.mcclans.api.CommandSender;
 import nl.riebie.mcclans.api.enums.Permission;
 import nl.riebie.mcclans.clan.ClanImpl;
 import nl.riebie.mcclans.clan.RankFactory;
@@ -404,7 +403,7 @@ public class ClanCommands {
         table.defineColumn("Player", 30);
         table.defineColumn("Location", 30);
 
-        table.draw(onlineMembers, page, clanPlayer);
+        table.draw(onlineMembers, page, commandSource);
     }
 
     @Command(name = "coords")
@@ -413,7 +412,7 @@ public class ClanCommands {
         if (clanTagOpt.isPresent()) {
             clan = ClansImpl.getInstance().getClan(clanTagOpt.get().toLowerCase());
             if (clan != null) {
-                printCoords(clanPlayer, clan, page);
+                printCoords(commandSource, clan, page);
             } else {
                 Messages.sendWarningMessage(commandSource, Messages.CLAN_DOES_NOT_EXIST);
             }
@@ -421,7 +420,7 @@ public class ClanCommands {
             if (commandSource instanceof Player) {
                 clan = clanPlayer.getClan();
                 if (clan != null) {
-                    printCoords(clanPlayer, clan, page);
+                    printCoords(commandSource, clan, page);
                 } else {
                     Messages.sendWarningMessage(commandSource, Messages.YOU_ARE_NOT_IN_A_CLAN);
                 }
@@ -431,7 +430,7 @@ public class ClanCommands {
         }
     }
 
-    private void printCoords(CommandSender sender, ClanImpl clan, int page) {
+    private void printCoords(CommandSource commandSource, ClanImpl clan, int page) {
         List<ClanPlayerImpl> members = clan.getMembersImpl();
         java.util.Collections.sort(members, new MemberComparator());
 
@@ -452,7 +451,7 @@ public class ClanCommands {
         table.defineColumn("Kills", 20);
         table.defineColumn("Deaths", 20);
 
-        table.draw(members, page, sender);
+        table.draw(members, page, commandSource);
     }
 
     @Command(name = "home")
