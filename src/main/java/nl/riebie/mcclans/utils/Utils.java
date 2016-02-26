@@ -57,6 +57,19 @@ public final class Utils {
         }
     }
 
+    public static Text formatKdr(int total, int high, int medium, int low) {
+        return Text.join(
+                Text.of(String.valueOf(total)),
+                Text.builder(" [").color(TextColors.GRAY).build(),
+                Text.of(String.valueOf(high)),
+                Text.builder(" : ").color(TextColors.GRAY).build(),
+                Text.of(String.valueOf(medium)),
+                Text.builder(" : ").color(TextColors.GRAY).build(),
+                Text.of(String.valueOf(low)),
+                Text.builder("]").color(TextColors.GRAY).build()
+        );
+    }
+
     public static Text formatLocation(@Nullable Location<World> location) {
         if (location == null) {
             return Text.builder("NOT SET").color(TextColors.DARK_RED).build();

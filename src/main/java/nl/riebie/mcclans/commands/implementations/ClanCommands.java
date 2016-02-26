@@ -45,6 +45,18 @@ import java.util.concurrent.TimeUnit;
 public class ClanCommands {
     private final static String CLAN_CREATE_DESCRIPTION = "Create a clan";
 
+    @ChildGroup(ClanChatCommands.class)
+    @Command(name = "chat")
+    public void clanChatRootCommand(ClanPlayerImpl clanPlayer) {
+        clanPlayer.sendMessage(Text.of("TODO"));
+    }
+
+    @ChildGroup(ClanPlayerCommands.class)
+    @Command(name = "player")
+    public void clanPlayerRootCommand(ClanPlayerImpl clanPlayer) {
+        clanPlayer.sendMessage(Text.of("TODO"));
+    }
+
     @Command(name = "create", isPlayerOnly = true, description = CLAN_CREATE_DESCRIPTION)
     public void clanCreateCommand(
             CommandSource commandSource,
@@ -147,12 +159,6 @@ public class ClanCommands {
         } else {
             Messages.sendWarningMessage(player, Messages.YOU_ARE_NOT_IN_A_CLAN);
         }
-    }
-
-    @ChildGroup(ClanChatCommands.class)
-    @Command(name = "chat")
-    public void clanChatRootCommand(ClanPlayerImpl clanPlayer) {
-        clanPlayer.sendMessage(Text.of("TODO"));
     }
 
     @Command(name = "disband")
@@ -324,8 +330,8 @@ public class ClanCommands {
         table.setValue("Owner", Text.of(clan.getOwner().getName()));
         table.setValue("Members", Text.of(String.valueOf(clan.getMembers().size())));
         table.setValue("Allies", generateAllyList(clan));
-        table.setValue("Kills", formatKdr(clan.getKills(), clan.getKillsHigh(), clan.getKillsMedium(), clan.getKillsLow()));
-        table.setValue("Deaths", formatKdr(clan.getDeaths(), clan.getDeathsHigh(), clan.getDeathsMedium(), clan.getDeathsLow()));
+        table.setValue("Kills", Utils.formatKdr(clan.getKills(), clan.getKillsHigh(), clan.getKillsMedium(), clan.getKillsLow()));
+        table.setValue("Deaths", Utils.formatKdr(clan.getDeaths(), clan.getDeathsHigh(), clan.getDeathsMedium(), clan.getDeathsLow()));
         table.setValue("KDR", Text.of(String.valueOf(clan.getKDR())));
         table.setValue("Created", Text.of(clan.getCreationDateUserFriendly()));
         table.draw(commandSource, 0);
@@ -348,20 +354,6 @@ public class ClanCommands {
         return allyList;
     }
 
-    // TODO SPONGE move to utils?
-    private Text formatKdr(int total, int high, int medium, int low) {
-        return Text.join(
-                Text.of(String.valueOf(total)),
-                Text.builder(" [").color(TextColors.GRAY).build(),
-                Text.of(String.valueOf(high)),
-                Text.builder(" : ").color(TextColors.GRAY).build(),
-                Text.of(String.valueOf(medium)),
-                Text.builder(" : ").color(TextColors.GRAY).build(),
-                Text.of(String.valueOf(low)),
-                Text.builder("]").color(TextColors.GRAY).build()
-        );
-    }
-
     @Command(name = "resign")
     public void clanResignCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer) {
         RankImpl rank = clanPlayer.getRank();
@@ -382,7 +374,7 @@ public class ClanCommands {
         List<ClanPlayerImpl> members = clan.getMembersImpl();
         for (ClanPlayerImpl member : members) {
             Optional<Player> playerOpt = Sponge.getServer().getPlayer(member.getUUID());
-            if (!playerOpt.isPresent() && playerOpt.get().isOnline()) {
+            if (playerOpt.isPresent() && playerOpt.get().isOnline()) {
                 onlineMembers.add(playerOpt.get());
             }
         }
@@ -406,13 +398,13 @@ public class ClanCommands {
         table.draw(onlineMembers, page, commandSource);
     }
 
-    @Command(name = "coords")
-    public void clanCoordsCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer, @OptionalParameter(String.class) Optional<String> clanTagOpt, @PageParameter int page) {
+    @Command(name = "stats")
+    public void clanStatsCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer, @OptionalParameter(String.class) Optional<String> clanTagOpt, @PageParameter int page) {
         ClanImpl clan;
         if (clanTagOpt.isPresent()) {
             clan = ClansImpl.getInstance().getClan(clanTagOpt.get().toLowerCase());
             if (clan != null) {
-                printCoords(commandSource, clan, page);
+                printStats(commandSource, clan, page);
             } else {
                 Messages.sendWarningMessage(commandSource, Messages.CLAN_DOES_NOT_EXIST);
             }
@@ -420,7 +412,7 @@ public class ClanCommands {
             if (commandSource instanceof Player) {
                 clan = clanPlayer.getClan();
                 if (clan != null) {
-                    printCoords(commandSource, clan, page);
+                    printStats(commandSource, clan, page);
                 } else {
                     Messages.sendWarningMessage(commandSource, Messages.YOU_ARE_NOT_IN_A_CLAN);
                 }
@@ -430,7 +422,7 @@ public class ClanCommands {
         }
     }
 
-    private void printCoords(CommandSource commandSource, ClanImpl clan, int page) {
+    private void printStats(CommandSource commandSource, ClanImpl clan, int page) {
         List<ClanPlayerImpl> members = clan.getMembersImpl();
         java.util.Collections.sort(members, new MemberComparator());
 
@@ -441,8 +433,8 @@ public class ClanCommands {
                     public void fillRow(Row row, ClanPlayerImpl member, int index) {
                         row.setValue("Player", Text.of(member.getName()));
                         row.setValue("KDR", Text.of(String.valueOf(member.getKDR())));
-                        row.setValue("Kills", formatKdr(member.getKills(), member.getKillsHigh(), member.getKillsMedium(), member.getKillsLow()));
-                        row.setValue("Deaths", formatKdr(member.getDeaths(), member.getDeathsHigh(), member.getDeathsMedium(), member.getDeathsLow()));
+                        row.setValue("Kills", Utils.formatKdr(member.getKills(), member.getKillsHigh(), member.getKillsMedium(), member.getKillsLow()));
+                        row.setValue("Deaths", Utils.formatKdr(member.getDeaths(), member.getDeathsHigh(), member.getDeathsMedium(), member.getDeathsLow()));
 
                     }
                 });
