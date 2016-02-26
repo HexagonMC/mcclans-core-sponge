@@ -8,10 +8,10 @@ public class ParseResult<T> {
     private String errorMessage;
     private T item;
 
-    public static <U> ParseResult<U> newErrorResult(String message) {
+    public static <U> ParseResult<U> newErrorResult(String message, String... args) {
         ParseResult<U> result = new ParseResult<>();
         result.success = false;
-        result.errorMessage = message;
+        result.errorMessage = String.format(message, args);
         return result;
     }
 

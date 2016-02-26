@@ -1,9 +1,11 @@
 package nl.riebie.mcclans.commands.implementations;
 
 import nl.riebie.mcclans.ClansImpl;
+import nl.riebie.mcclans.api.Clan;
 import nl.riebie.mcclans.MCClans;
 import nl.riebie.mcclans.api.enums.Permission;
 import nl.riebie.mcclans.clan.ClanImpl;
+import nl.riebie.mcclans.commands.Toggle;
 import nl.riebie.mcclans.clan.RankFactory;
 import nl.riebie.mcclans.clan.RankImpl;
 import nl.riebie.mcclans.commands.annotations.*;
@@ -44,6 +46,13 @@ import java.util.concurrent.TimeUnit;
  */
 public class ClanCommands {
     private final static String CLAN_CREATE_DESCRIPTION = "Create a clan";
+    private static final String CLAN_FRIENDLY_FIRE_DESCRIPTION = "";
+
+    @ChildGroup(ClanFriendlyFireCommands.class)
+    @Command(name = "friendlyfire", isPlayerOnly = true, permission = Permission.friendlyfire, description = CLAN_FRIENDLY_FIRE_DESCRIPTION)
+    public void clanFriendlyFireCommand() {
+
+    }
 
     @ChildGroup(ClanChatCommands.class)
     @Command(name = "chat")
