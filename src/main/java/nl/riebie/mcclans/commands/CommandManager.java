@@ -37,6 +37,7 @@ public class CommandManager {
         registerParameterValidator(new FloatParser(), float.class, Float.class);
         registerParameterValidator(new BooleanParser(), boolean.class, Boolean.class);
         registerParameterValidator(new PermissionParser(), Permission.class);
+        registerParameterValidator(new ToggleParser(), Toggle.class);
     }
 
     private static void registerParameterValidator(ParameterParser<?> parser, Class<?>... classes) {

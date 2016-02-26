@@ -1,8 +1,10 @@
 package nl.riebie.mcclans.commands.implementations;
 
 import nl.riebie.mcclans.ClansImpl;
+import nl.riebie.mcclans.api.Clan;
 import nl.riebie.mcclans.api.enums.Permission;
 import nl.riebie.mcclans.clan.ClanImpl;
+import nl.riebie.mcclans.commands.Toggle;
 import nl.riebie.mcclans.commands.annotations.*;
 import nl.riebie.mcclans.commands.constraints.length.LengthConstraints;
 import nl.riebie.mcclans.commands.constraints.regex.RegexConstraints;
@@ -32,6 +34,13 @@ import java.util.UUID;
  */
 public class ClanCommands {
     private final static String CLAN_CREATE_DESCRIPTION = "Create a clan";
+    private static final String CLAN_FRIENDLY_FIRE_DESCRIPTION = "";
+
+    @ChildGroup(ClanFriendlyFireCommands.class)
+    @Command(name = "friendlyfire", isPlayerOnly = true, permission = Permission.friendlyfire, description = CLAN_FRIENDLY_FIRE_DESCRIPTION)
+    public void clanFriendlyFireCommand(ClanPlayerImpl clanPlayer, @Parameter Toggle friendlyFireToggle) {
+
+    }
 
     @Command(name = "test")
     public void clanTestCommand(ClanPlayerImpl clanPlayer, @Multiline(listType = Permission.class) @Parameter List<Permission> test) {
