@@ -23,20 +23,20 @@ public class ClanFriendlyFireCommands {
         boolean ffProtected = friendlyFireToggle.getBoolean(clan.isFfProtected());
         clan.setFfProtection(ffProtected);
         if (ffProtected) {
-            Messages.sendClanBroadcastMessageClanFriendlyFireProtectionHasBeenDeactivatedByPlayer(clan, clanPlayer.getName());
-        } else {
             Messages.sendClanBroadcastMessageClanFriendlyFireProtectionHasBeenActivatedByPlayer(clan, clanPlayer.getName());
+        } else {
+            Messages.sendClanBroadcastMessageClanFriendlyFireProtectionHasBeenDeactivatedByPlayer(clan, clanPlayer.getName());
         }
     }
 
-    @Command(name = "personal", isPlayerOnly = true, permission = Permission.friendlyfire, description = CLAN_FRIENDLY_FIRE_DESCRIPTION)
+    @Command(name = "personal", isPlayerOnly = true, description = PLAYER_FRIENDLY_FIRE_DESCRIPTION)
     public void personalFriendlyFireCommand(CommandSource sender, ClanPlayerImpl clanPlayer, @Parameter Toggle friendlyFireToggle) {
         boolean ffProtected = friendlyFireToggle.getBoolean(clanPlayer.isFfProtected());
         clanPlayer.setFfProtection(ffProtected);
         if (ffProtected) {
-            Messages.sendBasicMessage(sender, Messages.DEACTIVATED_PERSONAL_FRIENDLY_FIRE_PROTECTION);
-        } else {
             Messages.sendBasicMessage(sender, Messages.ACTIVATED_PERSONAL_FRIENDLY_FIRE_PROTECTION);
+        } else {
+            Messages.sendBasicMessage(sender, Messages.DEACTIVATED_PERSONAL_FRIENDLY_FIRE_PROTECTION);
         }
     }
 }

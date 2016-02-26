@@ -19,7 +19,7 @@ public class Toggle {
     }
 
     public enum ToggleType {
-        TRUE("true", "on"), FALSE("false", "of"), TOGGLE("toggle");
+        TRUE("true", "on"), FALSE("false", "off"), TOGGLE("toggle");
 
         private List<String> values;
 

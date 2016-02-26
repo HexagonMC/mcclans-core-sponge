@@ -50,7 +50,7 @@ public class ClanCommands {
 
     @ChildGroup(ClanFriendlyFireCommands.class)
     @Command(name = "friendlyfire", isPlayerOnly = true, permission = Permission.friendlyfire, description = CLAN_FRIENDLY_FIRE_DESCRIPTION)
-    public void clanFriendlyFireCommand(ClanPlayerImpl clanPlayer, @Parameter Toggle friendlyFireToggle) {
+    public void clanFriendlyFireCommand() {
 
     }
 
