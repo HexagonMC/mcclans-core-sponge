@@ -16,8 +16,8 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
 
-import javax.security.auth.login.Configuration;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -54,7 +54,7 @@ public class ClanPlayerImpl implements ClanPlayer, Cloneable, CommandSender {
     private PlayerChatState chatState = PlayerChatState.GLOBAL;
     private PlayerChatState tempChatState = null;
     private LastClanHomeTeleport lastClanHomeTeleport;
-    private Location lastTeleportInitiationLocation;
+    private Location<World> lastTeleportInitiationLocation;
     private LastPlayerDamage lastPlayerDamage;
     private boolean ffProtection;
 
@@ -368,11 +368,11 @@ public class ClanPlayerImpl implements ClanPlayer, Cloneable, CommandSender {
         this.lastClanHomeTeleport = lastClanHomeTeleport;
     }
 
-    public Location getLastTeleportInitiationLocation() {
+    public Location<World> getLastTeleportInitiationLocation() {
         return lastTeleportInitiationLocation;
     }
 
-    public void setLastTeleportInitiationLocation(Location lastTeleportInitiationLocation) {
+    public void setLastTeleportInitiationLocation(Location<World> lastTeleportInitiationLocation) {
         this.lastTeleportInitiationLocation = lastTeleportInitiationLocation;
     }
 

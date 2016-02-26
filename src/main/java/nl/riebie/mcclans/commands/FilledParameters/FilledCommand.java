@@ -18,16 +18,18 @@ public final class FilledCommand {
     private String description;
     private List<FilledParameter> parameters = new ArrayList<>();
     private List<FilledCommand> children = new ArrayList<>();
+    private boolean isPlayerOnly;
 
     private boolean hasPageParameter;
     private boolean hasOptional;
     private boolean hasMultiline;
 
-    public FilledCommand(String name, Method method, Permission permission, String description) {
+    public FilledCommand(String name, Method method, Permission permission, String description, boolean isPlayerOnly) {
         this.method = method;
         this.permission = permission;
         this.description = description;
         this.name = name;
+        this.isPlayerOnly = isPlayerOnly;
     }
 
     public String getName() {
@@ -114,5 +116,13 @@ public final class FilledCommand {
 
     public Permission getPermission() {
         return permission;
+    }
+
+    public boolean isPlayerOnly() {
+        return isPlayerOnly;
+    }
+
+    public String getDescription() {
+        return description;
     }
 }

@@ -1,6 +1,6 @@
 package nl.riebie.mcclans.table;
 
-import nl.riebie.mcclans.api.CommandSender;
+import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.format.TextStyles;
@@ -40,7 +40,7 @@ public class VerticalTable {
         }
     }
 
-    public void draw(CommandSender sender, int page) {
+    public void draw(CommandSource sender, int page) {
         rowSizes.clear();
 
         List<String> compareHeaders = new ArrayList<>(headers);
@@ -71,7 +71,7 @@ public class VerticalTable {
         sender.sendMessage(Text.of(""));
         sender.sendMessage(Text.join(Text.builder().color(TextColors.DARK_GRAY).append(Text.of("== ")).toText(), Text.of(this.tableName), Text.builder().color(TextColors.DARK_GRAY).append(Text.of(" ==")).toText()));
         sender.sendMessage(Text.of(""));
-        sender.sendMessage(message.toArray(new Text[message.size()]));
+        sender.sendMessages(message.toArray(new Text[message.size()]));
     }
 
     private Text getSpacesString(double numberOfSpaces) {

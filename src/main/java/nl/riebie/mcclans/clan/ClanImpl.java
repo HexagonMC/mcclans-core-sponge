@@ -163,17 +163,18 @@ public class ClanImpl implements Clan, Cloneable {
 
     @Override
     public void setHome(Location<World> location) {
-        // TODO SPONGE: clone has protected access in Object..
+        // TODO SPONGE: clone has protected access in Object.. is copy & cast good enough?
 //        home = location.clone();
+        home = (Location) location.copy();
         TaskForwarder.sendUpdateClan(this);
     }
 
     @Override
     public Location<World> getHome() {
         if (home != null) {
-            // TODO SPONGE: clone has protected access in Object..
+            // TODO SPONGE: clone has protected access in Object.. why we clonin anyway?
 //            return home.clone();
-            return null;
+            return home;
         } else {
             return null;
         }
