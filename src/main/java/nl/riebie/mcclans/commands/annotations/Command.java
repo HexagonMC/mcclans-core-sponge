@@ -14,8 +14,9 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 public @interface Command {
     String name();
-    String parent() default "";
     String description() default "";
     Permission permission() default Permission.none;
     boolean isPlayerOnly() default false;
+    boolean isClanOnly() default false;
+    String spongePermission();
 }
