@@ -68,7 +68,7 @@ public class CommandManager {
     private void handleMethod(Method method, Object commandStructureInstance, FilledCommand parent) {
         Command commandAnnotation = method.getAnnotation(Command.class);
         if (commandAnnotation != null) {
-            FilledCommand filledCommand = new FilledCommand(commandAnnotation.name(), method, commandAnnotation.permission(), commandAnnotation.description(), commandAnnotation.isPlayerOnly());
+            FilledCommand filledCommand = new FilledCommand(commandAnnotation.name(), method, commandAnnotation.clanPermission(), commandAnnotation.description(), commandAnnotation.isPlayerOnly());
             commandStructureMap.put(filledCommand, commandStructureInstance);
             if (parent == null) {
                 filledCommandMap.put(commandAnnotation.name(), filledCommand);

@@ -6,13 +6,11 @@ import nl.riebie.mcclans.channels.ClanMessageChannel;
 import nl.riebie.mcclans.commands.annotations.Command;
 import nl.riebie.mcclans.commands.annotations.Multiline;
 import nl.riebie.mcclans.commands.annotations.OptionalParameter;
-import nl.riebie.mcclans.commands.annotations.Parameter;
 import nl.riebie.mcclans.enums.PlayerChatState;
 import nl.riebie.mcclans.messages.Messages;
 import nl.riebie.mcclans.player.ClanPlayerImpl;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.channel.MessageChannel;
 
@@ -22,7 +20,7 @@ import java.util.Optional;
  * Created by Mirko on 14/02/2016.
  */
 public class ClanChatCommands {
-    @Command(name = "clan", permission = Permission.clanchat)
+    @Command(name = "clan", description = "Talk in clan chat", isPlayerOnly = true, isClanOnly = true, clanPermission = Permission.clanchat, spongePermission = "mcclans.user.chat.clan")
     public void clanChatCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer, @Multiline @OptionalParameter(String.class) Optional<String> messageOpt) {
         if (messageOpt.isPresent()) {
             String message = messageOpt.get();
@@ -43,7 +41,7 @@ public class ClanChatCommands {
         }
     }
 
-    @Command(name = "ally", permission = Permission.allychat)
+    @Command(name = "ally", description = "Talk in ally chat", isPlayerOnly = true, isClanOnly = true, clanPermission = Permission.allychat, spongePermission = "mcclans.user.chat.ally")
     public void allyChatCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer, @Multiline @OptionalParameter(String.class) Optional<String> optionalMessage) {
         if (optionalMessage.isPresent()) {
             String message = optionalMessage.get();
@@ -64,7 +62,7 @@ public class ClanChatCommands {
         }
     }
 
-    @Command(name = "global")
+    @Command(name = "global", description = "Talk in global chat", isPlayerOnly = true, isClanOnly = true, spongePermission = "mcclans.user.chat.global")
     public void globalChatCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer, @Multiline @OptionalParameter(String.class) Optional<String> optionalMessage) {
         if (optionalMessage.isPresent()) {
             String message = optionalMessage.get();

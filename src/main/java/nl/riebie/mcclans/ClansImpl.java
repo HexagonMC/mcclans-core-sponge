@@ -17,11 +17,7 @@ import nl.riebie.mcclans.events.EventDispatcher;
 import nl.riebie.mcclans.player.ClanInvite;
 import nl.riebie.mcclans.player.ClanPlayerImpl;
 import nl.riebie.mcclans.utils.UUIDUtils;
-import org.spongepowered.api.Sponge;
-import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.profile.GameProfile;
-import org.spongepowered.api.service.user.UserStorageService;
 
 import java.util.*;
 

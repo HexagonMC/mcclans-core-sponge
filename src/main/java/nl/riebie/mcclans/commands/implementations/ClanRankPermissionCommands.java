@@ -4,24 +4,25 @@ import nl.riebie.mcclans.api.enums.Permission;
 import nl.riebie.mcclans.api.enums.PermissionModifyResponse;
 import nl.riebie.mcclans.clan.ClanImpl;
 import nl.riebie.mcclans.clan.RankImpl;
-import nl.riebie.mcclans.commands.annotations.*;
+import nl.riebie.mcclans.commands.annotations.Command;
+import nl.riebie.mcclans.commands.annotations.Multiline;
+import nl.riebie.mcclans.commands.annotations.PageParameter;
+import nl.riebie.mcclans.commands.annotations.Parameter;
 import nl.riebie.mcclans.messages.Messages;
 import nl.riebie.mcclans.player.ClanPlayerImpl;
 import nl.riebie.mcclans.table.HorizontalTable;
-import nl.riebie.mcclans.table.Row;
 import nl.riebie.mcclans.table.TableAdapter;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.text.Text;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Created by Mirko on 27/02/2016.
  */
 public class ClanRankPermissionCommands {
 
-    @Command(name = "add", permission = Permission.rank, description = "Adds the given permissions to a rank")
+    @Command(name = "add", description = "Adds the given permissions to a rank", isPlayerOnly = true, isClanOnly = true, clanPermission = Permission.rank, spongePermission = "mcclans.user.rank.permission.add")
     public void clanRankPermissionAddCommand(CommandSource sender, ClanPlayerImpl clanPlayer, @Parameter String rankName,
                                              @Multiline(listType = Permission.class) @Parameter List<Permission> permissions) {
 
@@ -57,7 +58,7 @@ public class ClanRankPermissionCommands {
         }
     }
 
-    @Command(name = "set", permission = Permission.rank, description = "Sets the given permissions to a rank")
+    @Command(name = "set", description = "Sets the given permissions to a rank", isPlayerOnly = true, isClanOnly = true, clanPermission = Permission.rank, spongePermission = "mcclans.user.rank.permission.set")
     public void clanRankPermissionSetCommand(CommandSource sender, ClanPlayerImpl clanPlayer, @Parameter String rankName,
                                              @Multiline(listType = Permission.class) @Parameter List<Permission> permissions) {
         ClanImpl clan = clanPlayer.getClan();
@@ -90,7 +91,7 @@ public class ClanRankPermissionCommands {
         }
     }
 
-    @Command(name = "remove", isPlayerOnly = true, description = "Removes the given permissions from a rank")
+    @Command(name = "remove", description = "Removes the given permissions from a rank", isPlayerOnly = true, isClanOnly = true, clanPermission = Permission.rank, spongePermission = "mcclans.user.rank.permission.remove")
     public void canPermissionRemoveCommand(CommandSource sender, ClanPlayerImpl clanPlayer, @Parameter String rankName,
                                            @Multiline(listType = Permission.class) @Parameter List<Permission> permissions) {
         ClanImpl clan = clanPlayer.getClan();
@@ -126,7 +127,7 @@ public class ClanRankPermissionCommands {
         }
     }
 
-    @Command(name = "view", description = "View all available permissions")
+    @Command(name = "view", description = "View all available permissions", spongePermission = "mcclans.user.rank.permission.view")
     public void clanPermissonViewCommand(CommandSource sender, @PageParameter int page) {
         HorizontalTable<Permission> table = new HorizontalTable<>("Permissions", 10,
                 (TableAdapter<Permission>) (row, permission, index) -> {

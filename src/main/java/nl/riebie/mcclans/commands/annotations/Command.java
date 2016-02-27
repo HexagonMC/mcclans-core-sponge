@@ -15,7 +15,7 @@ import java.lang.annotation.Target;
 public @interface Command {
     String name();
     String description() default "";
-    Permission permission() default Permission.none;
+    Permission clanPermission() default Permission.none;
     boolean isPlayerOnly() default false;
     boolean isClanOnly() default false;
     String spongePermission();

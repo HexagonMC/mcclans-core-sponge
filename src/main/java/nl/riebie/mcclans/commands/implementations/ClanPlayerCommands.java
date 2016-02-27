@@ -26,7 +26,7 @@ import java.util.Optional;
  */
 public class ClanPlayerCommands {
 
-    @Command(name = "setrank", isPlayerOnly = true, permission = Permission.setrank, description = "Set the rank of a member of your clan")
+    @Command(name = "setrank", description = "Set the rank of a member of your clan", isPlayerOnly = true, isClanOnly = true, clanPermission = Permission.setrank, spongePermission = "mcclans.user.player.info")
     public void playerSetRankCommand(CommandSource sender, ClanPlayerImpl clanPlayer, @Parameter String playerName,
                                      @Parameter String rankName) {
 
@@ -55,7 +55,7 @@ public class ClanPlayerCommands {
         }
     }
 
-    @Command(name = "info", isPlayerOnly = false, description = "Get the info of yourself or another player")
+    @Command(name = "info", description = "Get the info of yourself or another player", spongePermission = "mcclans.user.player.info")
     public void playerInfoCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer, @OptionalParameter(String.class) Optional<String> playerNameOpt) {
         ClansImpl clansImpl = ClansImpl.getInstance();
         if (playerNameOpt.isPresent()) {
