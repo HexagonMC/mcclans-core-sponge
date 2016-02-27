@@ -74,6 +74,17 @@ public class RankImpl implements Rank {
     }
 
     @Override
+    public PermissionModifyResponse addPermission(Permission permission) {
+        if (hasPermission(permission)) {
+            return PermissionModifyResponse.ALREADY_CONTAINS_PERMISSION;
+        } else {
+            permissions.add(permission);
+            TaskForwarder.sendUpdateRank(this);
+            return PermissionModifyResponse.SUCCESSFULLY_MODIFIED;
+        }
+    }
+
+    @Override
     public PermissionModifyResponse removePermission(String permission) {
         if (Permission.isUsablePermission(permission)) {
             Permission permEnum = Permission.valueOf(permission);
@@ -86,6 +97,17 @@ public class RankImpl implements Rank {
             }
         } else {
             return PermissionModifyResponse.NOT_A_VALID_PERMISSION;
+        }
+    }
+
+    @Override
+    public PermissionModifyResponse removePermission(Permission permission) {
+        if (hasPermission(permission)) {
+            permissions.remove(permission);
+            TaskForwarder.sendUpdateRank(this);
+            return PermissionModifyResponse.SUCCESSFULLY_MODIFIED;
+        } else {
+            return PermissionModifyResponse.DOES_NOT_CONTAIN_PERMISSION;
         }
     }
 

@@ -14,48 +14,61 @@ public interface Rank {
      *
      * @return the name of this rank
      */
-    public String getName();
+    String getName();
 
     /**
      * Get a List of Permissions contained by this rank
      *
      * @return a List containing all the Permissions of this Rank
      */
-    public List<Permission> getPermissions();
+    List<Permission> getPermissions();
 
     /**
      * Add a permission to this Rank
      *
-     * @param permission
-     *            the name of a permission
+     * @param permission the name of a permission
      * @return PermissionModifyResponse enum value
      */
-    public PermissionModifyResponse addPermission(String permission);
+    PermissionModifyResponse addPermission(String permission);
+
+    /**
+     * Add a permission to this Rank
+     *
+     * @param permission a permission
+     * @return PermissionModifyResponse enum value
+     */
+    PermissionModifyResponse addPermission(Permission permission);
 
     /**
      * Remove a permission from this Rank
      *
-     * @param permission
-     *            the name of a permission
+     * @param permission the name of a permission
      * @return PermissionModifyResponse enum value
      */
-    public PermissionModifyResponse removePermission(String permission);
+    PermissionModifyResponse removePermission(String permission);
+
+    /**
+     * Remove a permission from this Rank
+     *
+     * @param permission a permission
+     * @return PermissionModifyResponse enum value
+     */
+    PermissionModifyResponse removePermission(Permission permission);
+
 
     /**
      * Check if this Rank contains the given permission
      *
-     * @param permission
-     *            the name of a permission
+     * @param permission the name of a permission
      * @return true if the Rank contains the given Permission
      */
-    public boolean hasPermission(String permission);
+    boolean hasPermission(String permission);
 
     /**
      * Check if this Rank contains the given permission
      *
-     * @param permission
-     *            a Permission enum value
+     * @param permission a Permission enum value
      * @return true if the Rank contains the given Permission
      */
-    public boolean hasPermission(Permission permission);
+    boolean hasPermission(Permission permission);
 }

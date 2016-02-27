@@ -1,9 +1,13 @@
 package nl.riebie.mcclans.commands.implementations;
 
 import nl.riebie.mcclans.ClansImpl;
+import nl.riebie.mcclans.api.enums.Permission;
 import nl.riebie.mcclans.clan.ClanImpl;
+import nl.riebie.mcclans.clan.RankFactory;
+import nl.riebie.mcclans.clan.RankImpl;
 import nl.riebie.mcclans.commands.annotations.Command;
 import nl.riebie.mcclans.commands.annotations.OptionalParameter;
+import nl.riebie.mcclans.commands.annotations.Parameter;
 import nl.riebie.mcclans.messages.Messages;
 import nl.riebie.mcclans.player.ClanPlayerImpl;
 import nl.riebie.mcclans.player.KillDeathFactorHandler;
@@ -21,6 +25,35 @@ import java.util.Optional;
  * Created by Koen on 26/02/2016.
  */
 public class ClanPlayerCommands {
+
+    @Command(name = "setrank", isPlayerOnly = true, permission = Permission.setrank, description = "Set the rank of a member of your clan")
+    public void playerSetRankCommand(CommandSource sender, ClanPlayerImpl clanPlayer, @Parameter String playerName,
+                                     @Parameter String rankName) {
+
+        ClanImpl clan = clanPlayer.getClan();
+        if (!clan.isPlayerMember(playerName)) {
+            Messages.sendPlayerNotAMemberOfThisClan(sender, playerName);
+            return;
+        }
+
+        RankImpl rank = clanPlayer.getClan().getRank(rankName);
+        ClanPlayerImpl targetClanPlayer = clan.getMember(playerName);
+
+        if (rank == null) {
+            Messages.sendWarningMessage(sender, Messages.RANK_DOES_NOT_EXIST);
+        } else if (targetClanPlayer.getRank().getName().toLowerCase().equals(RankFactory.getOwnerIdentifier().toLowerCase())) {
+            Messages.sendWarningMessage(sender, Messages.YOU_CANNOT_OVERWRITE_THE_OWNER_RANK);
+        } else {
+            targetClanPlayer.setRank(rank);
+            if (RankFactory.getOwnerIdentifier().toLowerCase().equals(rankName.toLowerCase())) {
+                clan.setOwner(targetClanPlayer);
+                clanPlayer.setRank(clan.getRank(RankFactory.getRecruitIdentifier()));
+            }
+            Messages.sendRankOfPlayerSuccessfullyChangedToRank(sender, playerName, rank.getName());
+
+            targetClanPlayer.sendMessage(Messages.getYourRankHasBeenChangedToRank(rank.getName()));
+        }
+    }
 
     @Command(name = "info", isPlayerOnly = false, description = "Get the info of yourself or another player")
     public void playerInfoCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer, @OptionalParameter(String.class) Optional<String> playerNameOpt) {

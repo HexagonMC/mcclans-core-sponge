@@ -429,12 +429,11 @@ public class Messages {
         commandSource.sendMessage(message);
     }
 
-    public static void sendYourRankHasBeenChangedToRank(CommandSource commandSource, String rankName) {
-        Text message = Text.join(
+    public static Text getYourRankHasBeenChangedToRank(String rankName) {
+        return Text.join(
                 Text.builder("Your rank has been changed to ").color(BASIC_CHAT_COLOR).build(),
                 Text.builder(rankName).color(BASIC_HIGHLIGHT).build()
         );
-        commandSource.sendMessage(message);
     }
 
     public static void sendPlayerNotAMemberOfThisClan(CommandSource commandSource, String playerName) {
