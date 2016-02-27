@@ -212,7 +212,6 @@ public class ClansImpl implements Clans {
 
     public ClanPlayerImpl getClanPlayer(String playerName) {
         UUID uuid = UUIDUtils.getUUID(playerName);
-        createClanPlayer(uuid, playerName);
         if (uuid != null) {
             return getClanPlayer(uuid);
         }
