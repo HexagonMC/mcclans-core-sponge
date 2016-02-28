@@ -11,7 +11,7 @@ public class ToggleParser implements ParameterParser<Toggle> {
     public ParseResult<Toggle> parseValue(String value, NormalFilledParameter parameter) {
         Toggle.ToggleType type = Toggle.ToggleType.ofString(value);
         if (type == null) {
-            return ParseResult.newErrorResult("A toggleable parameter should be one of: %s", Toggle.ToggleType.getPossibleParameterString());
+            return ParseResult.newErrorResult(String.format("A toggleable parameter should be one of: %s", Toggle.ToggleType.getPossibleParameterString()));
         } else {
             return ParseResult.newSuccessResult(new Toggle(type));
         }

@@ -2,6 +2,8 @@ package nl.riebie.mcclans.commands.FilledParameters;
 
 
 import nl.riebie.mcclans.api.enums.Permission;
+import nl.riebie.mcclans.commands.annotations.Command;
+import nl.riebie.mcclans.commands.annotations.Parameter;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -12,24 +14,29 @@ import java.util.List;
  * Created by Mirko on 16/01/2016.
  */
 public final class FilledCommand {
+
     private String name;
     private Method method;
-    private Permission permission;
+    private Permission clanPermission;
+    private String spongePermission;
     private String description;
     private List<FilledParameter> parameters = new ArrayList<>();
     private List<FilledCommand> children = new ArrayList<>();
     private boolean isPlayerOnly;
+    private final boolean isClanOnly;
 
     private boolean hasPageParameter;
     private boolean hasOptional;
     private boolean hasMultiline;
 
-    public FilledCommand(String name, Method method, Permission permission, String description, boolean isPlayerOnly) {
+    public FilledCommand(Command command, Method method) {
         this.method = method;
-        this.permission = permission;
-        this.description = description;
-        this.name = name;
-        this.isPlayerOnly = isPlayerOnly;
+        this.clanPermission = command.clanPermission();
+        this.spongePermission = command.spongePermission();
+        this.description = command.description();
+        this.name = command.name();
+        this.isPlayerOnly = command.isPlayerOnly();
+        this.isClanOnly = command.isClanOnly();
     }
 
     public String getName() {
@@ -114,8 +121,8 @@ public final class FilledCommand {
         return hasPageParameter;
     }
 
-    public Permission getPermission() {
-        return permission;
+    public Permission getClanPermission() {
+        return clanPermission;
     }
 
     public boolean isPlayerOnly() {
@@ -124,5 +131,13 @@ public final class FilledCommand {
 
     public String getDescription() {
         return description;
+    }
+
+    public boolean isClanOnly() {
+        return isClanOnly;
+    }
+
+    public String getSpongePermission() {
+        return spongePermission;
     }
 }

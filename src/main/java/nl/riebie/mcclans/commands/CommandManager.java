@@ -68,7 +68,7 @@ public class CommandManager {
     private void handleMethod(Method method, Object commandStructureInstance, FilledCommand parent) {
         Command commandAnnotation = method.getAnnotation(Command.class);
         if (commandAnnotation != null) {
-            FilledCommand filledCommand = new FilledCommand(commandAnnotation.name(), method, commandAnnotation.clanPermission(), commandAnnotation.description(), commandAnnotation.isPlayerOnly());
+            FilledCommand filledCommand = new FilledCommand(commandAnnotation, method);
             commandStructureMap.put(filledCommand, commandStructureInstance);
             if (parent == null) {
                 filledCommandMap.put(commandAnnotation.name(), filledCommand);
@@ -193,12 +193,20 @@ public class CommandManager {
                 }
             }
 
+            if(!commandSource.hasPermission(filledCommand.getSpongePermission())){
+                commandSource.sendMessage(Text.of("You're not allowed to execute this command"));
+                return;
+            }
             if (filledCommand.isPlayerOnly() && !(commandSource instanceof Player)) {
                 commandSource.sendMessage(Text.of("This command can only be used by players"));
                 return;
             }
+            if(filledCommand.isClanOnly() && (!(commandSender instanceof ClanPlayerImpl) || !((ClanPlayerImpl) commandSender).isMemberOfAClan())){
+                commandSource.sendMessage(Text.of("This command can only be used of you are a member of a clan"));
+                return;
+            }
 
-            Permission permission = filledCommand.getPermission();
+            Permission permission = filledCommand.getClanPermission();
             if (permission != Permission.none && !commandSender.checkPermission(permission)) {
                 Messages.sendYouDoNotHaveTheRequiredPermission(commandSource, permission.name());
                 return;
