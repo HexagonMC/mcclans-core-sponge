@@ -61,10 +61,10 @@ public class Messages {
     public static final String CONFIGURATION_RELOADED = "Configuration reloaded";
     public static final String SYSTEM_BACKUP_INITIATED = "System backup initiated";
 
-    private static final TextColor BASIC_CHAT_COLOR = TextColors.DARK_GREEN;
-    private static final TextColor WARNING_CHAT_COLOR = TextColors.RED;
-    private static final TextColor BASIC_HIGHLIGHT = TextColors.GREEN;
-    private static final TextColor WARNING_HIGHLIGHT = TextColors.WHITE;
+    public static final TextColor BASIC_CHAT_COLOR = TextColors.DARK_GREEN;
+    public static final TextColor WARNING_CHAT_COLOR = TextColors.RED;
+    public static final TextColor BASIC_HIGHLIGHT = TextColors.GREEN;
+    public static final TextColor WARNING_HIGHLIGHT = TextColors.WHITE;
 
     // Use when providing basic feedback to the commandSender
     public static void sendBasicMessage(CommandSource commandSource, String message) {

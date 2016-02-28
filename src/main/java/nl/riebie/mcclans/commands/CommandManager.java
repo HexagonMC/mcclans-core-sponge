@@ -1,13 +1,16 @@
 package nl.riebie.mcclans.commands;
 
 import nl.riebie.mcclans.ClansImpl;
+import nl.riebie.mcclans.api.Clan;
 import nl.riebie.mcclans.api.CommandSender;
 import nl.riebie.mcclans.api.enums.Permission;
+import nl.riebie.mcclans.clan.ClanImpl;
 import nl.riebie.mcclans.commands.FilledParameters.*;
 import nl.riebie.mcclans.commands.annotations.*;
 import nl.riebie.mcclans.commands.parsers.*;
 import nl.riebie.mcclans.commands.constraints.length.LengthConstraint;
 import nl.riebie.mcclans.commands.constraints.regex.RegexConstraint;
+import nl.riebie.mcclans.config.Config;
 import nl.riebie.mcclans.messages.Messages;
 import nl.riebie.mcclans.player.ClanPlayerImpl;
 import org.spongepowered.api.command.CommandSource;
@@ -40,6 +43,7 @@ public class CommandManager {
 
         registerParameterValidator(new PermissionParser(), Permission.class);
         registerParameterValidator(new ToggleParser(), Toggle.class);
+        registerParameterValidator(new ClanParser(), Clan.class, ClanImpl.class);
     }
 
     private static void registerParameterValidator(ParameterParser<?> parser, Class<?>... classes) {
@@ -193,7 +197,8 @@ public class CommandManager {
                 }
             }
 
-            if(!commandSource.hasPermission(filledCommand.getSpongePermission())){
+            if ((Config.getBoolean(Config.USE_PERMISSIONS) || filledCommand.getSpongePermission().startsWith("mcclans.admin"))
+                    && !commandSource.hasPermission(filledCommand.getSpongePermission())) {
                 commandSource.sendMessage(Text.of("You're not allowed to execute this command"));
                 return;
             }
@@ -201,7 +206,7 @@ public class CommandManager {
                 commandSource.sendMessage(Text.of("This command can only be used by players"));
                 return;
             }
-            if(filledCommand.isClanOnly() && (!(commandSender instanceof ClanPlayerImpl) || !((ClanPlayerImpl) commandSender).isMemberOfAClan())){
+            if (filledCommand.isClanOnly() && (!(commandSender instanceof ClanPlayerImpl) || !((ClanPlayerImpl) commandSender).isMemberOfAClan())) {
                 commandSource.sendMessage(Text.of("This command can only be used of you are a member of a clan"));
                 return;
             }
@@ -240,7 +245,7 @@ public class CommandManager {
                                         if (result.isSuccess()) {
                                             parameterList.add(result.getItem());
                                         } else {
-                                            commandSender.sendMessage(Text.of(result.getErrorMessage()));
+                                            commandSender.sendMessage(Messages.getWarningMessage(result.getErrorMessage()));
                                             return;
                                         }
                                     }
@@ -258,7 +263,7 @@ public class CommandManager {
                                     if (result.isSuccess()) {
                                         objects[j] = Optional.of(result.getItem());
                                     } else {
-                                        commandSender.sendMessage(Text.of(result.getErrorMessage()));
+                                        commandSender.sendMessage(Messages.getWarningMessage(result.getErrorMessage()));
                                         return;
                                     }
                                 }
@@ -269,7 +274,7 @@ public class CommandManager {
                                 if (parseResult.isSuccess()) {
                                     objects[j] = Optional.of(parseResult.getItem());
                                 } else {
-                                    commandSender.sendMessage(Text.of(parseResult.getErrorMessage()));
+                                    commandSender.sendMessage(Messages.getWarningMessage(parseResult.getErrorMessage()));
                                     return;
                                 }
                             }
@@ -287,7 +292,7 @@ public class CommandManager {
                                     if (result.isSuccess()) {
                                         parameterList.add(result.getItem());
                                     } else {
-                                        commandSender.sendMessage(Text.of(result.getErrorMessage()));
+                                        commandSender.sendMessage(Messages.getWarningMessage(result.getErrorMessage()));
                                         return;
                                     }
                                 }
@@ -296,7 +301,7 @@ public class CommandManager {
                                 ParameterParser<String> parser = (ParameterParser<String>) parameterValidatorMap.get(String.class);
                                 StringBuilder stringBuilder = new StringBuilder();
                                 if (index >= args.length) {
-                                    commandSender.sendMessage(Text.of("Parameter should be supplied")); //TODO real error message
+                                    commandSender.sendMessage(Messages.getWarningMessage("Parameter should be supplied")); //TODO real error message
                                     return;
                                 }
                                 for (int pIndex = index; pIndex < args.length; pIndex++) {
@@ -309,7 +314,7 @@ public class CommandManager {
                                 if (result.isSuccess()) {
                                     objects[j] = result.getItem();
                                 } else {
-                                    commandSender.sendMessage(Text.of(result.getErrorMessage()));
+                                    commandSender.sendMessage(Messages.getWarningMessage(result.getErrorMessage()));
                                     return;
                                 }
                             }
@@ -319,7 +324,7 @@ public class CommandManager {
                             if (parseResult.isSuccess()) {
                                 objects[j] = parseResult.getItem();
                             } else {
-                                commandSender.sendMessage(Text.of(parseResult.getErrorMessage()));
+                                commandSender.sendMessage(Messages.getWarningMessage(parseResult.getErrorMessage()));
                                 return;
                             }
                         }

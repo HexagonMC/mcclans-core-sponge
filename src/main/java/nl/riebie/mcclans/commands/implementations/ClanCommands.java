@@ -44,6 +44,12 @@ import java.util.concurrent.TimeUnit;
  */
 public class ClanCommands {
 
+    @ChildGroup(ClanAdminCommands.class)
+    @Command(name = "admin", description = "Top command for all admin commands", spongePermission = "mcclans.admin.helppage")
+    public void clanAdminCommand(CommandSource commandSource) {
+        commandSource.sendMessage(Text.of("TODO"));
+    }
+
     @ChildGroup(ClanRankCommands.class)
     @Command(name = "rank", description = "Top command for all rank commands", spongePermission = "mcclans.user.rank.helppage")
     public void clanRankCommand(CommandSource commandSource) {

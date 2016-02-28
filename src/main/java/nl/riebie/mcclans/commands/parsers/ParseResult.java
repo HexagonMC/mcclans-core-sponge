@@ -1,5 +1,7 @@
 package nl.riebie.mcclans.commands.parsers;
 
+import org.spongepowered.api.text.Text;
+
 /**
  * Created by Mirko on 19/01/2016.
  */
