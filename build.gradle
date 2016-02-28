@@ -5,6 +5,11 @@ apply plugin: 'java'
 
 sourceCompatibility = 1.8
 
+jar {
+    Integer buildNumber = System.getProperty("BUILD_NUMBER") as Integer ?: 0;
+    archiveName = rootProject.name + '-' + project.version + '-' + buildNumber + '.jar'
+}
+
 repositories {
     mavenCentral()
     maven {
