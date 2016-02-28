@@ -46,19 +46,26 @@ public class ClanCommands {
 
     @ChildGroup(ClanAdminCommands.class)
     @Command(name = "admin", description = "Top command for all admin commands", spongePermission = "mcclans.admin.helppage")
-    public void clanAdminCommand(CommandSource commandSource) {
+    public void clanAdminRootCommand(CommandSource commandSource) {
         commandSource.sendMessage(Text.of("TODO"));
     }
 
+    @ChildGroup(ClanAllyCommands.class)
+    @Command(name = "ally", description = "Top command for all ally commands", spongePermission = "mcclans.user.ally.helppage")
+    public void clanAllyRootCommand(CommandSource commandSource) {
+        commandSource.sendMessage(Text.of("TODO"));
+    }
+
+
     @ChildGroup(ClanRankCommands.class)
     @Command(name = "rank", description = "Top command for all rank commands", spongePermission = "mcclans.user.rank.helppage")
-    public void clanRankCommand(CommandSource commandSource) {
+    public void clanRankRootCommand(CommandSource commandSource) {
         commandSource.sendMessage(Text.of("TODO"));
     }
 
     @ChildGroup(ClanFriendlyFireCommands.class)
     @Command(name = "friendlyfire", description = "Top command for all friendlyfire commands", spongePermission = "mcclans.user.friendlyfire.helppage")
-    public void clanFriendlyFireCommand(CommandSource commandSource) {
+    public void clanFriendlyFireRootCommand(CommandSource commandSource) {
         commandSource.sendMessage(Text.of("TODO"));
     }
 

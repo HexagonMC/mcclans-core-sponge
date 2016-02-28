@@ -493,7 +493,7 @@ public class Messages {
     public static void sendNowTalkingInAllyChat(CommandSource commandSource) {
         Text message = Text.join(
                 Text.builder("[").color(TextColors.GRAY).build(),
-                Text.builder("AC").color(TextColors.WHITE).build(),
+                Text.builder("AC").color(TextColors.GOLD).build(),
                 Text.builder("] ").color(TextColors.GRAY).build(),
                 Text.builder("Now talking in ally chat").color(BASIC_CHAT_COLOR).build()
         );
