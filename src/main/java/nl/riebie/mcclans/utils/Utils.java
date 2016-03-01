@@ -19,6 +19,44 @@ public final class Utils {
         // Private constructor
     }
 
+    public static TextColor getTextColorByName(String textColorName, TextColor fallbackColor) {
+        if (TextColors.AQUA.getName().equalsIgnoreCase(textColorName)) {
+            return TextColors.AQUA;
+        } else if (TextColors.BLACK.getName().equalsIgnoreCase(textColorName)) {
+            return TextColors.BLACK;
+        } else if (TextColors.BLUE.getName().equalsIgnoreCase(textColorName)) {
+            return TextColors.BLUE;
+        } else if (TextColors.DARK_AQUA.getName().equalsIgnoreCase(textColorName)) {
+            return TextColors.DARK_AQUA;
+        } else if (TextColors.DARK_BLUE.getName().equalsIgnoreCase(textColorName)) {
+            return TextColors.DARK_BLUE;
+        } else if (TextColors.DARK_GRAY.getName().equalsIgnoreCase(textColorName)) {
+            return TextColors.DARK_GRAY;
+        } else if (TextColors.DARK_GREEN.getName().equalsIgnoreCase(textColorName)) {
+            return TextColors.DARK_GREEN;
+        } else if (TextColors.DARK_PURPLE.getName().equalsIgnoreCase(textColorName)) {
+            return TextColors.DARK_PURPLE;
+        } else if (TextColors.DARK_RED.getName().equalsIgnoreCase(textColorName)) {
+            return TextColors.DARK_RED;
+        } else if (TextColors.GOLD.getName().equalsIgnoreCase(textColorName)) {
+            return TextColors.GOLD;
+        } else if (TextColors.GRAY.getName().equalsIgnoreCase(textColorName)) {
+            return TextColors.GRAY;
+        } else if (TextColors.GREEN.getName().equalsIgnoreCase(textColorName)) {
+            return TextColors.GREEN;
+        } else if (TextColors.LIGHT_PURPLE.getName().equalsIgnoreCase(textColorName)) {
+            return TextColors.LIGHT_PURPLE;
+        } else if (TextColors.RED.getName().equalsIgnoreCase(textColorName)) {
+            return TextColors.RED;
+        } else if (TextColors.WHITE.getName().equalsIgnoreCase(textColorName)) {
+            return TextColors.WHITE;
+        } else if (TextColors.YELLOW.getName().equalsIgnoreCase(textColorName)) {
+            return TextColors.YELLOW;
+        } else {
+            return fallbackColor;
+        }
+    }
+
     public static TextColor getTextColorById(String textColorId, TextColor fallbackColor) {
         if (TextColors.AQUA.getId().equalsIgnoreCase(textColorId)) {
             return TextColors.AQUA;
