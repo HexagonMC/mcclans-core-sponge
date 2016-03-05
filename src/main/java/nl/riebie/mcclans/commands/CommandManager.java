@@ -17,6 +17,7 @@ import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.source.ConsoleSource;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.format.TextColor;
 
 
 import java.lang.annotation.Annotation;
@@ -47,6 +48,7 @@ public class CommandManager {
         registerParameterValidator(new PermissionParser(), Permission.class);
         registerParameterValidator(new ToggleParser(), Toggle.class);
         registerParameterValidator(new ClanParser(), Clan.class, ClanImpl.class);
+        registerParameterValidator(new TextColorParser(), TextColor.class);
     }
 
     private static void registerParameterValidator(ParameterParser<?> parser, Class<?>... classes) {

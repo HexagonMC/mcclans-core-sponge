@@ -50,12 +50,17 @@ public class ClanCommands {
         commandSource.sendMessage(Text.of("TODO"));
     }
 
+    @ChildGroup(ClanTagCommands.class)
+    @Command(name = "tag", description = "Top command for all tag commands", spongePermission = "mcclans.user.tag.helppage")
+    public void clanTagRootCommand(CommandSource commandSource) {
+        commandSource.sendMessage(Text.of("TODO"));
+    }
+
     @ChildGroup(ClanAllyCommands.class)
     @Command(name = "ally", description = "Top command for all ally commands", spongePermission = "mcclans.user.ally.helppage")
     public void clanAllyRootCommand(CommandSource commandSource) {
         commandSource.sendMessage(Text.of("TODO"));
     }
-
 
     @ChildGroup(ClanRankCommands.class)
     @Command(name = "rank", description = "Top command for all rank commands", spongePermission = "mcclans.user.rank.helppage")
