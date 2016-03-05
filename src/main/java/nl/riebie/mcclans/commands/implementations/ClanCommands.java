@@ -545,4 +545,39 @@ public class ClanCommands {
             Messages.sendYouWereChargedCurrency(player, setClanhomeCost, currencyName);
         }
     }
+
+    // TODO command can use ClanPlayer (or rather Clan) info, but should also partly function for console (with less data displayd)
+    // TODO allow clanPlayer to be optional mayhaps?
+    @Command(name = "price", description = "See all the costs associated with clans", isPlayerOnly = true, spongePermission = "mcclans.user.price")
+    public void clanPriceCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer) {
+        ClanImpl clan = clanPlayer.getClan();
+
+        Text setHomeText = Text.of("0");
+        Text clanCreationText = Text.of("0");
+        Text teleportToClanHomeText = Text.of("0");
+
+        if (Config.getBoolean(Config.USE_ECONOMY)) {
+            setHomeText = Text.of(String.valueOf(Config.getDouble(Config.SET_CLANHOME_COST)));
+            double reSetClanhomeCostIncrease = Config.getDouble(Config.RE_SET_CLANHOME_COST_INCREASE);
+            if (reSetClanhomeCostIncrease != 0 && clan != null) {
+                double setHomePriceIncrease = 0;
+                setHomePriceIncrease = clan.getHomeSetTimes() * reSetClanhomeCostIncrease;
+                setHomeText.toBuilder().append(
+                        Text.builder(" + ").color(TextColors.GRAY).build(),
+                        Text.of(String.valueOf(setHomePriceIncrease)),
+                        Text.builder(" = ").color(TextColors.GRAY).build(),
+                        Text.of(String.valueOf(reSetClanhomeCostIncrease + setHomePriceIncrease))
+                ).build();
+            }
+            clanCreationText = Text.of(String.valueOf(Config.getDouble(Config.CLAN_CREATION_COST)));
+            teleportToClanHomeText = Text.of(String.valueOf(Config.getDouble(Config.TELEPORT_COST)));
+        }
+
+        VerticalTable table = new VerticalTable(" Clan price info", 0);
+        table.setValue("Clan creation", clanCreationText);
+        table.setValue("Teleport to clan home", teleportToClanHomeText);
+        table.setValue("Set clan home", setHomeText);
+
+        table.draw(commandSource, 0);
+    }
 }
