@@ -59,6 +59,7 @@ public class Config {
     private static final String SECTION_ECONOMY = "economy";
 
     public static final String USE_ECONOMY = "use-economy";
+    public static final String CURRENCY = "currency";
     public static final String CLAN_CREATION_COST = "clan-creation-cost";
     public static final String SET_CLANHOME_COST = "set-clanhome-cost";
     public static final String RE_SET_CLANHOME_COST_INCREASE = "re-set-clanhome-cost-increase";
@@ -113,6 +114,7 @@ public class Config {
 
         ConfigSection economyConfigSection = ConfigSection.builder(SECTION_ECONOMY).setConfigOptions(
                 ConfigOption.builder(USE_ECONOMY, false).build(),
+                ConfigOption.builder(CURRENCY, "default").build(),
                 ConfigOption.builder(CLAN_CREATION_COST, 50).addMinimumNumberConstraint(0).build(),
                 ConfigOption.builder(SET_CLANHOME_COST, 10).addMinimumNumberConstraint(0).build(),
                 ConfigOption.builder(RE_SET_CLANHOME_COST_INCREASE, 0).addMinimumNumberConstraint(0).build(),
@@ -235,10 +237,16 @@ public class Config {
 
     public static double getDouble(String key) {
         Object value = sConfig.get(key);
-        if (value == null || !(value instanceof Double)) {
+        if (value == null) {
             return 0;
-        } else {
+        }
+
+        if (value instanceof Double) {
             return (double) value;
+        } else if (value instanceof Integer) {
+            return (int) value;
+        } else {
+            return 0;
         }
     }
 

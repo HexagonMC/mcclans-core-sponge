@@ -1,14 +1,14 @@
 package nl.riebie.mcclans.player;
 
+import nl.riebie.mcclans.MCClans;
 import nl.riebie.mcclans.config.Config;
 import nl.riebie.mcclans.messages.Messages;
+import nl.riebie.mcclans.utils.EconomyUtils;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.event.cause.entity.teleport.TeleportCause;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
-import javax.security.auth.login.Configuration;
 import java.util.function.Consumer;
 
 /**
@@ -51,17 +51,16 @@ public class ClanHomeTeleportTask implements Consumer<Task> {
                     task.cancel();
                     if (Config.getBoolean(Config.USE_ECONOMY) && !forceNoCurrency) {
                         double teleportCost = Config.getDouble(Config.TELEPORT_COST);
-                        // TODO SPONGE EconomyHandler missing
-//                        String currencyName = EconomyHandler.getInstance().getCurrencyName();
-//                        if (EconomyHandler.getInstance().enoughCurrency(clanPlayer.getName(), teleportCost)) {
-//                            teleport(player, clanPlayer, teleportLocation);
-//                            if (teleportCost != 0) {
-//                                EconomyHandler.getInstance().chargePlayer(clanPlayer.getName(), teleportCost);
-//                                Messages.sendYouWereChargedCurrency(player, teleportCost, currencyName);
-//                            }
-//                        } else {
-//                            Messages.sendYouDoNotHaveEnoughCurrency(player, teleportCost, currencyName);
-//                        }
+                        boolean success = EconomyUtils.withdraw(clanPlayer.getUUID(), teleportCost);
+                        String currencyName = MCClans.getPlugin().getServiceHelper().currency.getDisplayName().toPlain();
+                        if (success) {
+                            teleport(player, clanPlayer, teleportLocation);
+                            if (teleportCost != 0) {
+                                Messages.sendYouWereChargedCurrency(player, teleportCost, currencyName);
+                            }
+                        } else {
+                            Messages.sendYouDoNotHaveEnoughCurrency(player, teleportCost, currencyName);
+                        }
                     } else {
                         teleport(player, clanPlayer, teleportLocation);
                     }

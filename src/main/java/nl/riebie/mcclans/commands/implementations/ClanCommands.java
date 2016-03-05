@@ -22,6 +22,7 @@ import nl.riebie.mcclans.table.HorizontalTable;
 import nl.riebie.mcclans.table.Row;
 import nl.riebie.mcclans.table.TableAdapter;
 import nl.riebie.mcclans.table.VerticalTable;
+import nl.riebie.mcclans.utils.EconomyUtils;
 import nl.riebie.mcclans.utils.UUIDUtils;
 import nl.riebie.mcclans.utils.Utils;
 import org.spongepowered.api.Sponge;
@@ -96,20 +97,19 @@ public class ClanCommands {
         if (clanPlayer.getClan() == null) {
             if (clansImpl.tagIsFree(clanTag)) {
                 if (Config.getBoolean(Config.USE_ECONOMY)) {
-                    commandSource.sendMessage(Text.of("Economy integration not implemented"));
-                    // TODO SPONGE economy integration
-//                    double clanCreationCost = Configuration.clanCreationCost;
-//                    String currencyName = EconomyHandler.getInstance().getCurrencyName();
-//                    if (EconomyHandler.getInstance().enoughCurrency(clanPlayer.getName(), clanCreationCost)) {
-//                        ClanImpl clanImpl = clansImpl.createClan(clanTag, clanName, clanPlayer);
-//                        Messages.sendBroadcastMessageClanCreatedBy(clanImpl.getName(), clanImpl.getTagColored(), clanPlayer.getName());
-//                        if (clanCreationCost != 0) {
-//                            EconomyHandler.getInstance().chargePlayer(clanPlayer.getName(), clanCreationCost);
-//                            Messages.sendYouWereChargedCurrency(commandSource, clanCreationCost, currencyName);
-//                        }
-//                    } else {
-//                        Messages.sendYouDoNotHaveEnoughCurrency(commandSource, clanCreationCost, currencyName);
-//                    }
+                    double clanCreationCost = Config.getDouble(Config.CLAN_CREATION_COST);
+                    boolean success = EconomyUtils.withdraw(clanPlayer.getUUID(), clanCreationCost);
+                    String currencyName = MCClans.getPlugin().getServiceHelper().currency.getDisplayName().toPlain();
+                    if (success) {
+                        if (clanCreationCost != 0) {
+                            Messages.sendYouWereChargedCurrency(commandSource, clanCreationCost, currencyName);
+                        }
+
+                        ClanImpl clanImpl = clansImpl.createClan(clanTag, clanName, clanPlayer);
+                        Messages.sendBroadcastMessageClanCreatedBy(clanImpl.getName(), clanImpl.getTagColored(), clanPlayer.getName());
+                    } else {
+                        Messages.sendYouDoNotHaveEnoughCurrency(commandSource, clanCreationCost, currencyName);
+                    }
                 } else {
                     ClanImpl clanImpl = clansImpl.createClan(clanTag, clanName, clanPlayer);
                     Messages.sendBroadcastMessageClanCreatedBy(clanImpl.getName(), clanImpl.getTagColored(), clanPlayer.getName());
@@ -489,19 +489,7 @@ public class ClanCommands {
                 if (lastTeleportInitiationLocation == null
                         || !lastTeleportInitiationLocation.getExtent().getName().equalsIgnoreCase(currentPlayerLocation.getExtent().getName())
                         || lastTeleportInitiationLocation.getPosition().distance(currentPlayerLocation.getPosition()) != 0) {
-                    if (Config.getBoolean(Config.USE_ECONOMY)) {
-                        commandSource.sendMessage(Text.of("Economy integration not implemented"));
-                        // TODO SPONGE economy impl
-//                        double teleportCost = Configuration.teleportCost;
-//                        String currencyName = EconomyHandler.getInstance().getCurrencyName();
-//                        if (EconomyHandler.getInstance().enoughCurrency(clanPlayer.getName(), teleportCost)) {
-//                            startTeleportTask(player, clanPlayer, teleportLocation, currentPlayerLocation);
-//                        } else {
-//                            Messages.sendYouDoNotHaveEnoughCurrency(player, teleportCost, currencyName);
-//                        }
-                    } else {
-                        startTeleportTask(player, clanPlayer, teleportLocation, currentPlayerLocation);
-                    }
+                    startTeleportTask(player, clanPlayer, teleportLocation, currentPlayerLocation);
                 } else {
                     Messages.sendWarningMessage(commandSource, Messages.YOU_NEED_TO_MOVE_BEFORE_ATTEMPTING_ANOTHER_TELEPORT);
                 }
@@ -526,19 +514,19 @@ public class ClanCommands {
         long setTimeDifference = (System.currentTimeMillis() - clan.getHomeSetTimeStamp()) / 1000;
         if (clan.getHomeSetTimeStamp() == -1 || setTimeDifference > Config.getInteger(Config.RE_SET_CLANHOME_COOLDOWN_SECONDS)) {
             if (Config.getBoolean(Config.USE_ECONOMY)) {
-                commandSource.sendMessage(Text.of("Economy integration not implemented"));
-                // TODO SPONGE economy integration
-//                double setClanhomeBaseCost = Config.getDouble(Config.SET_CLANHOME_COST);
-//                double reSetClanhomeCostIncrease = Config.getDouble(Config.RE_SET_CLANHOME_COST_INCREASE);
-//                int homeSetTimes = clan.getHomeSetTimes();
-//                double setClanhomeCost = setClanhomeBaseCost + (homeSetTimes * reSetClanhomeCostIncrease);
-//                String currencyName = EconomyHandler.getInstance().getCurrencyName();
-//                if (EconomyHandler.getInstance().enoughCurrency(clanPlayer.getName(), setClanhomeCost)) {
-//                    EconomyHandler.getInstance().chargePlayer(clanPlayer.getName(), setClanhomeCost);
-//                    setHome(player, clanPlayer, setClanhomeCost, currencyName);
-//                } else {
-//                    Messages.sendYouDoNotHaveEnoughCurrency(player, setClanhomeCost, currencyName);
-//                }
+                double setClanhomeBaseCost = Config.getDouble(Config.SET_CLANHOME_COST);
+                double reSetClanhomeCostIncrease = Config.getDouble(Config.RE_SET_CLANHOME_COST_INCREASE);
+
+                int homeSetTimes = clan.getHomeSetTimes();
+                double setClanhomeCost = setClanhomeBaseCost + (homeSetTimes * reSetClanhomeCostIncrease);
+
+                boolean success = EconomyUtils.withdraw(clanPlayer.getUUID(), setClanhomeCost);
+                String currencyName = MCClans.getPlugin().getServiceHelper().currency.getDisplayName().toPlain();
+                if (success) {
+                    setHome(player, clanPlayer, setClanhomeCost, currencyName);
+                } else {
+                    Messages.sendYouDoNotHaveEnoughCurrency(player, setClanhomeCost, currencyName);
+                }
             } else {
                 setHome(player, clanPlayer, 0, "");
             }
