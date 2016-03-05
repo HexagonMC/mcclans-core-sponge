@@ -557,17 +557,19 @@ public class ClanCommands {
         Text teleportToClanHomeText = Text.of("0");
 
         if (Config.getBoolean(Config.USE_ECONOMY)) {
-            setHomeText = Text.of(String.valueOf(Config.getDouble(Config.SET_CLANHOME_COST)));
+            double setClanhomeCost = Config.getDouble(Config.SET_CLANHOME_COST);
+            setHomeText = Text.of(String.valueOf(setClanhomeCost));
             double reSetClanhomeCostIncrease = Config.getDouble(Config.RE_SET_CLANHOME_COST_INCREASE);
             if (reSetClanhomeCostIncrease != 0 && clan != null) {
                 double setHomePriceIncrease = 0;
                 setHomePriceIncrease = clan.getHomeSetTimes() * reSetClanhomeCostIncrease;
-                setHomeText.toBuilder().append(
+                setHomeText = Text.join(
+                        setHomeText,
                         Text.builder(" + ").color(TextColors.GRAY).build(),
                         Text.of(String.valueOf(setHomePriceIncrease)),
                         Text.builder(" = ").color(TextColors.GRAY).build(),
-                        Text.of(String.valueOf(reSetClanhomeCostIncrease + setHomePriceIncrease))
-                ).build();
+                        Text.of(String.valueOf(setClanhomeCost + setHomePriceIncrease))
+                );
             }
             clanCreationText = Text.of(String.valueOf(Config.getDouble(Config.CLAN_CREATION_COST)));
             teleportToClanHomeText = Text.of(String.valueOf(Config.getDouble(Config.TELEPORT_COST)));
