@@ -159,7 +159,7 @@ public class DatabaseSaver extends DataSaver {
         String tag = clan.getTag();
         String name = clan.getName();
         int ownerID = clan.getOwner().getID();
-//        String tagColor = clan.getTagColor();    //TODO tagcolor -> SPONGE!!
+        String tagColorId = clan.getTagColor().getId();
         boolean allowAllyInvites = clan.isAllowingAllyInvites();
         boolean ffProtection = clan.isFfProtected();
         long creationTime = clan.getCreationDate().getTime();
@@ -183,7 +183,7 @@ public class DatabaseSaver extends DataSaver {
         long homeLastSetTimeStamp = clan.getHomeSetTimeStamp();
 
         return QueryGenerator.createUpdateQuery("mcc_clans", databaseConnectionOwner.getConnection()).value("clantag", tag).value("clanname", name)
-                .value("clanplayer_id_owner", ownerID).value("tagcolor", "")            //TODO TAGCOLOR -> SPONGE
+                .value("clanplayer_id_owner", ownerID).value("tagcolor", tagColorId)
                 .value("allow_ally_invites", allowAllyInvites)
                 .value("clanhome_world", clanHomeWorld).value("clanhome_x", clanHomeX).value("clanhome_y", clanHomeY).value("clanhome_z", clanHomeZ)
                 .value("clanhome_yaw", clanHomeYaw).value("clanhome_pitch", clanHomePitch).value("clanhome_set_times", homeSetTimes)

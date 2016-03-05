@@ -19,6 +19,7 @@ import org.spongepowered.api.event.game.state.GameStoppedServerEvent;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.service.ProviderRegistration;
+import org.spongepowered.api.service.economy.Currency;
 import org.spongepowered.api.service.economy.EconomyService;
 import org.spongepowered.api.service.user.UserStorageService;
 
@@ -105,19 +106,6 @@ public class MCClans {
         }
 
         ClansImpl.getInstance().updateClanTagCache();
-
-        // TODO SPONGE something wtih command/event registering
-//        this.getServer().getPluginManager().registerEvents(ClansImpl.getInstance(), this);
-//        this.getServer().getPluginManager().registerEvents(new PlayerChatListener(), this);
-//        this.getServer().getPluginManager().registerEvents(new PlayerJoinListener(), this);
-//        this.getServer().getPluginManager().registerEvents(new PlayerQuitListener(), this);
-//        this.getServer().getPluginManager().registerEvents(new PlayerDamageByPlayerListener(), this);
-//        this.getServer().getPluginManager().registerEvents(new FriendlyFireListener(), this);
-//        this.getServer().getPluginManager().registerEvents(new KillDeathRatioListener(), this);
-//        this.getServer().getPluginManager().registerEvents(PlayerCommandPreprocessListener.getInstance(), this);
-//        Bukkit.getServer().getPluginCommand("clan").setExecutor(new ClanCommandExecutor());
-
-//        Sponge.getCommandDispatcher().register(this, CommandFactory.create(), "armorhud");
 
         // Register listeners and commands
         Sponge.getEventManager().registerListeners(this, ClansImpl.getInstance());
@@ -224,9 +212,11 @@ public class MCClans {
         return serviceHelper;
     }
 
+    // Depends on Config being loaded
     public static class ServiceHelper {
         public UserStorageService userStorageService;
         public EconomyService economyService;
+        public Currency currency;
 
         private boolean initUserStorageService() {
             Optional<ProviderRegistration<UserStorageService>> userStorageOpt = Sponge.getServiceManager().getRegistration(UserStorageService.class);
@@ -242,6 +232,21 @@ public class MCClans {
             Optional<ProviderRegistration<EconomyService>> economyServiceOpt = Sponge.getServiceManager().getRegistration(EconomyService.class);
             if (economyServiceOpt.isPresent()) {
                 economyService = economyServiceOpt.get().getProvider();
+                String currencyName = Config.getString(Config.CURRENCY);
+                if (currencyName.equalsIgnoreCase("default")) {
+                    currency = economyService.getDefaultCurrency();
+                } else {
+                    for (Currency checkCurrency : economyService.getCurrencies()) {
+                        if (currencyName.equalsIgnoreCase(checkCurrency.getDisplayName().toPlain())) {
+                            currency = checkCurrency;
+                            break;
+                        }
+                    }
+                    if (currency == null) {
+                        currency = economyService.getDefaultCurrency();
+                        getPlugin().getLogger().warn("Currency " + currencyName + " not found, falling back to default currency");
+                    }
+                }
                 return true;
             } else {
                 return false;
