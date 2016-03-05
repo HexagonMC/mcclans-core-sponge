@@ -27,6 +27,9 @@ import java.util.*;
  * Created by Mirko on 16/01/2016.
  */
 public class CommandManager {
+
+    private static final int COMMANDS_PER_PAGE = 5;
+
     private Map<String, FilledCommand> filledCommandMap = new HashMap<>();
     private Map<CommandSender, FilledCommand> lastExecutedPageCommand = new HashMap<>();
     private Map<CommandSender, Object[]> lastExecutedPageCommandData = new HashMap<>();
@@ -181,6 +184,9 @@ public class CommandManager {
             objects[objects.length - 1] = Integer.valueOf(args[1]);
             filledCommand.execute(commandStructureMap.get(filledCommand), objects);
             return;
+        } else if(firstParam.equals("help")){
+
+            return;
         }
 
         FilledCommand filledCommand = filledCommandMap.get(firstParam);
@@ -232,103 +238,63 @@ public class CommandManager {
                     NormalFilledParameter normalFilledParameter = (NormalFilledParameter) parameter;
 
                     Class<?> type = normalFilledParameter.getParameterType();
-                    if (normalFilledParameter.isOptional()) {
+                    boolean isOptional = normalFilledParameter.isOptional();
+                    if (isOptional) {
                         type = normalFilledParameter.getOptionalType();
-                        if (index < args.length) {
-                            if (normalFilledParameter.isMultiline()) {
-                                Class<?> listType = normalFilledParameter.getListType();
-                                if (listType != Void.class) {
-                                    ParameterParser<?> parser = parameterValidatorMap.get(listType);
-                                    List<Object> parameterList = new ArrayList<>();
-                                    for (int pIndex = index; pIndex < args.length; pIndex++) {
-                                        ParseResult<?> result = parser.parseValue(args[pIndex], normalFilledParameter);
-                                        if (result.isSuccess()) {
-                                            parameterList.add(result.getItem());
-                                        } else {
-                                            commandSender.sendMessage(Messages.getWarningMessage(result.getErrorMessage()));
-                                            return;
-                                        }
-                                    }
-                                    objects[j] = Optional.of(parameterList);
-                                } else {
-                                    ParameterParser<String> parser = (ParameterParser<String>) parameterValidatorMap.get(String.class);
-                                    StringBuilder stringBuilder = new StringBuilder();
-                                    for (int pIndex = index; pIndex < args.length; pIndex++) {
-                                        if (pIndex != index) {
-                                            stringBuilder.append(" ");
-                                        }
-                                        stringBuilder.append(args[pIndex]);
-                                    }
-                                    ParseResult<String> result = parser.parseValue(stringBuilder.toString(), normalFilledParameter);
-                                    if (result.isSuccess()) {
-                                        objects[j] = Optional.of(result.getItem());
-                                    } else {
-                                        commandSender.sendMessage(Messages.getWarningMessage(result.getErrorMessage()));
-                                        return;
-                                    }
-                                }
-                            } else {
-                                ParameterParser<?> parser = parameterValidatorMap.get(type);
-                                ParseResult<?> parseResult = parser.parseValue(args[index], normalFilledParameter);
-
-                                if (parseResult.isSuccess()) {
-                                    objects[j] = Optional.of(parseResult.getItem());
-                                } else {
-                                    commandSender.sendMessage(Messages.getWarningMessage(parseResult.getErrorMessage()));
-                                    return;
-                                }
-                            }
-                        } else {
+                    }
+                    if (index >= args.length) {
+                        if (isOptional) {
                             objects[j] = Optional.empty();
+                            continue;
+                        } else {
+                            commandSender.sendMessage(Messages.getWarningMessage("Parameter should be supplied")); //TODO Sponge real error message
+                            return;
                         }
-                    } else {
-                        if (normalFilledParameter.isMultiline()) {
-                            Class<?> listType = normalFilledParameter.getListType();
-                            if (listType != Void.class) {
-                                ParameterParser<?> parser = parameterValidatorMap.get(listType);
-                                List<Object> parameterList = new ArrayList<>();
-                                for (int pIndex = index; pIndex < args.length; pIndex++) {
-                                    ParseResult<?> result = parser.parseValue(args[pIndex], normalFilledParameter);
-                                    if (result.isSuccess()) {
-                                        parameterList.add(result.getItem());
-                                    } else {
-                                        commandSender.sendMessage(Messages.getWarningMessage(result.getErrorMessage()));
-                                        return;
-                                    }
-                                }
-                                objects[j] = parameterList;
-                            } else {
-                                ParameterParser<String> parser = (ParameterParser<String>) parameterValidatorMap.get(String.class);
-                                StringBuilder stringBuilder = new StringBuilder();
-                                if (index >= args.length) {
-                                    commandSender.sendMessage(Messages.getWarningMessage("Parameter should be supplied")); //TODO real error message
-                                    return;
-                                }
-                                for (int pIndex = index; pIndex < args.length; pIndex++) {
-                                    if (pIndex != index) {
-                                        stringBuilder.append(" ");
-                                    }
-                                    stringBuilder.append(args[pIndex]);
-                                }
-                                ParseResult<String> result = parser.parseValue(stringBuilder.toString(), normalFilledParameter);
+                    }
+                    if (normalFilledParameter.isMultiline()) {
+                        Class<?> listType = normalFilledParameter.getListType();
+                        if (listType != Void.class) {
+                            ParameterParser<?> parser = parameterValidatorMap.get(listType);
+                            List<Object> parameterList = new ArrayList<>();
+                            for (int pIndex = index; pIndex < args.length; pIndex++) {
+                                ParseResult<?> result = parser.parseValue(args[pIndex], normalFilledParameter);
                                 if (result.isSuccess()) {
-                                    objects[j] = result.getItem();
+                                    parameterList.add(result.getItem());
                                 } else {
                                     commandSender.sendMessage(Messages.getWarningMessage(result.getErrorMessage()));
                                     return;
                                 }
                             }
+                            objects[j] = isOptional ? Optional.of(parameterList) : parameterList;
                         } else {
-                            ParameterParser<?> parser = parameterValidatorMap.get(type);
-                            ParseResult<?> parseResult = parser.parseValue(args[index], normalFilledParameter);
-                            if (parseResult.isSuccess()) {
-                                objects[j] = parseResult.getItem();
+                            ParameterParser<String> parser = (ParameterParser<String>) parameterValidatorMap.get(String.class);
+                            StringBuilder stringBuilder = new StringBuilder();
+
+                            for (int pIndex = index; pIndex < args.length; pIndex++) {
+                                if (pIndex != index) {
+                                    stringBuilder.append(" ");
+                                }
+                                stringBuilder.append(args[pIndex]);
+                            }
+                            ParseResult<String> result = parser.parseValue(stringBuilder.toString(), normalFilledParameter);
+                            if (result.isSuccess()) {
+                                objects[j] = isOptional ? Optional.of(result.getItem()) : result.getItem();
                             } else {
-                                commandSender.sendMessage(Messages.getWarningMessage(parseResult.getErrorMessage()));
+                                commandSender.sendMessage(Messages.getWarningMessage(result.getErrorMessage()));
                                 return;
                             }
                         }
+                    } else {
+                        ParameterParser<?> parser = parameterValidatorMap.get(type);
+                        ParseResult<?> parseResult = parser.parseValue(args[index], normalFilledParameter);
+                        if (parseResult.isSuccess()) {
+                            objects[j] = isOptional ? Optional.of(parseResult.getItem()) : parseResult.getItem();
+                        } else {
+                            commandSender.sendMessage(Messages.getWarningMessage(parseResult.getErrorMessage()));
+                            return;
+                        }
                     }
+
                 } else if (parameter instanceof PageFilledParameter) {
                     lastExecutedPageCommand.put(commandSender, filledCommand);
                     lastExecutedPageCommandData.put(commandSender, objects);
