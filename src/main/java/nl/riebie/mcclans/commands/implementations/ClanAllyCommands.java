@@ -47,7 +47,7 @@ public class ClanAllyCommands {
     }
 
     @Command(name = "invite", description = "Invite another clan to become an ally", isPlayerOnly = true, isClanOnly = true, clanPermission = Permission.ally, spongePermission = "mcclans.user.ally.invite")
-    public void allyInviteCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer, @Parameter String clanTag) {
+    public void allyInviteCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer, @Parameter(name = "clanTag") String clanTag) {
         ClansImpl clansImpl = ClansImpl.getInstance();
         ClanImpl invitedClan = clansImpl.getClan(clanTag);
         ClanImpl invitingClan = clanPlayer.getClan();
@@ -74,7 +74,7 @@ public class ClanAllyCommands {
     }
 
     @Command(name = "inviteable", description = "Change if the clan is accepting ally invites", isPlayerOnly = true, isClanOnly = true, clanPermission = Permission.ally, spongePermission = "mcclans.user.ally.inviteable")
-    public void allyInviteableCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer, @Parameter Toggle toggle) {
+    public void allyInviteableCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer, @Parameter(name = "toggle") Toggle toggle) {
         ClanImpl clan = clanPlayer.getClan();
 
         boolean allowAllyInvites = toggle.getBoolean(clan.isAllowingAllyInvites());
@@ -88,7 +88,7 @@ public class ClanAllyCommands {
     }
 
     @Command(name = "remove", description = "Remove an allied clan", isPlayerOnly = true, isClanOnly = true, clanPermission = Permission.ally, spongePermission = "mcclans.user.ally.remove")
-    public void allyRemoveCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer, @Parameter String clanTag) {
+    public void allyRemoveCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer, @Parameter(name = "clanTag") String clanTag) {
         ClanImpl clan = clanPlayer.getClan();
         ClanImpl ally = clan.getAlly(clanTag);
         if (ally == null) {

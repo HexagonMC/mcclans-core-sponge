@@ -21,7 +21,7 @@ import java.util.Optional;
  */
 public class ClanChatCommands {
     @Command(name = "clan", description = "Talk in clan chat", isPlayerOnly = true, isClanOnly = true, clanPermission = Permission.clanchat, spongePermission = "mcclans.user.chat.clan")
-    public void clanChatCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer, @Multiline @OptionalParameter(String.class) Optional<String> messageOpt) {
+    public void clanChatCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer, @Multiline @OptionalParameter(value = String.class, name = "message") Optional<String> messageOpt) {
         if (messageOpt.isPresent()) {
             String message = messageOpt.get();
             if (clanPlayer.getTempChatState() == null) {
@@ -42,7 +42,7 @@ public class ClanChatCommands {
     }
 
     @Command(name = "ally", description = "Talk in ally chat", isPlayerOnly = true, isClanOnly = true, clanPermission = Permission.allychat, spongePermission = "mcclans.user.chat.ally")
-    public void allyChatCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer, @Multiline @OptionalParameter(String.class) Optional<String> optionalMessage) {
+    public void allyChatCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer, @Multiline @OptionalParameter(value = String.class, name = "message") Optional<String> optionalMessage) {
         if (optionalMessage.isPresent()) {
             String message = optionalMessage.get();
             if (clanPlayer.getTempChatState() == null) {
@@ -63,7 +63,7 @@ public class ClanChatCommands {
     }
 
     @Command(name = "global", description = "Talk in global chat", isPlayerOnly = true, isClanOnly = true, spongePermission = "mcclans.user.chat.global")
-    public void globalChatCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer, @Multiline @OptionalParameter(String.class) Optional<String> optionalMessage) {
+    public void globalChatCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer, @Multiline @OptionalParameter(value = String.class, name = "message") Optional<String> optionalMessage) {
         if (optionalMessage.isPresent()) {
             String message = optionalMessage.get();
             if (clanPlayer.getTempChatState() == null) {

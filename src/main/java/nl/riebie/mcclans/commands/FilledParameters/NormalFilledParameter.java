@@ -12,8 +12,10 @@ public class NormalFilledParameter implements FilledParameter {
     private String regex = "";
     private Class<?> parameterType;
     private Class<?> optionalType;
+    private String name;
 
-    public NormalFilledParameter(Class<?> optional, boolean multiline, Class<?> listType, int minimalLength, int maximalLength, String regex, Class<?> parameterType) {
+    public NormalFilledParameter(String name, Class<?> optional, boolean multiline, Class<?> listType, int minimalLength, int maximalLength, String regex, Class<?> parameterType) {
+        this.name = name;
         this.optionalType = optional;
         this.listType = listType;
         this.minimalLength = minimalLength;
@@ -57,5 +59,9 @@ public class NormalFilledParameter implements FilledParameter {
 
     public Class<?> getListType() {
         return listType;
+    }
+
+    public String getName() {
+        return name;
     }
 }

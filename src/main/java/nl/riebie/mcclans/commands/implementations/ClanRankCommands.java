@@ -27,8 +27,8 @@ public class ClanRankCommands {
     }
 
     @Command(name = "create", description = "Create a rank", isPlayerOnly = true, isClanOnly = true, clanPermission = Permission.rank, spongePermission = "mcclans.user.rank.create")
-    public void clanRankCreateCommand(CommandSource sender, ClanPlayerImpl clanPlayer, @Parameter String rankName,
-                                      @Multiline(listType = Permission.class) @OptionalParameter(List.class) Optional<List<Permission>> permissions) {
+    public void clanRankCreateCommand(CommandSource sender, ClanPlayerImpl clanPlayer, @Parameter(name = "rankName") String rankName,
+                                      @Multiline(listType = Permission.class) @OptionalParameter(value = List.class, name = "permissions") Optional<List<Permission>> permissions) {
         ClanImpl clan = clanPlayer.getClan();
         if (clan == null) {
             Messages.sendWarningMessage(sender, Messages.YOU_ARE_NOT_IN_A_CLAN);
@@ -59,8 +59,8 @@ public class ClanRankCommands {
     }
 
     @Command(name = "rename", description = "Rename a rank", isPlayerOnly = true, isClanOnly = true, clanPermission = Permission.rank, spongePermission = "mcclans.user.rank.rename")
-    public void clanRankRenameCommand(CommandSource sender, ClanPlayerImpl clanPlayer, @Parameter String rankName,
-                                      @Parameter String newRankName) {
+    public void clanRankRenameCommand(CommandSource sender, ClanPlayerImpl clanPlayer, @Parameter(name = "oldRankName") String rankName,
+                                      @Parameter(name = "newRankName") String newRankName) {
         ClanImpl clan = clanPlayer.getClan();
         if (clan.containsRank(rankName)) {
             RankImpl rank = clan.getRank(rankName);
@@ -76,7 +76,7 @@ public class ClanRankCommands {
     }
 
     @Command(name = "remove", description = "Remove a rank", isPlayerOnly = true, isClanOnly = true, clanPermission = Permission.rank, spongePermission = "mcclans.user.rank.remove")
-    public void clanRankRemoveCommand(CommandSource sender, ClanPlayerImpl clanPlayer, @Parameter String rankName) {
+    public void clanRankRemoveCommand(CommandSource sender, ClanPlayerImpl clanPlayer, @Parameter(name = "rankName") String rankName) {
         if (clanPlayer.getClan().containsRank(rankName)) {
             ClanImpl clan = clanPlayer.getClan();
             RankImpl rank = clan.getRank(rankName);
@@ -98,7 +98,7 @@ public class ClanRankCommands {
 
     @Command(name = "view", description = "View the properties of the rank or all ranks", isPlayerOnly = true, isClanOnly = true, clanPermission = Permission.rank, spongePermission = "mcclans.user.rank.view")
     public void clanRankViewCommand(CommandSource sender, ClanPlayerImpl clanPlayer,
-                                    @OptionalParameter(String.class) Optional<String> rankName, @PageParameter int page) {
+                                    @OptionalParameter(value = String.class, name = "rankName") Optional<String> rankName, @PageParameter int page) {
         if (rankName.isPresent()) {
             RankImpl rank = clanPlayer.getClan().getRank(rankName.get());
             if (rank == null) {

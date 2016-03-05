@@ -90,8 +90,8 @@ public class ClanCommands {
     public void clanCreateCommand(
             CommandSource commandSource,
             ClanPlayerImpl clanPlayer,
-            @Parameter(length = LengthConstraints.CLAN_TAG, regex = RegexConstraints.CLAN_TAG) String clanTag,
-            @Multiline @Parameter(length = LengthConstraints.CLAN_NAME, regex = RegexConstraints.CLAN_NAME) String clanName) {
+            @Parameter(name = "clanTag", length = LengthConstraints.CLAN_TAG, regex = RegexConstraints.CLAN_TAG) String clanTag,
+            @Multiline @Parameter(name = "clanName", length = LengthConstraints.CLAN_NAME, regex = RegexConstraints.CLAN_NAME) String clanName) {
         ClansImpl clansImpl = ClansImpl.getInstance();
         if (clanPlayer.getClan() == null) {
             if (clansImpl.tagIsFree(clanTag)) {
@@ -150,7 +150,7 @@ public class ClanCommands {
     }
 
     @Command(name = "invite", description = "Invite a player to your clan", isPlayerOnly = true, isClanOnly = true, clanPermission = Permission.invite, spongePermission = "mcclans.user.invite")
-    public void clanInviteCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer, @Parameter String playerName) {
+    public void clanInviteCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer, @Parameter(name = "playerName") String playerName) {
         // TODO SPONGE: Check if command is properly and fully implemented
         ClanImpl clan = clanPlayer.getClan();
         Player player = (Player) commandSource;       // TODO SPONGE add check if it is a player
@@ -199,7 +199,7 @@ public class ClanCommands {
     }
 
     @Command(name = "remove", description = "Remove a player from your clan", isPlayerOnly = true, isClanOnly = true, clanPermission = Permission.remove, spongePermission = "mcclans.user.remove")
-    public void clanRemoveCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer, @Parameter String playerName) {
+    public void clanRemoveCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer, @Parameter(name = "playerName") String playerName) {
         ClanImpl clan = clanPlayer.getClan();
         if (clan != null) {
             ClanPlayerImpl toBeRemovedClanPlayer = clan.getMember(playerName);
@@ -244,7 +244,8 @@ public class ClanCommands {
     }
 
     @Command(name = "roster", description = "See the members of a clan", spongePermission = "mcclans.user.roster")
-    public void clanRosterCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer, @OptionalParameter(String.class) Optional<String> clanTagOpt, @PageParameter int page) {
+    public void clanRosterCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer, @OptionalParameter(value = String.class, name = "clanTag") Optional<String> clanTagOpt,
+                                  @PageParameter int page) {
         ClanImpl clan;
         if (clanTagOpt.isPresent()) {
             String clanTag = clanTagOpt.get();
@@ -329,7 +330,7 @@ public class ClanCommands {
     }
 
     @Command(name = "info", description = "Get the info of a clan", spongePermission = "mcclans.user.info")
-    public void clanInfoCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer, @OptionalParameter(String.class) Optional<String> clanTagOpt) {
+    public void clanInfoCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer, @OptionalParameter(value = String.class, name = "clanTag") Optional<String> clanTagOpt) {
         ClansImpl clansImpl = ClansImpl.getInstance();
         if (clanTagOpt.isPresent()) {
             String clanTag = clanTagOpt.get();
@@ -428,7 +429,8 @@ public class ClanCommands {
     }
 
     @Command(name = "stats", description = "See the statistics of a clan's members", spongePermission = "mcclans.user.stats")
-    public void clanStatsCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer, @OptionalParameter(String.class) Optional<String> clanTagOpt, @PageParameter int page) {
+    public void clanStatsCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer,
+                                 @OptionalParameter(value = String.class, name = "clanTag") Optional<String> clanTagOpt, @PageParameter int page) {
         ClanImpl clan;
         if (clanTagOpt.isPresent()) {
             clan = ClansImpl.getInstance().getClan(clanTagOpt.get().toLowerCase());

@@ -20,7 +20,7 @@ import java.util.UUID;
 public class ClanAdminClanPlayerCommands {
 
     @Command(name = "remove", description = "Remove all player properties", spongePermission = "mcclans.admin.clanplayer.remove")
-    public void clanPlayerRemoveCommand(CommandSource commandSource, @Parameter String playerName) {
+    public void clanPlayerRemoveCommand(CommandSource commandSource, @Parameter(name = "playerName") String playerName) {
         ClansImpl clansImpl = ClansImpl.getInstance();
         ClanPlayerImpl targetClanPlayer = clansImpl.getClanPlayer(playerName);
 
@@ -33,7 +33,8 @@ public class ClanAdminClanPlayerCommands {
     }
 
     @Command(name = "setdeaths", description = "Set the deaths of a player", spongePermission = "mcclans.admin.clanplayer.setdeaths")
-    public void clanPlayerSetDeathsCommand(CommandSource commandSource, @Parameter String playerName, @Parameter int high, @Parameter int medium, @Parameter int low) {
+    public void clanPlayerSetDeathsCommand(CommandSource commandSource, @Parameter(name = "playerName") String playerName,
+                                           @Parameter(name = "highDeaths") int high, @Parameter(name = "mediumDeaths") int medium, @Parameter(name = "lowDeaths") int low) {
         ClansImpl clansImpl = ClansImpl.getInstance();
         ClanPlayerImpl targetClanPlayer = clansImpl.getClanPlayer(playerName);
 
@@ -48,7 +49,8 @@ public class ClanAdminClanPlayerCommands {
     }
 
     @Command(name = "setkills", description = "Set the kills of a player", spongePermission = "mcclans.admin.clanplayer.setkills")
-    public void clanPlayerSetKillsCommand(CommandSource commandSource, @Parameter String playerName, @Parameter int high, @Parameter int medium, @Parameter int low) {
+    public void clanPlayerSetKillsCommand(CommandSource commandSource, @Parameter(name = "playerName") String playerName,
+                                          @Parameter(name = "highDeaths") int high, @Parameter(name = "mediumDeaths") int medium, @Parameter(name = "lowDeaths") int low) {
         ClansImpl clansImpl = ClansImpl.getInstance();
         ClanPlayerImpl targetClanPlayer = clansImpl.getClanPlayer(playerName);
 
@@ -63,7 +65,7 @@ public class ClanAdminClanPlayerCommands {
     }
 
     @Command(name = "transfer", description = "Transfer all player properties to a different player", spongePermission = "mcclans.admin.clanplayer.transfer")
-    public void clanPlayerTransferCommand(CommandSource commandSource, @Parameter String targetClanPlayer, @Parameter String newPlayerName) {
+    public void clanPlayerTransferCommand(CommandSource commandSource, @Parameter(name = "playerName") String targetClanPlayer, @Parameter(name = "newPlayerName") String newPlayerName) {
         ClansImpl clansImpl = ClansImpl.getInstance();
         ClanPlayerImpl oldClanPlayer = clansImpl.getClanPlayer(targetClanPlayer);
         ClanPlayerImpl newClanPlayer = clansImpl.getClanPlayer(newPlayerName); // Needs to be null to prevent information from being overwritten /

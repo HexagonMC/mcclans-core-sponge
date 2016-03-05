@@ -18,6 +18,7 @@ import org.spongepowered.api.command.source.ConsoleSource;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColor;
+import org.spongepowered.api.text.format.TextColors;
 
 
 import java.lang.annotation.Annotation;
@@ -77,7 +78,7 @@ public class CommandManager {
     private void handleMethod(Method method, Object commandStructureInstance, FilledCommand parent) {
         Command commandAnnotation = method.getAnnotation(Command.class);
         if (commandAnnotation != null) {
-            FilledCommand filledCommand = new FilledCommand(commandAnnotation, method);
+            FilledCommand filledCommand = new FilledCommand(commandAnnotation, method, parent == null ? "clan" : parent.getFullPath());
             commandStructureMap.put(filledCommand, commandStructureInstance);
             if (parent == null) {
                 filledCommandMap.put(commandAnnotation.name(), filledCommand);
@@ -128,8 +129,7 @@ public class CommandManager {
                     LengthConstraint lengthConstraint = parameterValues.length();
                     RegexConstraint regexConstraint = parameterValues.regex();
 
-
-                    filledCommand.addParameter(null, multiline, listType, lengthConstraint.getMinimalLength(),
+                    filledCommand.addParameter(parameterValues.name(), null, multiline, listType, lengthConstraint.getMinimalLength(),
                             lengthConstraint.getMaximalLength(), regexConstraint.getRegex(), parameter.getType());
 
 
@@ -154,7 +154,7 @@ public class CommandManager {
                     RegexConstraint regexConstraint = parameterValues.regex();
 
 
-                    filledCommand.addParameter(parameterValues.value(), multiline, listType, lengthConstraint.getMinimalLength(),
+                    filledCommand.addParameter(parameterValues.name(), parameterValues.value(), multiline, listType, lengthConstraint.getMinimalLength(),
                             lengthConstraint.getMaximalLength(), regexConstraint.getRegex(), parameter.getType());
                 }
             }
@@ -186,8 +186,9 @@ public class CommandManager {
             objects[objects.length - 1] = Integer.valueOf(args[1]);
             filledCommand.execute(commandStructureMap.get(filledCommand), objects);
             return;
-        } else if(firstParam.equals("help")){
-
+        } else if (firstParam.equals("help")) {
+            int page = args.length > 1 ? Integer.valueOf(args[1]) : 1;
+            sendHelp(commandSource, page);
             return;
         }
 
@@ -305,6 +306,97 @@ public class CommandManager {
             }
             filledCommand.execute(commandStructureMap.get(filledCommand), objects);
         }
+    }
+
+    public void sendHelp(CommandSource commandSource, int page) {
+        List<FilledCommand> commands = new ArrayList<>();
+
+        this.filledCommandMap.values().stream().filter(
+                filledCommand -> !(Config.getBoolean(Config.USE_PERMISSIONS) || filledCommand.getSpongePermission().startsWith("mcclans.admin"))
+                        || commandSource.hasPermission(filledCommand.getSpongePermission())).forEach(filledCommand -> {
+            commands.add(filledCommand);
+            commands.addAll(getSubCommands(filledCommand));
+        });
+
+        sendHelpPage(commands, commandSource, page);
+    }
+
+    private List<FilledCommand> getSubCommands(FilledCommand filledCommand) {
+        List<FilledCommand> commands = new ArrayList<>();
+        for (FilledCommand subCommand : filledCommand.getChildren()) {
+            commands.add(subCommand);
+            commands.addAll(getSubCommands(subCommand));
+        }
+        return commands;
+    }
+
+    private void sendHelpPage(List<FilledCommand> commands, CommandSource commandSender, int page) {
+
+        int id = page - 1;
+        int commandMinIndex = getMinIndexForPage(page);
+        int commandMaxIndex = getMaxIndexForPage(page, commands.size());
+        int maxPages = getMaxPagesForSize(commands.size());
+
+        if (id < maxPages && id >= 0) {
+            commandSender.sendMessage(Text.EMPTY);
+          /*  commandSender.sendMessage(ChatColor.DARK_GRAY + "== " + ChatColor.DARK_GREEN + "MC" + ChatColor.GREEN + "Clans" + ChatColor.RESET
+                    + " Help Page " + ChatColor.GREEN + page + ChatColor.GRAY + "/" + ChatColor.GREEN + maxPages + ChatColor.DARK_GRAY + " ==");
+            if (page < maxPages) {
+                commandSender.sendMessage(ChatColor.GRAY + "Type" + ChatColor.DARK_GREEN + " /clan help " + (page + 1) + ChatColor.GRAY
+                        + " to read the next page" + ChatColor.RESET);
+            }*/
+            commandSender.sendMessage(Text.EMPTY);
+
+            List<FilledCommand> commandsSubList = commands.subList(commandMinIndex, commandMaxIndex);
+            for (FilledCommand baseCommand : commandsSubList) {
+                Text.Builder firstMessageLine = Text.builder();
+                if (baseCommand.getSpongePermission().startsWith("mcclans.admin")) {
+                    firstMessageLine.append(Text.of("["), Text.builder().color(TextColors.RED).append(Text.of("Admin")).build(), Text.of("] "));
+                }
+                firstMessageLine.append(Text.builder().color(TextColors.DARK_GREEN).append(Text.of("/" + baseCommand.getFullPath())).build());
+                List<FilledParameter> parameters = baseCommand.getParameters();
+                for (FilledParameter parameter : parameters) {
+                    if (parameter instanceof NormalFilledParameter) {
+                        NormalFilledParameter normalParameter = (NormalFilledParameter) parameter;
+                        if (normalParameter.isOptional()) {
+                            firstMessageLine.append(Text.of(Text.builder().color(TextColors.GREEN).append(Text.of(" {")).build(), Text.of(normalParameter.getName()), Text.builder().color(TextColors.GREEN).append(Text.of("}")).build()));
+                        } else {
+                            firstMessageLine.append(Text.of(Text.builder().color(TextColors.GREEN).append(Text.of(" <")).build(), Text.of(normalParameter.getName()), Text.builder().color(TextColors.GREEN).append(Text.of(">")).build()));
+
+                        }
+                    }
+                }
+
+                Text secondMessageLine = Text.of(Text.of(" "), Text.builder().color(TextColors.GRAY).append(Text.of(baseCommand.getDescription())).build());
+
+                commandSender.sendMessage(firstMessageLine.build());
+                commandSender.sendMessage(secondMessageLine);
+            }
+        } else if (maxPages == 0) {
+            Messages.sendWarningMessage(commandSender, Messages.THIS_COMMAND_HAS_NO_INFORMATION_TO_DISPLAY);
+        } else {
+            Messages.sendWarningMessage(commandSender, Messages.PAGE_DOES_NOT_EXIST);
+        }
+    }
+
+    private int getMinIndexForPage(int page) {
+        return ((page * COMMANDS_PER_PAGE) - COMMANDS_PER_PAGE);
+    }
+
+    private int getMaxIndexForPage(int page, int size) {
+        int commandMaxIndex = (page * COMMANDS_PER_PAGE);
+        if (commandMaxIndex > size) {
+            commandMaxIndex = size;
+        }
+        return commandMaxIndex;
+    }
+
+    private int getMaxPagesForSize(int amountOfCommands) {
+        int pages = amountOfCommands / COMMANDS_PER_PAGE;
+        if (amountOfCommands % COMMANDS_PER_PAGE != 0) {
+            pages++;
+        }
+        return pages;
     }
 
     private CommandSender getCommandSender(CommandSource commandSource) {

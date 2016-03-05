@@ -18,7 +18,7 @@ public class ClanFriendlyFireCommands {
     private final static String PLAYER_FRIENDLY_FIRE_DESCRIPTION = "Toggle your personal friendly fire protection";
 
     @Command(name = "clan", description = CLAN_FRIENDLY_FIRE_DESCRIPTION, isPlayerOnly = true, isClanOnly = true, clanPermission = Permission.friendlyfire, spongePermission = "mcclans.user.friendlyfire.clan")
-    public void clanFriendlyFireCommand(ClanPlayerImpl clanPlayer, @Parameter Toggle friendlyFireToggle) {
+    public void clanFriendlyFireCommand(ClanPlayerImpl clanPlayer, @Parameter(name = "toggle") Toggle friendlyFireToggle) {
         ClanImpl clan = clanPlayer.getClan();
         boolean ffProtected = friendlyFireToggle.getBoolean(clan.isFfProtected());
         clan.setFfProtection(ffProtected);
@@ -30,7 +30,7 @@ public class ClanFriendlyFireCommands {
     }
 
     @Command(name = "personal", description = PLAYER_FRIENDLY_FIRE_DESCRIPTION, isPlayerOnly = true, isClanOnly = true, spongePermission = "mcclans.user.friendlyfire.personal")
-    public void personalFriendlyFireCommand(CommandSource sender, ClanPlayerImpl clanPlayer, @Parameter Toggle friendlyFireToggle) {
+    public void personalFriendlyFireCommand(CommandSource sender, ClanPlayerImpl clanPlayer, @Parameter(name = "toggle") Toggle friendlyFireToggle) {
         boolean ffProtected = friendlyFireToggle.getBoolean(clanPlayer.isFfProtected());
         clanPlayer.setFfProtection(ffProtected);
         if (ffProtected) {

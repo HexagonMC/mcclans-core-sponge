@@ -16,6 +16,8 @@ import java.lang.annotation.Target;
 public @interface OptionalParameter {
     Class<?> value();
 
+    String name();
+
     LengthConstraints length() default LengthConstraints.EMPTY;
 
     RegexConstraints regex() default RegexConstraints.EMPTY;

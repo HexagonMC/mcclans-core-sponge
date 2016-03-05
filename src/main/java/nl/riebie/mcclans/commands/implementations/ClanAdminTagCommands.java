@@ -14,7 +14,7 @@ import org.spongepowered.api.text.format.TextColor;
 public class ClanAdminTagCommands {
 
     @Command(name = "color", description = "Change a clan tag color", spongePermission = "mcclans.admin.tag.color")
-    public void tagColorCommand(CommandSource commandSource, @Parameter String clanTag, @Parameter TextColor tagColor) {
+    public void tagColorCommand(CommandSource commandSource, @Parameter(name = "clanTag") String clanTag, @Parameter(name = "tagColor") TextColor tagColor) {
         ClansImpl clansImpl = ClansImpl.getInstance();
         ClanImpl clan = clansImpl.getClan(clanTag);
 

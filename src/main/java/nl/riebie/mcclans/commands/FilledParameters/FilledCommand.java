@@ -24,19 +24,22 @@ public final class FilledCommand {
     private List<FilledCommand> children = new ArrayList<>();
     private boolean isPlayerOnly;
     private final boolean isClanOnly;
+    private String path;
 
     private boolean hasPageParameter;
     private boolean hasOptional;
-    private boolean hasMultiline;
 
-    public FilledCommand(Command command, Method method) {
+    public FilledCommand(Command command, Method method, String path) {
         this.method = method;
+
         this.clanPermission = command.clanPermission();
         this.spongePermission = command.spongePermission();
         this.description = command.description();
         this.name = command.name();
         this.isPlayerOnly = command.isPlayerOnly();
         this.isClanOnly = command.isClanOnly();
+
+        this.path = path == null ? name : String.format("%s %s", path, name);
     }
 
     public String getName() {
@@ -56,8 +59,8 @@ public final class FilledCommand {
         children.add(child);
     }
 
-    public void addParameter(Class<?> optional, boolean isMultiline, Class<?> listType, int minimalLength, int maximalLength, String regex, Class<?> parameterType) {
-        NormalFilledParameter normalFilledParameter = new NormalFilledParameter(optional, isMultiline, listType, minimalLength, maximalLength, regex, parameterType);
+    public void addParameter(String name, Class<?> optional, boolean isMultiline, Class<?> listType, int minimalLength, int maximalLength, String regex, Class<?> parameterType) {
+        NormalFilledParameter normalFilledParameter = new NormalFilledParameter(name, optional, isMultiline, listType, minimalLength, maximalLength, regex, parameterType);
         checkStateAndAddParameter(normalFilledParameter);
         if (normalFilledParameter.isOptional()) {
             hasOptional = true;
@@ -92,8 +95,6 @@ public final class FilledCommand {
             throw new IllegalStateException("The PageParameter should always be the last parameter in a command");
         } else if (hasOptional && !(parameter instanceof PageFilledParameter)) {
             throw new IllegalStateException("Only the last parameter can be optional");
-        } else if (hasMultiline && !(parameter instanceof PageFilledParameter)) {
-            throw new IllegalStateException("Only the last parameter can be multiline");
         }
 
         parameters.add(parameter);
@@ -139,5 +140,9 @@ public final class FilledCommand {
 
     public String getSpongePermission() {
         return spongePermission;
+    }
+
+    public String getFullPath() {
+        return path;
     }
 }

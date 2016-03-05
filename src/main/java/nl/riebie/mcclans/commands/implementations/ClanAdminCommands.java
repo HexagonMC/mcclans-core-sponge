@@ -48,7 +48,7 @@ public class ClanAdminCommands {
     }
 
     @Command(name = "coords", description = "See the coordinates of a clan's members", spongePermission = "mcclans.admin.coords")
-    public void adminCoordsCommand(CommandSource commandSource, @Parameter ClanImpl clan, @PageParameter int page) {
+    public void adminCoordsCommand(CommandSource commandSource, @Parameter(name = "clan") ClanImpl clan, @PageParameter int page) {
         List<Player> onlineMembers = new ArrayList<Player>();
         List<ClanPlayerImpl> members = clan.getMembersImpl();
         for (ClanPlayerImpl member : members) {
@@ -82,9 +82,9 @@ public class ClanAdminCommands {
     @Command(name = "create", description = "Create a clan", spongePermission = "mcclans.admin.create")
     public void adminCreateCommand(
             CommandSource commandSource,
-            @Parameter String owner,
-            @Parameter(length = LengthConstraints.CLAN_TAG, regex = RegexConstraints.CLAN_TAG) String clanTag,
-            @Multiline @Parameter(length = LengthConstraints.CLAN_NAME, regex = RegexConstraints.CLAN_NAME) String clanName
+            @Parameter(name = "owner") String owner,
+            @Parameter(name = "clanTag", length = LengthConstraints.CLAN_TAG, regex = RegexConstraints.CLAN_TAG) String clanTag,
+            @Multiline @Parameter(name = "clanName", length = LengthConstraints.CLAN_NAME, regex = RegexConstraints.CLAN_NAME) String clanName
     ) {
         ClansImpl clansImpl = ClansImpl.getInstance();
         ClanPlayerImpl targetClanPlayer = clansImpl.getClanPlayer(owner);
@@ -118,7 +118,7 @@ public class ClanAdminCommands {
     }
 
     @Command(name = "disband", description = "Disband a clan", spongePermission = "mcclans.admin.disband")
-    public void adminDisbandCommand(CommandSource commandSource, @Parameter String clanTag) {
+    public void adminDisbandCommand(CommandSource commandSource, @Parameter(name = "clanTag") String clanTag) {
         ClansImpl clansImpl = ClansImpl.getInstance();
         ClanImpl clan = clansImpl.getClan(clanTag);
         if (clan == null) {
@@ -130,7 +130,7 @@ public class ClanAdminCommands {
     }
 
     @Command(name = "home", description = "Teleport to a clan home", isPlayerOnly = true, spongePermission = "mcclans.admin.home")
-    public void adminHomeCommand(CommandSource commandSource, @Parameter String clanTag) {
+    public void adminHomeCommand(CommandSource commandSource, @Parameter(name = "clanTag")  String clanTag) {
         Player player = (Player) commandSource;
         ClansImpl clansImpl = ClansImpl.getInstance();
         ClanImpl clan = clansImpl.getClan(clanTag);
@@ -147,7 +147,7 @@ public class ClanAdminCommands {
     }
 
     @Command(name = "invite", description = "Invite a player to a clan", spongePermission = "mcclans.admin.invite")
-    public void adminInviteCommand(CommandSource commandSource, @Parameter String clanTag, @Parameter String playerName) {
+    public void adminInviteCommand(CommandSource commandSource, @Parameter(name = "clanTag") String clanTag, @Parameter(name = "playerName") String playerName) {
         ClansImpl clansImpl = ClansImpl.getInstance();
         ClanImpl clan = clansImpl.getClan(clanTag);
         if (clan == null) {
@@ -184,7 +184,7 @@ public class ClanAdminCommands {
     }
 
     @Command(name = "remove", description = "Remove a player from a clan", spongePermission = "mcclans.admin.remove")
-    public void adminRemoveCommand(CommandSource commandSource, @Parameter String clanTag, @Parameter String playerName) {
+    public void adminRemoveCommand(CommandSource commandSource, @Parameter(name = "clanTag") String clanTag, @Parameter(name = "playerName") String playerName) {
         ClansImpl clansImpl = ClansImpl.getInstance();
         ClanImpl clan = clansImpl.getClan(clanTag);
         if (clan == null) {
@@ -208,7 +208,7 @@ public class ClanAdminCommands {
     }
 
     @Command(name = "sethome", description = "Set the location of a clan home", isPlayerOnly = true, spongePermission = "mcclans.admin.sethome")
-    public void adminSetHomeCommand(CommandSource commandSource, @Parameter String clanTag) {
+    public void adminSetHomeCommand(CommandSource commandSource, @Parameter(name = "clanTag") String clanTag) {
         Player player = (Player) commandSource;
         ClansImpl clansImpl = ClansImpl.getInstance();
         ClanImpl clan = clansImpl.getClan(clanTag);
@@ -222,7 +222,7 @@ public class ClanAdminCommands {
     }
 
     @Command(name = "setowner", description = "Set the owner of a clan", spongePermission = "mcclans.admin.setowner")
-    public void adminSetOwnerCommand(CommandSource commandSource, @Parameter String clanTag, @Parameter String playerName) {
+    public void adminSetOwnerCommand(CommandSource commandSource, @Parameter(name = "clanTag") String clanTag, @Parameter(name = "playerName") String playerName) {
         ClansImpl clansImpl = ClansImpl.getInstance();
         ClanImpl clan = clansImpl.getClan(clanTag);
         if (clan == null) {

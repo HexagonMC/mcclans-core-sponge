@@ -15,7 +15,7 @@ import org.spongepowered.api.text.format.TextColor;
 public class ClanTagCommands {
 
     @Command(name = "color", description = "Change the clan tag color", isPlayerOnly = true, isClanOnly = true, clanPermission = Permission.tag, spongePermission = "mcclans.user.tag.color")
-    public void tagColorCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer, @Parameter TextColor textColor) {
+    public void tagColorCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer, @Parameter(name = "tagColor") TextColor textColor) {
         ClanImpl clan = clanPlayer.getClan();
         clan.setTagColor(textColor);
         Messages.sendSuccessfullyChangedTheClanTagColorTo(commandSource, clan.getTagColored());
