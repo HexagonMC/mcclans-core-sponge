@@ -17,12 +17,14 @@ import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.source.ConsoleSource;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.format.TextColors;
 
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.util.*;
 
 /**
@@ -33,28 +35,35 @@ public class CommandManager {
     private static final int COMMANDS_PER_PAGE = 5;
 
     private Map<String, FilledCommand> filledCommandMap = new HashMap<>();
-    private Map<CommandSender, FilledCommand> lastExecutedPageCommand = new HashMap<>();
-    private Map<CommandSender, Object[]> lastExecutedPageCommandData = new HashMap<>();
+
     private Map<FilledCommand, Object> commandStructureMap = new HashMap<>();
 
+    //last executed page commands
+    private Map<CommandSender, FilledCommand> lastExecutedPageCommand = new HashMap<>();
+    private Map<CommandSender, Object[]> lastExecutedPageCommandData = new HashMap<>();
+
+    //parameter validation
     private static final Map<Class<?>, ParameterParser<?>> parameterValidatorMap = new HashMap<>();
+    private static final Map<Class<?>, String> parameterDescriptionMap = new HashMap<>();
 
     static {
-        registerParameterValidator(new StringParser(), String.class);
-        registerParameterValidator(new IntegerParser(), int.class, Integer.class);
-        registerParameterValidator(new DoubleParser(), double.class, Double.class);
-        registerParameterValidator(new FloatParser(), float.class, Float.class);
-        registerParameterValidator(new BooleanParser(), boolean.class, Boolean.class);
+        registerParameterValidator(new StringParser(), "word", String.class);
+        registerParameterValidator(new IntegerParser(), "number", int.class, Integer.class);
+        registerParameterValidator(new DoubleParser(), "decimal number", double.class, Double.class);
+        registerParameterValidator(new FloatParser(), "decimal number", float.class, Float.class);
+        registerParameterValidator(new BooleanParser(), "value (on/off)", boolean.class, Boolean.class);
 
-        registerParameterValidator(new PermissionParser(), Permission.class);
-        registerParameterValidator(new ToggleParser(), Toggle.class);
-        registerParameterValidator(new ClanParser(), Clan.class, ClanImpl.class);
-        registerParameterValidator(new TextColorParser(), TextColor.class);
+        registerParameterValidator(new PermissionParser(), "permission", Permission.class);
+        registerParameterValidator(new ToggleParser(), "value (on/off/toggle)", Toggle.class);
+        registerParameterValidator(new ClanParser(), "clanTag", Clan.class, ClanImpl.class);
+        registerParameterValidator(new TextColorParser(), "color", TextColor.class);
     }
 
-    private static void registerParameterValidator(ParameterParser<?> parser, Class<?>... classes) {
+    private static void registerParameterValidator(ParameterParser<?> parser, String userFriendlyDescription, Class<?>... classes) {
+
         for (Class<?> type : classes) {
             parameterValidatorMap.put(type, parser);
+            parameterDescriptionMap.put(type, userFriendlyDescription);
         }
     }
 
@@ -358,10 +367,12 @@ public class CommandManager {
                 for (FilledParameter parameter : parameters) {
                     if (parameter instanceof NormalFilledParameter) {
                         NormalFilledParameter normalParameter = (NormalFilledParameter) parameter;
+
+                        Text parameterText = Text.builder().onHover(TextActions.showText(getParameterDescription(normalParameter))).append(Text.of(normalParameter.getName())).build();
                         if (normalParameter.isOptional()) {
-                            firstMessageLine.append(Text.of(Text.builder().color(TextColors.GREEN).append(Text.of(" {")).build(), Text.of(normalParameter.getName()), Text.builder().color(TextColors.GREEN).append(Text.of("}")).build()));
+                            firstMessageLine.append(Text.of(Text.builder().color(TextColors.GREEN).append(Text.of(" {")).build(), parameterText, Text.builder().color(TextColors.GREEN).append(Text.of("}")).build()));
                         } else {
-                            firstMessageLine.append(Text.of(Text.builder().color(TextColors.GREEN).append(Text.of(" <")).build(), Text.of(normalParameter.getName()), Text.builder().color(TextColors.GREEN).append(Text.of(">")).build()));
+                            firstMessageLine.append(Text.of(Text.builder().color(TextColors.GREEN).append(Text.of(" <")).build(), parameterText, Text.builder().color(TextColors.GREEN).append(Text.of(">")).build()));
 
                         }
                     }
@@ -377,6 +388,25 @@ public class CommandManager {
         } else {
             Messages.sendWarningMessage(commandSender, Messages.PAGE_DOES_NOT_EXIST);
         }
+    }
+
+    private Text getParameterDescription(NormalFilledParameter parameter) {
+        Type type = parameter.getParameterType();
+        String prefix = String.format("a %s", parameterDescriptionMap.get(type));
+        if (parameter.isMultiline()) {
+            if (parameter.getListType() != Void.class) {
+                type = parameter.getListType();
+                prefix = String.format("a list of %ss", parameterDescriptionMap.get(type));
+            } else {
+                prefix = "a sentence";
+            }
+
+        } else if (parameter.isOptional()) {
+            type = parameter.getOptionalType();
+            prefix = String.format("a %s", parameterDescriptionMap.get(type));
+        }
+
+        return Text.of(prefix);
     }
 
     private int getMinIndexForPage(int page) {
