@@ -57,11 +57,7 @@ public class PlayerChatListener {
         }
 
         // TODO SPONGE which message to get, getMessage() or getRawMessage()?
-        Optional<Text> messageOpt = event.getMessage();
-        if (!messageOpt.isPresent()) {
-            return;
-        }
-        Text message = messageOpt.get();
+        Text message = event.getMessage();
 //        Text message = event.getRawMessage();
 
         ClanImpl clan = clanPlayer.getClan();
