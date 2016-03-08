@@ -2,6 +2,7 @@ package nl.riebie.mcclans.utils;
 
 import nl.riebie.mcclans.MCClans;
 import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.cause.NamedCause;
 import org.spongepowered.api.service.economy.Currency;
 import org.spongepowered.api.service.economy.EconomyService;
 import org.spongepowered.api.service.economy.account.UniqueAccount;
@@ -24,16 +25,17 @@ public class EconomyUtils {
 
         EconomyService economyService = MCClans.getPlugin().getServiceHelper().economyService;
         Currency currency = MCClans.getPlugin().getServiceHelper().currency;
-        Optional<UniqueAccount> accountOpt = economyService.getAccount(uuid);
-        if (!accountOpt.isPresent()) {
-            accountOpt = economyService.createAccount(uuid);
-        }
+        Optional<UniqueAccount> accountOpt = economyService.getOrCreateAccount(uuid);
         if (!accountOpt.isPresent()) {
             return false;
         }
 
         UniqueAccount account = accountOpt.get();
-        TransactionResult result = account.withdraw(currency, BigDecimal.valueOf(charge), Cause.of(MCClans.getPlugin()));
+        TransactionResult result = account.withdraw(
+                currency,
+                BigDecimal.valueOf(charge),
+                Cause.of(NamedCause.of("MCClans", MCClans.getPlugin()))
+        );
         return (result.getResult().equals(ResultType.SUCCESS));
     }
 }

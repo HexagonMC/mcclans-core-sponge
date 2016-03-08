@@ -2,6 +2,7 @@ package nl.riebie.mcclans.api.events;
 
 import org.spongepowered.api.event.Event;
 import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.cause.NamedCause;
 import org.spongepowered.api.event.impl.AbstractEvent;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
 
@@ -21,9 +22,10 @@ public abstract class ClanEvent extends AbstractEvent {
 //    }
 
     @Override
-    @NonnullByDefault
     public Cause getCause() {
-        return Cause.of(new Object());
+        return Cause.of(
+                NamedCause.of("ClanEvent", this)
+        );
     }
 
 

@@ -9,6 +9,7 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.channel.AbstractMutableMessageChannel;
 import org.spongepowered.api.text.channel.MessageReceiver;
+import org.spongepowered.api.text.chat.ChatType;
 import org.spongepowered.api.text.format.TextColors;
 
 import javax.annotation.Nonnull;
@@ -58,7 +59,7 @@ public class AllyMessageChannel extends AbstractMutableMessageChannel {
     }
 
     @Override
-    public Optional<Text> transformMessage(@Nullable Object sender, MessageReceiver recipient, Text original) {
+    public Optional<Text> transformMessage(@Nullable Object sender, MessageReceiver recipient, Text original, ChatType type) {
         Clan clan = clanPlayer.getClan();
         Text clanTagText = null;
         if (clan != null) {

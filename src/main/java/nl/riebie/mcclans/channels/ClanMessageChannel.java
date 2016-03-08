@@ -9,7 +9,10 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.channel.AbstractMutableMessageChannel;
 import org.spongepowered.api.text.channel.MessageReceiver;
+import org.spongepowered.api.text.chat.ChatType;
+import org.spongepowered.api.text.chat.ChatTypes;
 import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -54,7 +57,7 @@ public class ClanMessageChannel extends AbstractMutableMessageChannel {
     }
 
     @Override
-    public Optional<Text> transformMessage(@Nullable Object sender, MessageReceiver recipient, Text original) {
+    public Optional<Text> transformMessage(@Nullable Object sender, MessageReceiver recipient, Text original, ChatType type) {
         Rank rank = clanPlayer.getRank();
         Text rankText = null;
         if (rank != null) {
