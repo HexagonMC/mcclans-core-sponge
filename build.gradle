@@ -1,9 +1,14 @@
-group 'nl.riebie'
-version '0.1'
+//plugins {
+//    id 'org.spongepowered.plugin' version '0.1'
+//}
 
 apply plugin: 'java'
 
 sourceCompatibility = 1.8
+
+group = 'nl.riebie'
+version = '0.1'
+description = 'MCClans allows players to group together by forming clans'
 
 jar {
     Integer buildNumber = System.getenv("BUILD_NUMBER") as Integer ?: 0;

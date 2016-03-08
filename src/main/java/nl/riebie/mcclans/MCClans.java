@@ -16,6 +16,7 @@ import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GameStartedServerEvent;
 import org.spongepowered.api.event.game.state.GameStoppedServerEvent;
+import org.spongepowered.api.event.game.state.GameStoppingServerEvent;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.service.ProviderRegistration;
@@ -29,7 +30,7 @@ import java.util.Optional;
 /**
  * Created by K.Volkers on 8-12-2015.
  */
-@Plugin(id = "nl.riebie.MCClans", name = "MCClans", version = "0.1")
+@Plugin(id = "nl.riebie.mcclans", name = "MCClans", version = "0.1")
 public class MCClans {
 
     private static MCClans plugin;
@@ -128,7 +129,7 @@ public class MCClans {
     }
 
     @Listener
-    public void onServerStop(GameStoppedServerEvent event) {
+    public void onServerStop(GameStoppingServerEvent event) {
         if (Config.getBoolean(Config.USE_DATABASE)) {
             getLogger().info("Database updater shutting down...", false);
             TaskExecutor.getInstance().terminate();
