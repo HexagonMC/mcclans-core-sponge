@@ -46,6 +46,10 @@ public final class FilledCommand {
         return name;
     }
 
+    public boolean hasChildren(){
+        return !children.isEmpty();
+    }
+
     public FilledCommand getChild(String name) {
         for (FilledCommand command : children) {
             if (command.name.equals(name)) {

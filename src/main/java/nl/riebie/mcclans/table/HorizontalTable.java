@@ -17,8 +17,8 @@ public class HorizontalTable<T> {
     //input
     private int pageSize;
     private int page;
-    private String tableName;
-    private String message;
+    private Text tableName;
+    private Text message;
     private List<T> items;
     private CommandSource sender;
 
@@ -42,6 +42,12 @@ public class HorizontalTable<T> {
 
     public HorizontalTable(String tableName, int pageSize, TableAdapter<T> adapter) {
         this.tableAdapter = adapter;
+        this.tableName = Text.of(tableName);
+        this.pageSize = pageSize;
+    }
+
+    public HorizontalTable(Text tableName, int pageSize, TableAdapter<T> adapter) {
+        this.tableAdapter = adapter;
         this.tableName = tableName;
         this.pageSize = pageSize;
     }
@@ -50,7 +56,7 @@ public class HorizontalTable<T> {
         this.comparator = comparator;
     }
 
-    public void setMessage(String message) {
+    public void setMessage(Text message) {
         this.message = message;
     }
 
@@ -104,24 +110,24 @@ public class HorizontalTable<T> {
     private void printHeader(int currentPage, int maxPages) {
         topMessage.add(Text.EMPTY);
         topMessage.add(Text.join(Text.builder().color(TextColors.DARK_GRAY).append(Text.of("== ")).build(),
-                Text.of(this.tableName, " "),
-                Text.builder().color(TextColors.GREEN).append(Text.of(currentPage)).build(),
+                this.tableName,
+                Text.builder().color(TextColors.GREEN).append(Text.of(" "), Text.of(currentPage)).build(),
                 Text.builder().color(TextColors.GRAY).append(Text.of("/")).build(),
                 Text.builder().color(TextColors.GREEN).append(Text.of(maxPages)).build(),
                 Text.builder().color(TextColors.DARK_GRAY).append(Text.of(" ==")).build()));
 
         if (maxPages > 1) {
-            topMessage.add(Text.builder().color(TextColors.GRAY).append(Text.of("Type /zs page <1-", maxPages, "> to scroll through pages")).build());
+            topMessage.add(Text.builder().color(TextColors.GRAY).append(Text.of("Type /clan page <1-", maxPages, "> to scroll through pages")).build());
         }
         topMessage.add(Text.EMPTY);
         if (message != null) {
-            topMessage.add(Text.of(message));
+            topMessage.add(message);
             topMessage.add(Text.EMPTY);
         }
         double totalCount = 0;
         Text.Builder row = Text.builder();
         for (Column column : this.columns) {
-            Text header = Text.of(column.key, ":");
+            Text header = Text.builder(column.key+ ":").color(TextColors.DARK_GREEN).build();
             double numberOfSpaces = column.spacing - getSpaces(header);
             Text spaces = getSpacesString(numberOfSpaces);
             row.color(TextColors.DARK_GREEN).append(Text.of(header)).color(TextColors.RESET).append(Text.of(spaces));

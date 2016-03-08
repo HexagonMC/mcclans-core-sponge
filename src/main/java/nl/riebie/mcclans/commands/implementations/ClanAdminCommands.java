@@ -1,6 +1,5 @@
 package nl.riebie.mcclans.commands.implementations;
 
-import com.flowpowered.math.vector.Vector3d;
 import nl.riebie.mcclans.ClansImpl;
 import nl.riebie.mcclans.api.enums.Permission;
 import nl.riebie.mcclans.clan.ClanImpl;
@@ -14,7 +13,6 @@ import nl.riebie.mcclans.database.DatabaseHandler;
 import nl.riebie.mcclans.messages.Messages;
 import nl.riebie.mcclans.player.ClanPlayerImpl;
 import nl.riebie.mcclans.table.HorizontalTable;
-import nl.riebie.mcclans.table.Row;
 import nl.riebie.mcclans.table.TableAdapter;
 import nl.riebie.mcclans.utils.UUIDUtils;
 import nl.riebie.mcclans.utils.Utils;
@@ -48,7 +46,7 @@ public class ClanAdminCommands {
     }
 
     @Command(name = "coords", description = "See the coordinates of a clan's members", spongePermission = "mcclans.admin.coords")
-    public void adminCoordsCommand(CommandSource commandSource, @Parameter(name = "clan") ClanImpl clan, @PageParameter int page) {
+    public void adminCoordsCommand(CommandSource commandSource, @Parameter(name = "clanTag") ClanImpl clan, @PageParameter int page) {
         List<Player> onlineMembers = new ArrayList<Player>();
         List<ClanPlayerImpl> members = clan.getMembersImpl();
         for (ClanPlayerImpl member : members) {

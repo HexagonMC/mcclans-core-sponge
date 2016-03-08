@@ -13,6 +13,8 @@ import nl.riebie.mcclans.commands.constraints.regex.RegexConstraint;
 import nl.riebie.mcclans.config.Config;
 import nl.riebie.mcclans.messages.Messages;
 import nl.riebie.mcclans.player.ClanPlayerImpl;
+import nl.riebie.mcclans.table.HorizontalTable;
+import nl.riebie.mcclans.table.TableAdapter;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.source.ConsoleSource;
 import org.spongepowered.api.entity.living.player.Player;
@@ -191,9 +193,16 @@ public class CommandManager {
 
         if (firstParam.equals("page")) {
             FilledCommand filledCommand = lastExecutedPageCommand.get(commandSender);
-            Object[] objects = lastExecutedPageCommandData.get(commandSender);
-            objects[objects.length - 1] = Integer.valueOf(args[1]);
-            filledCommand.execute(commandStructureMap.get(filledCommand), objects);
+            int page = Integer.valueOf(args[1]);
+
+            if (filledCommand.hasChildren()) {
+                sendContextHelp(commandSender, commandSource, filledCommand, page);
+                return;
+            } else {
+                Object[] objects = lastExecutedPageCommandData.get(commandSender);
+                objects[objects.length - 1] = page;
+                filledCommand.execute(commandStructureMap.get(filledCommand), objects);
+            }
             return;
         } else if (firstParam.equals("help")) {
             int page = args.length > 1 ? Integer.valueOf(args[1]) : 1;
@@ -228,12 +237,16 @@ public class CommandManager {
                 commandSource.sendMessage(Text.of("This command can only be used of you are a member of a clan"));
                 return;
             }
-
             Permission permission = filledCommand.getClanPermission();
             if (permission != Permission.none && !commandSender.checkPermission(permission)) {
                 Messages.sendYouDoNotHaveTheRequiredPermission(commandSource, permission.name());
                 return;
             }
+            if (filledCommand.hasChildren()) {
+                sendContextHelp(commandSender, commandSource, filledCommand, 1);
+                return;
+            }
+
             List<FilledParameter> parameters = filledCommand.getParameters();
             Object[] objects = new Object[parameters.size()];
             int argOffset = i;
@@ -259,7 +272,8 @@ public class CommandManager {
                             objects[j] = Optional.empty();
                             continue;
                         } else {
-                            commandSender.sendMessage(Messages.getWarningMessage("Parameter should be supplied")); //TODO Sponge real error message
+                            displayParameterHelpPage(commandSource, filledCommand);
+//                            commandSender.sendMessage(Messages.getWarningMessage("Parameter should be supplied")); //TODO Sponge real error message
                             return;
                         }
                     }
@@ -314,10 +328,12 @@ public class CommandManager {
                 }
             }
             filledCommand.execute(commandStructureMap.get(filledCommand), objects);
+        } else{
+            sendHelp(commandSource, 1);
         }
     }
 
-    public void sendHelp(CommandSource commandSource, int page) {
+    private void sendHelp(CommandSource commandSource, int page) {
         List<FilledCommand> commands = new ArrayList<>();
 
         this.filledCommandMap.values().stream().filter(
@@ -327,7 +343,12 @@ public class CommandManager {
             commands.addAll(getSubCommands(filledCommand));
         });
 
-        sendHelpPage(commands, commandSource, page);
+        sendHelpPage(commands, commandSource, page, "help");
+    }
+
+    private void sendContextHelp(CommandSender sender, CommandSource commandSource, FilledCommand root, int page) {
+        sendHelpPage(getSubCommands(root), commandSource, page, "page");
+        lastExecutedPageCommand.put(sender, root);
     }
 
     private List<FilledCommand> getSubCommands(FilledCommand filledCommand) {
@@ -339,7 +360,7 @@ public class CommandManager {
         return commands;
     }
 
-    private void sendHelpPage(List<FilledCommand> commands, CommandSource commandSender, int page) {
+    private void sendHelpPage(List<FilledCommand> commands, CommandSource commandSender, int page, String pageCommand) {
 
         int id = page - 1;
         int commandMinIndex = getMinIndexForPage(page);
@@ -348,19 +369,38 @@ public class CommandManager {
 
         if (id < maxPages && id >= 0) {
             commandSender.sendMessage(Text.EMPTY);
-          /*  commandSender.sendMessage(ChatColor.DARK_GRAY + "== " + ChatColor.DARK_GREEN + "MC" + ChatColor.GREEN + "Clans" + ChatColor.RESET
-                    + " Help Page " + ChatColor.GREEN + page + ChatColor.GRAY + "/" + ChatColor.GREEN + maxPages + ChatColor.DARK_GRAY + " ==");
+            Text header = Text.of(
+                    Text.builder("== ").color(TextColors.DARK_GRAY).build(),
+                    Text.builder("MC").color(TextColors.DARK_GREEN).build(),
+                    Text.builder("Clans").color(TextColors.GREEN).build(),
+                    Text.of(" Help Page "),
+                    Text.builder(String.valueOf(page)).color(TextColors.GREEN).build(),
+                    Text.builder("/").color(TextColors.GRAY).build(),
+                    Text.builder(String.valueOf(maxPages)).color(TextColors.GREEN).build(),
+                    Text.builder(" ==").color(TextColors.DARK_GRAY).build()
+            );
+
+            commandSender.sendMessage(header);
             if (page < maxPages) {
-                commandSender.sendMessage(ChatColor.GRAY + "Type" + ChatColor.DARK_GREEN + " /clan help " + (page + 1) + ChatColor.GRAY
-                        + " to read the next page" + ChatColor.RESET);
-            }*/
+                Text subHeader = Text.of(
+                        Text.builder("Type").color(TextColors.GRAY).build(),
+                        Text.builder(String.format(" /clan %s %s", pageCommand, page + 1)).color(TextColors.DARK_GREEN),
+                        Text.builder(" to read the next page").color(TextColors.GRAY)
+                );
+                commandSender.sendMessage(subHeader);
+            }
+
             commandSender.sendMessage(Text.EMPTY);
 
             List<FilledCommand> commandsSubList = commands.subList(commandMinIndex, commandMaxIndex);
             for (FilledCommand baseCommand : commandsSubList) {
                 Text.Builder firstMessageLine = Text.builder();
                 if (baseCommand.getSpongePermission().startsWith("mcclans.admin")) {
-                    firstMessageLine.append(Text.of("["), Text.builder().color(TextColors.RED).append(Text.of("Admin")).build(), Text.of("] "));
+                    firstMessageLine.append(
+                            Text.of("["),
+                            Text.builder("Admin").color(TextColors.RED).build(),
+                            Text.of("] ")
+                    );
                 }
                 firstMessageLine.append(Text.builder().color(TextColors.DARK_GREEN).append(Text.of("/" + baseCommand.getFullPath())).build());
                 List<FilledParameter> parameters = baseCommand.getParameters();
@@ -378,7 +418,10 @@ public class CommandManager {
                     }
                 }
 
-                Text secondMessageLine = Text.of(Text.of(" "), Text.builder().color(TextColors.GRAY).append(Text.of(baseCommand.getDescription())).build());
+                Text secondMessageLine = Text.of(
+                        Text.of(" "),
+                        Text.builder(baseCommand.getDescription()).color(TextColors.GRAY).build()
+                );
 
                 commandSender.sendMessage(firstMessageLine.build());
                 commandSender.sendMessage(secondMessageLine);
@@ -388,6 +431,7 @@ public class CommandManager {
         } else {
             Messages.sendWarningMessage(commandSender, Messages.PAGE_DOES_NOT_EXIST);
         }
+
     }
 
     private Text getParameterDescription(NormalFilledParameter parameter) {
@@ -396,15 +440,24 @@ public class CommandManager {
         if (parameter.isMultiline()) {
             if (parameter.getListType() != Void.class) {
                 type = parameter.getListType();
-                prefix = String.format("a list of %ss", parameterDescriptionMap.get(type));
+                prefix = String.format("a %s list", parameterDescriptionMap.get(type));
             } else {
-                prefix = "a sentence";
+                prefix = "multiple words";
             }
 
         } else if (parameter.isOptional()) {
             type = parameter.getOptionalType();
             prefix = String.format("a %s", parameterDescriptionMap.get(type));
         }
+        int minimalLength = parameter.getMinimalLength();
+        int maximalLength = parameter.getMaximalLength();
+        if (minimalLength != -1 && maximalLength != -1) {
+            prefix += "; " + minimalLength + "-" + maximalLength;
+        }
+        if (parameter.isOptional()) {
+            prefix += "; optional";
+        }
+
 
         return Text.of(prefix);
     }
@@ -427,6 +480,53 @@ public class CommandManager {
             pages++;
         }
         return pages;
+    }
+
+    private void displayParameterHelpPage(CommandSource commandSource, FilledCommand filledCommand) {
+        commandSource.sendMessage(Text.EMPTY);
+        commandSource.sendMessage(Text.builder("Failed to execute command").color(TextColors.RED).build());
+        commandSource.sendMessage(Text.builder("This command requires the following parameters:").color(TextColors.RED).build());
+        Text title = Text.of(
+                Text.builder("MC").color(TextColors.DARK_GREEN).build(),
+                Text.builder("Clans").color(TextColors.GREEN).build(),
+                Text.of(" Parameter Help Page")
+                );
+        HorizontalTable<NormalFilledParameter> table = new HorizontalTable<>(title, 5, (TableAdapter<NormalFilledParameter>) (row, parameter, index) -> {
+            Text parameterName;
+            if (parameter.isOptional()) {
+                parameterName = Text.builder(String.format("{%s}", parameter.getName())).build();
+            } else {
+                parameterName = Text.builder(String.format("<%s>", parameter.getName())).build();
+            }
+            Text parameterDescription = getParameterDescription(parameter);
+
+            row.setValue("Parameter", parameterName);
+            row.setValue("Description", parameterDescription);
+
+        });
+        table.defineColumn("Parameter", 25);
+        table.defineColumn("Description", 30);
+
+        Text.Builder fullCommandString = Text.builder("/" + filledCommand.getFullPath());
+
+        List<FilledParameter> requiredParameters = filledCommand.getParameters();
+        List<NormalFilledParameter> normalParameters = new ArrayList<>();
+
+        for (FilledParameter parameter : requiredParameters) {
+            if (parameter instanceof NormalFilledParameter) {
+                NormalFilledParameter normalFilledParameter = (NormalFilledParameter) parameter;
+                normalParameters.add(normalFilledParameter);
+                if (normalFilledParameter.isOptional()) {
+                    fullCommandString.append(Text.builder(" {" + normalFilledParameter.getName() + "}").color(TextColors.GREEN).build());
+                } else {
+                    fullCommandString.append(Text.builder(" <" + normalFilledParameter.getName() + ">").color(TextColors.GREEN).build());
+                }
+            }
+        }
+
+        table.setMessage(fullCommandString.build());
+
+        table.draw(normalParameters, 1, commandSource);
     }
 
     private CommandSender getCommandSender(CommandSource commandSource) {
