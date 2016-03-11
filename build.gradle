@@ -1,6 +1,6 @@
-//plugins {
-//    id 'org.spongepowered.plugin' version '0.1'
-//}
+plugins {
+    id 'com.github.johnrengelman.shadow' version '1.2.3'
+}
 
 apply plugin: 'java'
 
@@ -21,9 +21,26 @@ repositories {
         name = 'sponge'
         url = 'http://repo.spongepowered.org/maven'
     }
+    maven {
+        name = 'minecrell'
+        url = 'http://repo.minecrell.net/releases'
+    }
 }
 
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.11'
     compile 'org.spongepowered:spongeapi:4.0.2'
+    compile 'net.minecrell.mcstats:statslite-sponge:0.2.2'
+}
+
+shadowJar {
+    dependencies {
+        include dependency('net.minecrell.mcstats:statslite-sponge')
+    }
+
+    relocate 'net.minecrell.mcstats', 'nl.riebie.mcclans.mcstats'
+}
+
+artifacts {
+    archives shadowJar
 }
