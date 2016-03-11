@@ -57,7 +57,7 @@ public class MCClans {
 
         // Init config
         if (!Config.load(configDir)) {
-            getLogger().error("Config failed to load");
+            getLogger().error("Config failed to load!");
             // todo stop plugin?
             return;
         }
