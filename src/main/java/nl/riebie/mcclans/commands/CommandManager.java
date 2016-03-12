@@ -37,7 +37,6 @@ import nl.riebie.mcclans.config.Config;
 import nl.riebie.mcclans.messages.Messages;
 import nl.riebie.mcclans.player.ClanPlayerImpl;
 import nl.riebie.mcclans.table.HorizontalTable;
-import nl.riebie.mcclans.table.TableAdapter;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.source.ConsoleSource;
 import org.spongepowered.api.entity.living.player.Player;
@@ -215,7 +214,7 @@ public class CommandManager {
         return stringBuilder.toString();
     }
 
-    public void executeCommand(CommandSource commandSource, String[] args) {
+    public void executeCommand(CommandSource commandSource, String root, String[] args) {
         CommandSender commandSender = getCommandSender(commandSource);
         String firstParam = args[0];
 

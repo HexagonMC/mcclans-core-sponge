@@ -45,9 +45,11 @@ public class CommandHandler implements CommandCallable {
 
     private final Server server;
     private final CommandManager commandManager;
+    private final String root;
 
-    public CommandHandler(Server server, CommandManager commandExecutor) {
+    public CommandHandler(Server server, String root, CommandManager commandExecutor) {
         this.server = server;
+        this.root = root;
         this.commandManager = commandExecutor;
     }
 
@@ -74,5 +76,9 @@ public class CommandHandler implements CommandCallable {
 
     public List<String> getSuggestions(CommandSource source, String arguments) throws CommandException {
         return Collections.emptyList();
+    }
+
+    public String getRoot(){
+        return root;
     }
 }
