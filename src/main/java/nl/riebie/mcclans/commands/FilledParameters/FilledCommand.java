@@ -20,12 +20,11 @@
  * THE SOFTWARE.
  */
 
-package nl.riebie.mcclans.commands.FilledParameters;
+package nl.riebie.mcclans.commands.filledparameters;
 
 
 import nl.riebie.mcclans.api.enums.Permission;
 import nl.riebie.mcclans.commands.annotations.Command;
-import nl.riebie.mcclans.commands.annotations.Parameter;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

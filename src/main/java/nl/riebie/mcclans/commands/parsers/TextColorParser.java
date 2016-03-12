@@ -22,11 +22,10 @@
 
 package nl.riebie.mcclans.commands.parsers;
 
-import nl.riebie.mcclans.commands.FilledParameters.NormalFilledParameter;
+import nl.riebie.mcclans.commands.filledparameters.NormalFilledParameter;
 import nl.riebie.mcclans.messages.Messages;
 import nl.riebie.mcclans.utils.Utils;
 import org.spongepowered.api.text.format.TextColor;
-import org.spongepowered.api.text.format.TextColors;
 
 /**
  * Created by Kippers on 1-3-2016.
