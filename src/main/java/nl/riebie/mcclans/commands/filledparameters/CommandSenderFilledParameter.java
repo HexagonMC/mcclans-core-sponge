@@ -20,10 +20,10 @@
  * THE SOFTWARE.
  */
 
-package nl.riebie.mcclans.commands.filledparametersYOLO;
+package nl.riebie.mcclans.commands.filledparameters;
 
 /**
  * Created by riebie on 16/01/2016.
  */
-public interface FilledParameter {
+public class CommandSenderFilledParameter implements FilledParameter {
 }

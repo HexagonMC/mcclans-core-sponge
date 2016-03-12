@@ -23,7 +23,7 @@
 package nl.riebie.mcclans.commands.parsers;
 
 
-import nl.riebie.mcclans.commands.filledparametersYOLO.NormalFilledParameter;
+import nl.riebie.mcclans.commands.filledparameters.NormalFilledParameter;
 
 /**
  * Created by riebie on 17/01/2016.

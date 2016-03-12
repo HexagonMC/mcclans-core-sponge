@@ -24,7 +24,7 @@ package nl.riebie.mcclans.commands.parsers;
 
 import nl.riebie.mcclans.ClansImpl;
 import nl.riebie.mcclans.clan.ClanImpl;
-import nl.riebie.mcclans.commands.filledparametersYOLO.NormalFilledParameter;
+import nl.riebie.mcclans.commands.filledparameters.NormalFilledParameter;
 import nl.riebie.mcclans.messages.Messages;
 
 /**
