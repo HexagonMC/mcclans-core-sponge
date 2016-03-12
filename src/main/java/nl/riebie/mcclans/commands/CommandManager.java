@@ -93,7 +93,7 @@ public class CommandManager {
         }
     }
 
-    public void registerCommandStructure(String tag, Class<?> commandStructure) {
+    public List<CommandHandler> registerCommandStructure(String tag, Class<?> commandStructure) {
         registerCommandStructure(tag, commandStructure, null);
     }
 

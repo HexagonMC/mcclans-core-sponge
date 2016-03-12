@@ -44,12 +44,11 @@ public class CommandHandler implements CommandCallable {
     private final Text usage = Text.of("<message>");
 
     private final Server server;
-    private CommandManager commandManager;
+    private final CommandManager commandManager;
 
-    public CommandHandler(Server server) {
+    public CommandHandler(Server server, CommandManager commandExecutor) {
         this.server = server;
-        commandManager = new CommandManager();
-        commandManager.registerCommandStructure("clan", ClanCommands.class);
+        this.commandManager = commandExecutor;
     }
 
     public CommandResult process(CommandSource source, String arguments) throws CommandException {

@@ -24,6 +24,7 @@ package nl.riebie.mcclans;
 
 import com.google.inject.Inject;
 import nl.riebie.mcclans.commands.CommandHandler;
+import nl.riebie.mcclans.commands.implementations.ClanCommands;
 import nl.riebie.mcclans.config.Config;
 import nl.riebie.mcclans.database.DatabaseConnectionOwner;
 import nl.riebie.mcclans.database.DatabaseHandler;
@@ -144,6 +145,8 @@ public class MCClans {
         Sponge.getEventManager().registerListeners(this, new KillDeathRatioListener());
 
         CommandManager cmdService = Sponge.getCommandManager();
+        nl.riebie.mcclans.commands.CommandManager commandManager = new nl.riebie.mcclans.commands.CommandManager();
+        commandManager.registerCommandStructure("clan", ClanCommands.class);
         cmdService.register(this, new CommandHandler(Sponge.getServer()), "clan");
     }
 
