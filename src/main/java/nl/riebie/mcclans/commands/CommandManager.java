@@ -67,7 +67,7 @@ public class CommandManager {
 
     private Map<String, List<String>> aliasesPathMap = new HashMap<>();
 
-    private String root;
+    private String rootValue;
 
     //last executed page commands
     private Map<CommandSender, FilledCommand> lastExecutedPageCommand = new HashMap<>();
@@ -114,10 +114,10 @@ public class CommandManager {
 
     public List<CommandRoot> registerCommandStructure(String tag, Class<?> commandStructure) {
         loadConfig();
-        root = tag;
+        rootValue = tag;
         registerCommandStructure(tag, commandStructure, null);
         List<CommandRoot> roots = new ArrayList<>();
-        roots.add(new CommandRoot(root, this));
+        roots.add(new CommandRoot(rootValue, this));
         for (String alias : aliasesMap.keySet()) {
             CommandRoot commandRoot = new CommandRoot(alias, this);
             roots.add(commandRoot);
@@ -140,7 +140,7 @@ public class CommandManager {
         Command commandAnnotation = method.getAnnotation(Command.class);
         Aliases aliasesAnnotation = method.getAnnotation(Aliases.class);
         if (commandAnnotation != null) {
-            FilledCommand filledCommand = new FilledCommand(commandAnnotation, method, parent == null ? root : parent.getFullPath());
+            FilledCommand filledCommand = new FilledCommand(commandAnnotation, method, parent == null ? rootValue : parent.getFullPath());
             commandStructureMap.put(filledCommand, commandStructureInstance);
             if (parent == null) {
                 filledCommandMap.put(commandAnnotation.name(), filledCommand);
@@ -261,7 +261,7 @@ public class CommandManager {
         String firstParam;
         FilledCommand filledCommand;
         int startIndex = 1;
-        if (!root.equals(root)) {
+        if (!root.equals(rootValue)) {
             startIndex = 0;
             filledCommand = aliasesMap.get(root);
             if (filledCommand == null) {
