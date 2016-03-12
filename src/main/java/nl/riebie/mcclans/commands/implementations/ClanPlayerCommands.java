@@ -22,7 +22,6 @@
 
 package nl.riebie.mcclans.commands.implementations;
 
-import nl.riebie.mcclans.ClansImpl;
 import nl.riebie.mcclans.api.enums.Permission;
 import nl.riebie.mcclans.clan.ClanImpl;
 import nl.riebie.mcclans.clan.RankFactory;

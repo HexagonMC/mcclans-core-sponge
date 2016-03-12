@@ -22,7 +22,6 @@
 
 package nl.riebie.mcclans.commands.implementations;
 
-import nl.riebie.mcclans.ClansImpl;
 import nl.riebie.mcclans.api.enums.Permission;
 import nl.riebie.mcclans.clan.ClanImpl;
 import nl.riebie.mcclans.commands.Toggle;
@@ -69,29 +68,23 @@ public class ClanAllyCommands {
     }
 
     @Command(name = "invite", description = "Invite another clan to become an ally", isPlayerOnly = true, isClanOnly = true, clanPermission = Permission.ally, spongePermission = "mcclans.user.ally.invite")
-    public void allyInviteCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer, @Parameter(name = "clanTag") String clanTag) {
-        ClansImpl clansImpl = ClansImpl.getInstance();
-        ClanImpl invitedClan = clansImpl.getClan(clanTag);
+    public void allyInviteCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer, @Parameter(name = "clanTag") ClanImpl invitedClan) {
         ClanImpl invitingClan = clanPlayer.getClan();
-        if (invitedClan == null) {
-            Messages.sendWarningMessage(commandSource, Messages.CLAN_DOES_NOT_EXIST);
+        if (invitingClan.equals(invitedClan)) {
+            Messages.sendWarningMessage(commandSource, Messages.YOU_CANNOT_BECOME_ALLIES_WITH_YOUR_OWN_CLAN);
+        } else if (invitingClan.isClanAllyOfThisClan(invitedClan.getTag())) {
+            Messages.sendWarningMessage(commandSource, Messages.YOUR_CLANS_ARE_ALREADY_ALLIES);
+        } else if (!invitedClan.isAllowingAllyInvites()) {
+            Messages.sendWarningMessage(commandSource, Messages.THIS_CLAN_IS_NOT_ACCEPTING_ALLY_INVITES);
+        } else if (invitedClan.getInvitingAlly() != null) {
+            Messages.sendThisClanHasAlreadyBeenInvitedToBecomeAlliesWithClan(commandSource, invitedClan.getInvitingAlly().getName());
         } else {
-            if (invitedClan.getTag().toLowerCase().equals(invitingClan.getTag().toLowerCase())) {
-                Messages.sendWarningMessage(commandSource, Messages.YOU_CANNOT_BECOME_ALLIES_WITH_YOUR_OWN_CLAN);
-            } else if (invitingClan.isClanAllyOfThisClan(invitedClan.getTag())) {
-                Messages.sendWarningMessage(commandSource, Messages.YOUR_CLANS_ARE_ALREADY_ALLIES);
-            } else if (!invitedClan.isAllowingAllyInvites()) {
-                Messages.sendWarningMessage(commandSource, Messages.THIS_CLAN_IS_NOT_ACCEPTING_ALLY_INVITES);
-            } else if (invitedClan.getInvitingAlly() != null) {
-                Messages.sendThisClanHasAlreadyBeenInvitedToBecomeAlliesWithClan(commandSource, invitedClan.getInvitingAlly().getName());
-            } else {
-                invitedClan.setInvitingAlly(invitingClan);
-                Messages.sendClanBroadcastMessageClanHasBeenInvitedToBecomeAlliesBy(invitingClan, invitedClan.getName(), clanPlayer.getName(),
-                        Permission.ally);
+            invitedClan.setInvitingAlly(invitingClan);
+            Messages.sendClanBroadcastMessageClanHasBeenInvitedToBecomeAlliesBy(invitingClan, invitedClan.getName(), clanPlayer.getName(),
+                    Permission.ally);
 
-                Messages.sendClanBroadcastMessageYourClanHasBeenInvitedToBecomeAlliesWithClan(invitedClan, invitingClan.getName(),
-                        invitingClan.getTagColored(), Permission.ally);
-            }
+            Messages.sendClanBroadcastMessageYourClanHasBeenInvitedToBecomeAlliesWithClan(invitedClan, invitingClan.getName(),
+                    invitingClan.getTagColored(), Permission.ally);
         }
     }
 
@@ -110,16 +103,11 @@ public class ClanAllyCommands {
     }
 
     @Command(name = "remove", description = "Remove an allied clan", isPlayerOnly = true, isClanOnly = true, clanPermission = Permission.ally, spongePermission = "mcclans.user.ally.remove")
-    public void allyRemoveCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer, @Parameter(name = "clanTag") String clanTag) {
+    public void allyRemoveCommand(ClanPlayerImpl clanPlayer, @Parameter(name = "clanTag") ClanImpl ally) {
         ClanImpl clan = clanPlayer.getClan();
-        ClanImpl ally = clan.getAlly(clanTag);
-        if (ally == null) {
-            Messages.sendWarningMessage(commandSource, Messages.THIS_CLAN_IS_NOT_AN_ALLY);
-        } else {
-            clan.removeAlly(ally.getTag());
-            ally.removeAlly(clan.getTag());
-            Messages.sendClanBroadcastMessagePlayerHasEndedTheAllianceWithClan(clan, clanPlayer.getName(), ally.getName());
-            Messages.sendClanBroadcastMessageClanHasEndedTheAllianceWithYourClan(ally, clan.getName());
-        }
+        clan.removeAlly(ally.getTag());
+        ally.removeAlly(clan.getTag());
+        Messages.sendClanBroadcastMessagePlayerHasEndedTheAllianceWithClan(clan, clanPlayer.getName(), ally.getName());
+        Messages.sendClanBroadcastMessageClanHasEndedTheAllianceWithYourClan(ally, clan.getName());
     }
 }
