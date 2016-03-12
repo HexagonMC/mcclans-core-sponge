@@ -243,17 +243,12 @@ public class ClanCommands {
     }
 
     @Command(name = "roster", description = "See the members of a clan", spongePermission = "mcclans.user.roster")
-    public void clanRosterCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer, @OptionalParameter(value = String.class, name = "clanTag") Optional<String> clanTagOpt,
+    public void clanRosterCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer, @OptionalParameter(value = ClanImpl.class, name = "clanTag") Optional<ClanImpl> clanOpt,
                                   @PageParameter int page) {
         ClanImpl clan;
-        if (clanTagOpt.isPresent()) {
-            String clanTag = clanTagOpt.get();
-            clan = ClansImpl.getInstance().getClan(clanTag.toLowerCase());
-            if (clan != null) {
-                printRoster(commandSource, clan, page);
-            } else {
-                Messages.sendWarningMessage(commandSource, Messages.CLAN_DOES_NOT_EXIST);
-            }
+        if (clanOpt.isPresent()) {
+            clan = clanOpt.get();
+            printRoster(commandSource, clan, page);
         } else {
             if (commandSource instanceof Player) {
                 clan = clanPlayer.getClan();
@@ -329,16 +324,10 @@ public class ClanCommands {
     }
 
     @Command(name = "info", description = "Get the info of a clan", spongePermission = "mcclans.user.info")
-    public void clanInfoCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer, @OptionalParameter(value = String.class, name = "clanTag") Optional<String> clanTagOpt) {
-        ClansImpl clansImpl = ClansImpl.getInstance();
-        if (clanTagOpt.isPresent()) {
-            String clanTag = clanTagOpt.get();
-            ClanImpl clan = clansImpl.getClan(clanTag);
-            if (clan != null) {
-                printInfo(commandSource, clan);
-            } else {
-                Messages.sendWarningMessage(commandSource, Messages.CLAN_DOES_NOT_EXIST);
-            }
+    public void clanInfoCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer, @OptionalParameter(value = ClanImpl.class, name = "clanTag") Optional<ClanImpl> clanOpt) {
+        if (clanOpt.isPresent()) {
+            ClanImpl clan = clanOpt.get();
+            printInfo(commandSource, clan);
         } else {
             if (commandSource instanceof Player) {
                 ClanImpl clan = clanPlayer.getClan();
@@ -429,15 +418,11 @@ public class ClanCommands {
 
     @Command(name = "stats", description = "See the statistics of a clan's members", spongePermission = "mcclans.user.stats")
     public void clanStatsCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer,
-                                 @OptionalParameter(value = String.class, name = "clanTag") Optional<String> clanTagOpt, @PageParameter int page) {
+                                 @OptionalParameter(value = ClanImpl.class, name = "clanTag") Optional<ClanImpl> clanOpt, @PageParameter int page) {
         ClanImpl clan;
-        if (clanTagOpt.isPresent()) {
-            clan = ClansImpl.getInstance().getClan(clanTagOpt.get().toLowerCase());
-            if (clan != null) {
-                printStats(commandSource, clan, page);
-            } else {
-                Messages.sendWarningMessage(commandSource, Messages.CLAN_DOES_NOT_EXIST);
-            }
+        if (clanOpt.isPresent()) {
+            clan = clanOpt.get();
+            printStats(commandSource, clan, page);
         } else {
             if (commandSource instanceof Player) {
                 clan = clanPlayer.getClan();

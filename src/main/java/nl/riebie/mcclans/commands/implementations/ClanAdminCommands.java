@@ -116,132 +116,95 @@ public class ClanAdminCommands {
     }
 
     @Command(name = "disband", description = "Disband a clan", spongePermission = "mcclans.admin.disband")
-    public void adminDisbandCommand(CommandSource commandSource, @Parameter(name = "clanTag") String clanTag) {
+    public void adminDisbandCommand(CommandSource commandSource, @Parameter(name = "clanTag") ClanImpl clan) {
         ClansImpl clansImpl = ClansImpl.getInstance();
-        ClanImpl clan = clansImpl.getClan(clanTag);
-        if (clan == null) {
-            Messages.sendWarningMessage(commandSource, Messages.CLAN_DOES_NOT_EXIST);
-        } else {
-            Messages.sendBroadcastMessageClanDisbandedBy(clan.getName(), clan.getTagColored(), commandSource.getName());
-            clansImpl.disbandClan(clan.getTag());
-        }
+
+        Messages.sendBroadcastMessageClanDisbandedBy(clan.getName(), clan.getTagColored(), commandSource.getName());
+        clansImpl.disbandClan(clan.getTag());
     }
 
     @Command(name = "home", description = "Teleport to a clan home", isPlayerOnly = true, spongePermission = "mcclans.admin.home")
-    public void adminHomeCommand(CommandSource commandSource, @Parameter(name = "clanTag")  String clanTag) {
+    public void adminHomeCommand(CommandSource commandSource, @Parameter(name = "clanTag") ClanImpl clan) {
         Player player = (Player) commandSource;
-        ClansImpl clansImpl = ClansImpl.getInstance();
-        ClanImpl clan = clansImpl.getClan(clanTag);
-        if (clan == null) {
-            Messages.sendWarningMessage(commandSource, Messages.CLAN_DOES_NOT_EXIST);
+        Location<World> teleportLocation = clan.getHome();
+        if (teleportLocation == null) {
+            Messages.sendWarningMessage(commandSource, Messages.CLAN_HOME_LOCATION_IS_NOT_SET);
         } else {
-            Location<World> teleportLocation = clan.getHome();
-            if (teleportLocation == null) {
-                Messages.sendWarningMessage(commandSource, Messages.CLAN_HOME_LOCATION_IS_NOT_SET);
-            } else {
-                player.setLocation(teleportLocation);
-            }
+            player.setLocation(teleportLocation);
         }
     }
 
     @Command(name = "invite", description = "Invite a player to a clan", spongePermission = "mcclans.admin.invite")
-    public void adminInviteCommand(CommandSource commandSource, @Parameter(name = "clanTag") String clanTag, @Parameter(name = "playerName") String playerName) {
+    public void adminInviteCommand(CommandSource commandSource, @Parameter(name = "clanTag") ClanImpl clan, @Parameter(name = "playerName") String playerName) {
         ClansImpl clansImpl = ClansImpl.getInstance();
-        ClanImpl clan = clansImpl.getClan(clanTag);
-        if (clan == null) {
-            Messages.sendWarningMessage(commandSource, Messages.CLAN_DOES_NOT_EXIST);
+        UUID uuid = UUIDUtils.getUUID(playerName);
+        Optional<Player> playerOpt;
+        if (uuid == null) {
+            playerOpt = Optional.empty();
         } else {
-            UUID uuid = UUIDUtils.getUUID(playerName);
-            Optional<Player> playerOpt = null;
-            if (uuid == null) {
-                playerOpt = Optional.empty();
-            } else {
-                playerOpt = Sponge.getServer().getPlayer(uuid);
-            }
-            if (!playerOpt.isPresent()) {
-                Messages.sendPlayerNotOnline(commandSource, playerName);
-                return;
-            }
+            playerOpt = Sponge.getServer().getPlayer(uuid);
+        }
+        if (!playerOpt.isPresent()) {
+            Messages.sendPlayerNotOnline(commandSource, playerName);
+            return;
+        }
 
-            Player player = playerOpt.get();
-            ClanPlayerImpl invitedClanPlayer = clansImpl.getClanPlayer(player.getUniqueId());
-            if (invitedClanPlayer == null) {
-                invitedClanPlayer = clansImpl.createClanPlayer(player.getUniqueId(), player.getName());
-            }
-            if (invitedClanPlayer.getClan() != null) {
-                Messages.sendPlayerAlreadyInClan(commandSource, player.getName());
-            } else if (invitedClanPlayer.getClanInvite() != null) {
-                Messages.sendPlayerAlreadyInvitedByAnotherClan(commandSource, player.getName());
-            } else {
-                invitedClanPlayer.inviteToClan(clan);
-                clan.addInvitedPlayer(invitedClanPlayer);
-                Messages.sendInvitedToClan(player, clan.getName(), clan.getTagColored());
-                Messages.sendClanBroadcastMessagePlayerInvitedToTheClan(clan, player.getName(), commandSource.getName(), Permission.invite);
-            }
+        Player player = playerOpt.get();
+        ClanPlayerImpl invitedClanPlayer = clansImpl.getClanPlayer(player.getUniqueId());
+        if (invitedClanPlayer == null) {
+            invitedClanPlayer = clansImpl.createClanPlayer(player.getUniqueId(), player.getName());
+        }
+        if (invitedClanPlayer.getClan() != null) {
+            Messages.sendPlayerAlreadyInClan(commandSource, player.getName());
+        } else if (invitedClanPlayer.getClanInvite() != null) {
+            Messages.sendPlayerAlreadyInvitedByAnotherClan(commandSource, player.getName());
+        } else {
+            invitedClanPlayer.inviteToClan(clan);
+            clan.addInvitedPlayer(invitedClanPlayer);
+            Messages.sendInvitedToClan(player, clan.getName(), clan.getTagColored());
+            Messages.sendClanBroadcastMessagePlayerInvitedToTheClan(clan, player.getName(), commandSource.getName(), Permission.invite);
         }
     }
 
     @Command(name = "remove", description = "Remove a player from a clan", spongePermission = "mcclans.admin.remove")
-    public void adminRemoveCommand(CommandSource commandSource, @Parameter(name = "clanTag") String clanTag, @Parameter(name = "playerName") String playerName) {
-        ClansImpl clansImpl = ClansImpl.getInstance();
-        ClanImpl clan = clansImpl.getClan(clanTag);
-        if (clan == null) {
-            Messages.sendWarningMessage(commandSource, Messages.CLAN_DOES_NOT_EXIST);
-        } else {
-            ClanPlayerImpl toBeRemovedClanPlayer = clan.getMember(playerName);
-            if (toBeRemovedClanPlayer != null) {
-                if (toBeRemovedClanPlayer.getName().equals(commandSource.getName())) {
-                    Messages.sendWarningMessage(commandSource, Messages.YOU_CANNOT_REMOVE_YOURSELF_FROM_THE_CLAN);
-                } else if (toBeRemovedClanPlayer.getName().equalsIgnoreCase(clan.getOwner().getName())) {
-                    Messages.sendWarningMessage(commandSource, Messages.YOU_CANNOT_REMOVE_THE_OWNER_FROM_THE_CLAN);
-                } else {
-                    clan.removeMember(playerName);
-                    Messages.sendClanBroadcastMessagePlayerRemovedFromTheClanBy(clan, toBeRemovedClanPlayer.getName(), commandSource.getName());
-                    Messages.sendYouHaveBeenRemovedFromClan(toBeRemovedClanPlayer, clan.getName());
-                }
+    public void adminRemoveCommand(CommandSource commandSource, @Parameter(name = "clanTag") ClanImpl clan, @Parameter(name = "playerName") ClanPlayerImpl toBeRemovedClanPlayer) {
+        if (toBeRemovedClanPlayer.getClan() != clan) {
+            if (toBeRemovedClanPlayer.getName().equals(commandSource.getName())) {
+                Messages.sendWarningMessage(commandSource, Messages.YOU_CANNOT_REMOVE_YOURSELF_FROM_THE_CLAN);
+            } else if (toBeRemovedClanPlayer.getName().equalsIgnoreCase(clan.getOwner().getName())) {
+                Messages.sendWarningMessage(commandSource, Messages.YOU_CANNOT_REMOVE_THE_OWNER_FROM_THE_CLAN);
             } else {
-                Messages.sendPlayerNotAMemberOfThisClan(commandSource, playerName);
+                clan.removeMember(toBeRemovedClanPlayer.getName());
+                Messages.sendClanBroadcastMessagePlayerRemovedFromTheClanBy(clan, toBeRemovedClanPlayer.getName(), commandSource.getName());
+                Messages.sendYouHaveBeenRemovedFromClan(toBeRemovedClanPlayer, clan.getName());
             }
+        } else {
+            Messages.sendPlayerNotAMemberOfThisClan(commandSource, toBeRemovedClanPlayer.getName());
         }
     }
 
     @Command(name = "sethome", description = "Set the location of a clan home", isPlayerOnly = true, spongePermission = "mcclans.admin.sethome")
-    public void adminSetHomeCommand(CommandSource commandSource, @Parameter(name = "clanTag") String clanTag) {
+    public void adminSetHomeCommand(CommandSource commandSource, @Parameter(name = "clanTag") ClanImpl clan) {
         Player player = (Player) commandSource;
-        ClansImpl clansImpl = ClansImpl.getInstance();
-        ClanImpl clan = clansImpl.getClan(clanTag);
-        if (clan == null) {
-            Messages.sendWarningMessage(commandSource, Messages.CLAN_DOES_NOT_EXIST);
-        } else {
-            Location<World> location = player.getLocation();
-            clan.setHome(location);
-            Messages.sendBasicMessage(commandSource, Messages.CLAN_HOME_LOCATION_SET);
-        }
+        Location<World> location = player.getLocation();
+        clan.setHome(location);
+        Messages.sendBasicMessage(commandSource, Messages.CLAN_HOME_LOCATION_SET);
     }
 
     @Command(name = "setowner", description = "Set the owner of a clan", spongePermission = "mcclans.admin.setowner")
-    public void adminSetOwnerCommand(CommandSource commandSource, @Parameter(name = "clanTag") String clanTag, @Parameter(name = "playerName") String playerName) {
-        ClansImpl clansImpl = ClansImpl.getInstance();
-        ClanImpl clan = clansImpl.getClan(clanTag);
-        if (clan == null) {
-            Messages.sendWarningMessage(commandSource, Messages.CLAN_DOES_NOT_EXIST);
+    public void adminSetOwnerCommand(CommandSource commandSource, @Parameter(name = "clanTag") ClanImpl clan, @Parameter(name = "playerName") ClanPlayerImpl targetClanPlayer) {
+        if (targetClanPlayer.getClan() != clan) {
+            Messages.sendPlayerNotAMemberOfThisClan(commandSource, targetClanPlayer.getName());
+            return;
+        }
+        RankImpl rank = clan.getRank(RankFactory.getOwnerIdentifier());
+        if (targetClanPlayer.getRank().getName().toLowerCase().equals(RankFactory.getOwnerIdentifier().toLowerCase())) {
+            Messages.sendWarningMessage(commandSource, Messages.THIS_PLAYER_IS_ALREADY_THE_OWNER);
         } else {
-            if (!clan.isPlayerMember(playerName)) {
-                Messages.sendPlayerNotAMemberOfThisClan(commandSource, playerName);
-                return;
-            }
-
-            RankImpl rank = clan.getRank(RankFactory.getOwnerIdentifier());
-            ClanPlayerImpl targetClanPlayer = clan.getMember(playerName);
-
-            if (targetClanPlayer.getRank().getName().toLowerCase().equals(RankFactory.getOwnerIdentifier().toLowerCase())) {
-                Messages.sendWarningMessage(commandSource, Messages.THIS_PLAYER_IS_ALREADY_THE_OWNER);
-            } else {
-                clan.getOwner().setRank(clan.getRank(RankFactory.getRecruitIdentifier()));
-                clan.setOwner(targetClanPlayer);
-                targetClanPlayer.setRank(rank);
-                Messages.sendRankOfPlayerSuccessfullyChangedToRank(commandSource, playerName, rank.getName());
-            }
+            clan.getOwner().setRank(clan.getRank(RankFactory.getRecruitIdentifier()));
+            clan.setOwner(targetClanPlayer);
+            targetClanPlayer.setRank(rank);
+            Messages.sendRankOfPlayerSuccessfullyChangedToRank(commandSource, targetClanPlayer.getName(), rank.getName());
         }
     }
 }

@@ -14,15 +14,8 @@ import org.spongepowered.api.text.format.TextColor;
 public class ClanAdminTagCommands {
 
     @Command(name = "color", description = "Change a clan tag color", spongePermission = "mcclans.admin.tag.color")
-    public void tagColorCommand(CommandSource commandSource, @Parameter(name = "clanTag") String clanTag, @Parameter(name = "tagColor") TextColor tagColor) {
-        ClansImpl clansImpl = ClansImpl.getInstance();
-        ClanImpl clan = clansImpl.getClan(clanTag);
-
-        if (clan == null) {
-            Messages.sendWarningMessage(commandSource, Messages.CLAN_DOES_NOT_EXIST);
-        } else {
-            clan.setTagColor(tagColor);
-            Messages.sendSuccessfullyChangedTheClanTagColorTo(commandSource, clan.getTagColored());
-        }
+    public void tagColorCommand(CommandSource commandSource, @Parameter(name = "clanTag") ClanImpl clan, @Parameter(name = "tagColor") TextColor tagColor) {
+        clan.setTagColor(tagColor);
+        Messages.sendSuccessfullyChangedTheClanTagColorTo(commandSource, clan.getTagColored());
     }
 }

@@ -668,6 +668,21 @@ public class ClanImpl implements Clan, Cloneable {
         return clone;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ClanImpl clan = (ClanImpl) o;
+
+        return tag.equals(clan.tag);
+    }
+
+    @Override
+    public int hashCode() {
+        return tag.hashCode();
+    }
+
     public static class Builder {
         private int clanID;
         private String name;
