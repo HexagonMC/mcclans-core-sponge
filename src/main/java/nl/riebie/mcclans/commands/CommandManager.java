@@ -28,7 +28,7 @@ import nl.riebie.mcclans.api.ClanPlayer;
 import nl.riebie.mcclans.api.CommandSender;
 import nl.riebie.mcclans.api.enums.Permission;
 import nl.riebie.mcclans.clan.ClanImpl;
-import nl.riebie.mcclans.commands.filledparameters.*;
+import nl.riebie.mcclans.commands.filledparametersYOLO.*;
 import nl.riebie.mcclans.commands.annotations.*;
 import nl.riebie.mcclans.commands.parsers.*;
 import nl.riebie.mcclans.commands.constraints.length.LengthConstraint;

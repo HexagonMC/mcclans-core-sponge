@@ -24,7 +24,7 @@ package nl.riebie.mcclans.commands.parsers;
 
 
 import nl.riebie.mcclans.api.enums.Permission;
-import nl.riebie.mcclans.commands.filledparameters.NormalFilledParameter;
+import nl.riebie.mcclans.commands.filledparametersYOLO.NormalFilledParameter;
 
 /**
  * Created by riebie on 17/01/2016.

@@ -20,7 +20,7 @@
  * THE SOFTWARE.
  */
 
-package nl.riebie.mcclans.commands.filledparameters;
+package nl.riebie.mcclans.commands.filledparametersYOLO;
 
 
 import nl.riebie.mcclans.api.enums.Permission;

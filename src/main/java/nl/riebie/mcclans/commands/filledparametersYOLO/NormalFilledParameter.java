@@ -20,7 +20,7 @@
  * THE SOFTWARE.
  */
 
-package nl.riebie.mcclans.commands.filledparameters;
+package nl.riebie.mcclans.commands.filledparametersYOLO;
 
 /**
  * Created by riebie on 16/01/2016.
