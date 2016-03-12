@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, Minecrell <https://github.com/Minecrell>
+ * Copyright (c) 2016 riebie, Kippers <https://bitbucket.org/Kippers/mcclans-core-sponge>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -41,7 +41,7 @@ import static java.util.Objects.requireNonNull;
  * <p>
  * Modified to append 'Sponge' to the plugin name so it does not clash with the Bukkit version on MCStats.
  * <p>
- * Created by Koen on 11/03/2016.
+ * Created by Kippers on 11/03/2016.
  */
 public class MetricsWrapper extends StatsLite {
     private final PluginContainer plugin;
