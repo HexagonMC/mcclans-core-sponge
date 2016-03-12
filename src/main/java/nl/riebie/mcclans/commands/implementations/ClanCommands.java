@@ -199,14 +199,13 @@ public class ClanCommands {
     }
 
     @Command(name = "remove", description = "Remove a player from your clan", isPlayerOnly = true, isClanOnly = true, clanPermission = Permission.remove, spongePermission = "mcclans.user.remove")
-    public void clanRemoveCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer, @Parameter(name = "playerName") String playerName) {
+    public void clanRemoveCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer, @Parameter(name = "playerName") ClanPlayerImpl toBeRemovedClanPlayer) {
         ClanImpl clan = clanPlayer.getClan();
         if (clan != null) {
-            ClanPlayerImpl toBeRemovedClanPlayer = clan.getMember(playerName);
-            if (toBeRemovedClanPlayer != null) {
-                if (playerName.equalsIgnoreCase(clanPlayer.getName())) {
+            if (toBeRemovedClanPlayer.getClan() == clan) {
+                if (toBeRemovedClanPlayer.getName().equalsIgnoreCase(clanPlayer.getName())) {
                     Messages.sendWarningMessage(commandSource, Messages.YOU_CANNOT_REMOVE_YOURSELF_FROM_THE_CLAN);
-                } else if (playerName.equalsIgnoreCase(clan.getOwner().getName())) {
+                } else if (toBeRemovedClanPlayer == clan.getOwner()) {
                     Messages.sendWarningMessage(commandSource, Messages.YOU_CANNOT_REMOVE_THE_OWNER_FROM_THE_CLAN);
                 } else {
                     clan.removeMember(toBeRemovedClanPlayer.getName());
@@ -214,7 +213,7 @@ public class ClanCommands {
                     Messages.sendYouHaveBeenRemovedFromClan(toBeRemovedClanPlayer, clan.getName());
                 }
             } else {
-                Messages.sendPlayerNotAMemberOfThisClan(commandSource, playerName);
+                Messages.sendPlayerNotAMemberOfThisClan(commandSource, toBeRemovedClanPlayer.getName());
             }
         } else {
             Messages.sendWarningMessage(commandSource, Messages.YOU_ARE_NOT_IN_A_CLAN);

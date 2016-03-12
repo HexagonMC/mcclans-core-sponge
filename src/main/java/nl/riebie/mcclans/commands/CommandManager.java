@@ -2,6 +2,7 @@ package nl.riebie.mcclans.commands;
 
 import nl.riebie.mcclans.ClansImpl;
 import nl.riebie.mcclans.api.Clan;
+import nl.riebie.mcclans.api.ClanPlayer;
 import nl.riebie.mcclans.api.CommandSender;
 import nl.riebie.mcclans.api.enums.Permission;
 import nl.riebie.mcclans.clan.ClanImpl;
@@ -58,6 +59,7 @@ public class CommandManager {
         registerParameterValidator(new PermissionParser(), "permission", Permission.class);
         registerParameterValidator(new ToggleParser(), "value (on/off/toggle)", Toggle.class);
         registerParameterValidator(new ClanParser(), "clanTag", Clan.class, ClanImpl.class);
+        registerParameterValidator(new ClanPlayerParser(), "player name", ClanPlayer.class, ClanPlayerImpl.class);
         registerParameterValidator(new TextColorParser(), "color", TextColor.class);
     }
 
@@ -79,9 +81,7 @@ public class CommandManager {
             for (Method method : commandStructure.getMethods()) {
                 handleMethod(method, commandStructureInstance, parent);
             }
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
+        } catch (InstantiationException | IllegalAccessException e) {
             e.printStackTrace();
         }
     }
@@ -107,13 +107,19 @@ public class CommandManager {
     }
 
     private void handleParameter(java.lang.reflect.Parameter parameter, FilledCommand filledCommand) {
-        if (CommandSender.class.isAssignableFrom(parameter.getType())) {
+        if (hasNoParameterAnnotation(parameter) && CommandSender.class.isAssignableFrom(parameter.getType())) {
             filledCommand.addCommandSenderParameter();
         } else if (CommandSource.class.isAssignableFrom(parameter.getType())) {
             filledCommand.addCommandSourceParameter();
         } else {
             handleAnnotatedParameter(parameter, filledCommand);
         }
+    }
+
+    public boolean hasNoParameterAnnotation(java.lang.reflect.Parameter parameter) {
+        OptionalParameter optionalParameter = parameter.getAnnotation(OptionalParameter.class);
+        Parameter parameterAnnotation = parameter.getAnnotation(Parameter.class);
+        return optionalParameter == null && parameterAnnotation == null;
     }
 
     private void handleAnnotatedParameter(java.lang.reflect.Parameter parameter, FilledCommand filledCommand) {
@@ -328,7 +334,7 @@ public class CommandManager {
                 }
             }
             filledCommand.execute(commandStructureMap.get(filledCommand), objects);
-        } else{
+        } else {
             sendHelp(commandSource, 1);
         }
     }
@@ -490,7 +496,7 @@ public class CommandManager {
                 Text.builder("MC").color(TextColors.DARK_GREEN).build(),
                 Text.builder("Clans").color(TextColors.GREEN).build(),
                 Text.of(" Parameter Help Page")
-                );
+        );
         HorizontalTable<NormalFilledParameter> table = new HorizontalTable<>(title, 5, (TableAdapter<NormalFilledParameter>) (row, parameter, index) -> {
             Text parameterName;
             if (parameter.isOptional()) {

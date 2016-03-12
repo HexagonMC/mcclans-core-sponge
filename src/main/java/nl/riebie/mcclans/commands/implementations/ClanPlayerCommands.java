@@ -27,45 +27,40 @@ import java.util.Optional;
 public class ClanPlayerCommands {
 
     @Command(name = "setrank", description = "Set the rank of a member of your clan", isPlayerOnly = true, isClanOnly = true, clanPermission = Permission.setrank, spongePermission = "mcclans.user.player.info")
-    public void playerSetRankCommand(CommandSource sender, ClanPlayerImpl clanPlayer, @Parameter(name = "playerName") String playerName,
+    public void playerSetRankCommand(CommandSource sender, ClanPlayerImpl clanPlayer, @Parameter(name = "playerName") ClanPlayerImpl targetPlayer,
                                      @Parameter(name = "rankName") String rankName) {
 
         ClanImpl clan = clanPlayer.getClan();
-        if (!clan.isPlayerMember(playerName)) {
-            Messages.sendPlayerNotAMemberOfThisClan(sender, playerName);
+        if (targetPlayer.getClan() != clan) {
+            Messages.sendPlayerNotAMemberOfThisClan(sender, targetPlayer.getName());
             return;
         }
 
         RankImpl rank = clanPlayer.getClan().getRank(rankName);
-        ClanPlayerImpl targetClanPlayer = clan.getMember(playerName);
 
         if (rank == null) {
             Messages.sendWarningMessage(sender, Messages.RANK_DOES_NOT_EXIST);
-        } else if (targetClanPlayer.getRank().getName().toLowerCase().equals(RankFactory.getOwnerIdentifier().toLowerCase())) {
+        } else if (targetPlayer.getRank().getName().toLowerCase().equals(RankFactory.getOwnerIdentifier().toLowerCase())) {
             Messages.sendWarningMessage(sender, Messages.YOU_CANNOT_OVERWRITE_THE_OWNER_RANK);
         } else {
-            targetClanPlayer.setRank(rank);
+            targetPlayer.setRank(rank);
             if (RankFactory.getOwnerIdentifier().toLowerCase().equals(rankName.toLowerCase())) {
-                clan.setOwner(targetClanPlayer);
+                clan.setOwner(targetPlayer);
                 clanPlayer.setRank(clan.getRank(RankFactory.getRecruitIdentifier()));
             }
-            Messages.sendRankOfPlayerSuccessfullyChangedToRank(sender, playerName, rank.getName());
+            Messages.sendRankOfPlayerSuccessfullyChangedToRank(sender, targetPlayer.getName(), rank.getName());
 
-            targetClanPlayer.sendMessage(Messages.getYourRankHasBeenChangedToRank(rank.getName()));
+            targetPlayer.sendMessage(Messages.getYourRankHasBeenChangedToRank(rank.getName()));
         }
     }
 
     @Command(name = "info", description = "Get the info of yourself or another player", spongePermission = "mcclans.user.player.info")
-    public void playerInfoCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer, @OptionalParameter(value = String.class, name = "playerName") Optional<String> playerNameOpt) {
-        ClansImpl clansImpl = ClansImpl.getInstance();
-        if (playerNameOpt.isPresent()) {
-            String playerName = playerNameOpt.get();
-            ClanPlayerImpl targetClanPlayer = clansImpl.getClanPlayer(playerName);
-            if (targetClanPlayer != null) {
-                printInfo(commandSource, clanPlayer, targetClanPlayer);
-            } else {
-                Messages.sendWarningMessage(commandSource, Messages.PLAYER_DOES_NOT_EXIST);
-            }
+    public void playerInfoCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer, @OptionalParameter(value = ClanPlayerImpl.class, name = "playerName") Optional<ClanPlayerImpl> playerOpt) {
+        if (playerOpt.isPresent()) {
+            ClanPlayerImpl targetClanPlayer = playerOpt.get();
+
+            printInfo(commandSource, clanPlayer, targetClanPlayer);
+
         } else {
             if (commandSource instanceof Player) {
                 printInfo(commandSource, clanPlayer, clanPlayer);
