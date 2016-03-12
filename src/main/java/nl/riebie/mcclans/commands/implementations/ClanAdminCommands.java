@@ -190,7 +190,7 @@ public class ClanAdminCommands {
 
     @Command(name = "remove", description = "Remove a player from a clan", spongePermission = "mcclans.admin.remove")
     public void adminRemoveCommand(CommandSource commandSource, @Parameter(name = "clanTag") ClanImpl clan, @Parameter(name = "playerName") ClanPlayerImpl toBeRemovedClanPlayer) {
-        if (toBeRemovedClanPlayer.getClan() != clan) {
+        if (toBeRemovedClanPlayer.getClan().equals(clan)) {
             if (toBeRemovedClanPlayer.getName().equals(commandSource.getName())) {
                 Messages.sendWarningMessage(commandSource, Messages.YOU_CANNOT_REMOVE_YOURSELF_FROM_THE_CLAN);
             } else if (toBeRemovedClanPlayer.getName().equalsIgnoreCase(clan.getOwner().getName())) {

@@ -105,9 +105,13 @@ public class ClanAllyCommands {
     @Command(name = "remove", description = "Remove an allied clan", isPlayerOnly = true, isClanOnly = true, clanPermission = Permission.ally, spongePermission = "mcclans.user.ally.remove")
     public void allyRemoveCommand(ClanPlayerImpl clanPlayer, @Parameter(name = "clanTag") ClanImpl ally) {
         ClanImpl clan = clanPlayer.getClan();
-        clan.removeAlly(ally.getTag());
-        ally.removeAlly(clan.getTag());
-        Messages.sendClanBroadcastMessagePlayerHasEndedTheAllianceWithClan(clan, clanPlayer.getName(), ally.getName());
-        Messages.sendClanBroadcastMessageClanHasEndedTheAllianceWithYourClan(ally, clan.getName());
+        if(clan.isClanAllyOfThisClan(ally)){
+            clan.removeAlly(ally.getTag());
+            ally.removeAlly(clan.getTag());
+            Messages.sendClanBroadcastMessagePlayerHasEndedTheAllianceWithClan(clan, clanPlayer.getName(), ally.getName());
+            Messages.sendClanBroadcastMessageClanHasEndedTheAllianceWithYourClan(ally, clan.getName());
+        } else{
+            clanPlayer.sendMessage(Messages.getWarningMessage(Messages.THIS_CLAN_IS_NOT_AN_ALLY));
+        }
     }
 }

@@ -47,7 +47,7 @@ public class UUIDUtils {
 
     @Nullable
     public static UUID getUUID(String name) {
-        if (Holder.INSTANCE.service == null) {
+        if (Holder.INSTANCE.service == null || name.length() < 3 || name.length() > 16) {
             return null;
         }
 

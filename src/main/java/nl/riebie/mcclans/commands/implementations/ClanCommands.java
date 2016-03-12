@@ -379,19 +379,20 @@ public class ClanCommands {
 
     // TODO SPONGE make more efficient
     private Text generateAllyList(ClanImpl clan) {
-        Text allyList = null;
-        for (ClanImpl ally : clan.getAlliesImpl()) {
-            if (allyList == null) {
-                allyList = Text.of();
-            } else {
-                allyList.toBuilder().append(Text.of(", ")).build();
+        Text.Builder allyList = Text.builder();
+        if (clan.getAlliesImpl().isEmpty()) {
+            allyList.color(TextColors.GRAY).append(Text.of("None")).build();
+        } else {
+            boolean first = true;
+            for (ClanImpl ally : clan.getAlliesImpl()) {
+                if (!first) {
+                    allyList.append(Text.of(", ")).build();
+                }
+                first = false;
+                allyList.append(ally.getTagColored()).build();
             }
-            allyList.toBuilder().append(ally.getTagColored()).build();
         }
-        if (allyList == null) {
-            allyList = Text.builder("None").color(TextColors.GRAY).build();
-        }
-        return allyList;
+        return allyList.build();
     }
 
     @Command(name = "resign", description = "Resign from a clan", isPlayerOnly = true, isClanOnly = true, spongePermission = "mcclans.user.resign")
