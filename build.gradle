@@ -10,10 +10,7 @@ group = 'nl.riebie'
 version = '0.1'
 description = 'MCClans allows players to group together by forming clans'
 
-jar {
-    Integer buildNumber = System.getenv("BUILD_NUMBER") as Integer ?: 0;
-    archiveName = rootProject.name + '-' + project.version + '-' + buildNumber + '.jar'
-}
+jar.enabled = false
 
 repositories {
     mavenCentral()
@@ -39,6 +36,9 @@ shadowJar {
     }
 
     relocate 'net.minecrell.mcstats', 'nl.riebie.mcclans.mcstats'
+
+    Integer buildNumber = System.getenv("BUILD_NUMBER") as Integer ?: 0;
+    archiveName = rootProject.name + '-' + project.version + '-' + buildNumber + '.jar'
 }
 
 artifacts {
