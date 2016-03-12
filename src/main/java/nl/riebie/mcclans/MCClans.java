@@ -23,7 +23,7 @@
 package nl.riebie.mcclans;
 
 import com.google.inject.Inject;
-import nl.riebie.mcclans.commands.CommandHandler;
+import nl.riebie.mcclans.commands.CommandRoot;
 import nl.riebie.mcclans.commands.implementations.ClanCommands;
 import nl.riebie.mcclans.config.Config;
 import nl.riebie.mcclans.database.DatabaseConnectionOwner;
@@ -49,6 +49,7 @@ import org.spongepowered.api.service.economy.EconomyService;
 import org.spongepowered.api.service.user.UserStorageService;
 
 import java.io.File;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -146,8 +147,10 @@ public class MCClans {
 
         CommandManager cmdService = Sponge.getCommandManager();
         nl.riebie.mcclans.commands.CommandManager commandManager = new nl.riebie.mcclans.commands.CommandManager();
-        commandManager.registerCommandStructure("clan", ClanCommands.class);
-        cmdService.register(this, new CommandHandler(Sponge.getServer()), "clan");
+        List<CommandRoot> commandRoots = commandManager.registerCommandStructure("clan", ClanCommands.class);
+        for(CommandRoot commandRoot : commandRoots) {
+            cmdService.register(this, commandRoot, commandRoot.getRoot());
+        }
     }
 
     public void reloadSettings() {

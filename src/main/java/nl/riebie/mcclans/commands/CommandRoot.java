@@ -37,24 +37,22 @@ import java.util.Optional;
 /**
  * Created by riebie on 13/02/2016.
  */
-public class CommandHandler implements CommandCallable {
+public class CommandRoot implements CommandCallable {
 
     private final Optional<Text> desc = Optional.of(Text.of("Displays a message to all players"));
     private final Optional<Text> help = Optional.of(Text.of("Displays a message to all players. It has no color support!"));
     private final Text usage = Text.of("<message>");
 
-    private final Server server;
     private final CommandManager commandManager;
     private final String root;
 
-    public CommandHandler(Server server, String root, CommandManager commandExecutor) {
-        this.server = server;
+    public CommandRoot(String root, CommandManager commandExecutor) {
         this.root = root;
         this.commandManager = commandExecutor;
     }
 
     public CommandResult process(CommandSource source, String arguments) throws CommandException {
-        commandManager.executeCommand(source, arguments.split(" "));
+        commandManager.executeCommand(source, root, "".equals(arguments) ? new String[0] : arguments.split(" "));
         return CommandResult.success();
     }
 

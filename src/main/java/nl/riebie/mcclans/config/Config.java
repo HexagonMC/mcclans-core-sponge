@@ -147,8 +147,8 @@ public class Config {
         commandAliases.put("/g", "/clan chat global");
         commandAliases.put("/cc", "/clan chat clan");
         commandAliases.put("/ac", "/clan chat ally");
-        commandAliases.put("/clanff", "/clan friendlyfire clan toggle");
-        commandAliases.put("/personalff", "/clan friendlyfire personal toggle");
+        commandAliases.put("/clanff", "/clan friendlyfire clan");
+        commandAliases.put("/personalff", "/clan friendlyfire personal");
 
         ConfigSection commandAliasesConfigSection = ConfigSection.builder(SECTION_COMMAND_ALIASES).setConfigOptions(
                 ConfigOption.builder(COMMAND_ALIASES, commandAliases).build()

@@ -25,6 +25,7 @@ package nl.riebie.mcclans.commands.implementations;
 import nl.riebie.mcclans.api.enums.Permission;
 import nl.riebie.mcclans.channels.AllyMessageChannel;
 import nl.riebie.mcclans.channels.ClanMessageChannel;
+import nl.riebie.mcclans.commands.annotations.Aliases;
 import nl.riebie.mcclans.commands.annotations.Command;
 import nl.riebie.mcclans.commands.annotations.Multiline;
 import nl.riebie.mcclans.commands.annotations.OptionalParameter;
@@ -42,6 +43,7 @@ import java.util.Optional;
  * Created by riebie on 14/02/2016.
  */
 public class ClanChatCommands {
+
     @Command(name = "clan", description = "Talk in clan chat", isPlayerOnly = true, isClanOnly = true, clanPermission = Permission.clanchat, spongePermission = "mcclans.user.chat.clan")
     public void clanChatCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer, @Multiline @OptionalParameter(value = String.class, name = "message") Optional<String> messageOpt) {
         if (messageOpt.isPresent()) {
