@@ -37,8 +37,16 @@ shadowJar {
 
     relocate 'net.minecrell.mcstats', 'nl.riebie.mcclans.mcstats'
 
-    Integer buildNumber = System.getenv("BUILD_NUMBER") as Integer ?: 0;
-    archiveName = rootProject.name + '-' + project.version + '-' + buildNumber + '.jar'
+    Boolean devBuild = System.getenv("DEV_BUILD") as Boolean ?: false;
+    Boolean relBuild = System.getenv("REL_BUILD") as Boolean ?: false;
+    if (devBuild) {
+        Integer buildNumber = System.getenv("BUILD_NUMBER") as Integer ?: 0;
+        archiveName = rootProject.name + '-' + project.version + '-' + buildNumber + '.jar'
+    } else if (relBuild) {
+        archiveName = rootProject.name + '-' + project.version + '.jar'
+    } else {
+        archiveName = rootProject.name + '-' + project.version + '-' + 'LOCAL' + '.jar'
+    }
 }
 
 artifacts {
