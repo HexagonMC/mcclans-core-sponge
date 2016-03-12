@@ -8,14 +8,15 @@ import nl.riebie.mcclans.database.DatabaseHandler;
 import nl.riebie.mcclans.database.TaskExecutor;
 import nl.riebie.mcclans.enums.DBMSType;
 import nl.riebie.mcclans.listeners.*;
+import nl.riebie.mcclans.metrics.MetricsWrapper;
 import nl.riebie.mcclans.utils.FileUtils;
 import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandManager;
 import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
 import org.spongepowered.api.event.game.state.GameStartedServerEvent;
-import org.spongepowered.api.event.game.state.GameStoppedServerEvent;
 import org.spongepowered.api.event.game.state.GameStoppingServerEvent;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.scheduler.Task;
@@ -30,7 +31,7 @@ import java.util.Optional;
 /**
  * Created by K.Volkers on 8-12-2015.
  */
-@Plugin(id = "nl.riebie.mcclans", name = "MCClans", version = "0.1")
+@Plugin(id = "nl.riebie.mcclans", name = "MCClans", version = "0.1", description = "MCClans allows players to group together by forming clans")
 public class MCClans {
 
     private static MCClans plugin;
@@ -42,8 +43,12 @@ public class MCClans {
     @ConfigDir(sharedRoot = false)
     private File configDir;
 
-    public File getXmlDataFolder() {
-        return new File(configDir, "data");
+    @Inject
+    public MetricsWrapper stats;
+
+    @Listener
+    public void onPreInitialize(GamePreInitializationEvent event) {
+        stats.start();
     }
 
     @Listener
@@ -52,7 +57,7 @@ public class MCClans {
 
         // Init config
         if (!Config.load(configDir)) {
-            getLogger().error("Config failed to load");
+            getLogger().error("Config failed to load!");
             // todo stop plugin?
             return;
         }
@@ -203,6 +208,10 @@ public class MCClans {
 
     public static MCClans getPlugin() {
         return plugin;
+    }
+
+    public File getXmlDataFolder() {
+        return new File(configDir, "data");
     }
 
     public Logger getLogger() {
