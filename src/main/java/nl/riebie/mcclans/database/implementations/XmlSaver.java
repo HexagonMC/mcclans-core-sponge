@@ -23,6 +23,7 @@
 package nl.riebie.mcclans.database.implementations;
 
 import nl.riebie.mcclans.MCClans;
+import nl.riebie.mcclans.api.enums.KillDeathFactor;
 import nl.riebie.mcclans.clan.ClanImpl;
 import nl.riebie.mcclans.clan.RankImpl;
 import nl.riebie.mcclans.config.Config;
@@ -230,27 +231,27 @@ public class XmlSaver extends DataSaver {
         clanPlayersWriter.writeEndElement();
 
         clanPlayersWriter.writeStartElement("killsHigh");
-        clanPlayersWriter.writeCharacters(String.valueOf(cp.getKillsHigh()));
+        clanPlayersWriter.writeCharacters(String.valueOf(cp.getKillDeath().getKills(KillDeathFactor.HIGH)));
         clanPlayersWriter.writeEndElement();
 
         clanPlayersWriter.writeStartElement("killsMedium");
-        clanPlayersWriter.writeCharacters(String.valueOf(cp.getKillsMedium()));
+        clanPlayersWriter.writeCharacters(String.valueOf(cp.getKillDeath().getKills(KillDeathFactor.MEDIUM)));
         clanPlayersWriter.writeEndElement();
 
         clanPlayersWriter.writeStartElement("killsLow");
-        clanPlayersWriter.writeCharacters(String.valueOf(cp.getKillsLow()));
+        clanPlayersWriter.writeCharacters(String.valueOf(cp.getKillDeath().getKills(KillDeathFactor.LOW)));
         clanPlayersWriter.writeEndElement();
 
         clanPlayersWriter.writeStartElement("deathsHigh");
-        clanPlayersWriter.writeCharacters(String.valueOf(cp.getDeathsHigh()));
+        clanPlayersWriter.writeCharacters(String.valueOf(cp.getKillDeath().getDeaths(KillDeathFactor.HIGH)));
         clanPlayersWriter.writeEndElement();
 
         clanPlayersWriter.writeStartElement("deathsMedium");
-        clanPlayersWriter.writeCharacters(String.valueOf(cp.getDeathsMedium()));
+        clanPlayersWriter.writeCharacters(String.valueOf(cp.getKillDeath().getDeaths(KillDeathFactor.MEDIUM)));
         clanPlayersWriter.writeEndElement();
 
         clanPlayersWriter.writeStartElement("deathsLow");
-        clanPlayersWriter.writeCharacters(String.valueOf(cp.getDeathsLow()));
+        clanPlayersWriter.writeCharacters(String.valueOf(cp.getKillDeath().getDeaths(KillDeathFactor.LOW)));
         clanPlayersWriter.writeEndElement();
 
         clanPlayersWriter.writeStartElement("ffProtection");

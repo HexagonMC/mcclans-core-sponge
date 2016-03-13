@@ -106,13 +106,6 @@ public class CommandManager {
         }
     }
 
-    /*    List<String> configAliases = aliasesPathMap.get(filledCommand.getFullPath());
-        if (configAliases != null) {
-            for (String alias : configAliases) {
-                String[] aliasPrefix = filledCommand.getFullPath().split(" ");
-                aliasesMap.put(alias, ArrayUtils.subarray(aliasPrefix, 1, aliasPrefix.length));
-            }
-        }*/
     public List<CommandRoot> registerCommandStructure(String tag, Class<?> commandStructure) {
         loadConfig();
         rootValue = tag;

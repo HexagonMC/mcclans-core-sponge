@@ -22,7 +22,7 @@
 
 package nl.riebie.mcclans.player;
 
-import nl.riebie.mcclans.enums.KillDeathFactor;
+import nl.riebie.mcclans.api.enums.KillDeathFactor;
 
 /**
  * Created by Kippers on 19-1-2016.
@@ -98,14 +98,14 @@ public class KillDeathFactorHandler {
     }
 
     public KillDeathFactor getKillFactor(ClanPlayerImpl killer, ClanPlayerImpl victim) {
-        double killerKdr = killer.getKDR();
-        double victimKdr = victim.getKDR();
+        double killerKdr = killer.getKillDeath().getKDR();
+        double victimKdr = victim.getKillDeath().getKDR();
         return getKillFactor(killerKdr, victimKdr);
     }
 
     public KillDeathFactor getDeathFactor(ClanPlayerImpl killer, ClanPlayerImpl victim) {
-        double killerKdr = killer.getKDR();
-        double victimKdr = victim.getKDR();
+        double killerKdr = killer.getKillDeath().getKDR();
+        double victimKdr = victim.getKillDeath().getKDR();
         return getDeathFactor(killerKdr, victimKdr);
     }
 

@@ -72,7 +72,7 @@ public class ClanAllyCommands {
         ClanImpl invitingClan = clanPlayer.getClan();
         if (invitingClan.equals(invitedClan)) {
             Messages.sendWarningMessage(commandSource, Messages.YOU_CANNOT_BECOME_ALLIES_WITH_YOUR_OWN_CLAN);
-        } else if (invitingClan.isClanAllyOfThisClan(invitedClan.getTag())) {
+        } else if (invitingClan.equals(invitedClan)) {
             Messages.sendWarningMessage(commandSource, Messages.YOUR_CLANS_ARE_ALREADY_ALLIES);
         } else if (!invitedClan.isAllowingAllyInvites()) {
             Messages.sendWarningMessage(commandSource, Messages.THIS_CLAN_IS_NOT_ACCEPTING_ALLY_INVITES);
@@ -106,8 +106,8 @@ public class ClanAllyCommands {
     public void allyRemoveCommand(ClanPlayerImpl clanPlayer, @Parameter(name = "clanTag") ClanImpl ally) {
         ClanImpl clan = clanPlayer.getClan();
         if(clan.isClanAllyOfThisClan(ally)){
-            clan.removeAlly(ally.getTag());
-            ally.removeAlly(clan.getTag());
+            clan.removeAlly(ally);
+            ally.removeAlly(clan);
             Messages.sendClanBroadcastMessagePlayerHasEndedTheAllianceWithClan(clan, clanPlayer.getName(), ally.getName());
             Messages.sendClanBroadcastMessageClanHasEndedTheAllianceWithYourClan(ally, clan.getName());
         } else{

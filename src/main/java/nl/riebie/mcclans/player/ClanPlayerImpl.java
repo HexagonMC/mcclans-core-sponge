@@ -22,16 +22,14 @@
 
 package nl.riebie.mcclans.player;
 
-import nl.riebie.mcclans.api.Clan;
-import nl.riebie.mcclans.api.ClanPlayer;
-import nl.riebie.mcclans.api.CommandSender;
-import nl.riebie.mcclans.api.Rank;
+import nl.riebie.mcclans.api.*;
 import nl.riebie.mcclans.api.enums.Permission;
 import nl.riebie.mcclans.api.exceptions.NotDefaultImplementationException;
 import nl.riebie.mcclans.clan.ClanImpl;
 import nl.riebie.mcclans.clan.RankImpl;
 import nl.riebie.mcclans.config.Config;
 import nl.riebie.mcclans.database.TaskForwarder;
+import nl.riebie.mcclans.api.enums.KillDeathFactor;
 import nl.riebie.mcclans.enums.PlayerChatState;
 import nl.riebie.mcclans.utils.UUIDUtils;
 import org.spongepowered.api.Sponge;
@@ -48,13 +46,6 @@ import java.util.UUID;
  */
 public class ClanPlayerImpl implements ClanPlayer, Cloneable, CommandSender {
 
-    private static final float killsHighFactor = 2.0f;
-    private static final float killsMediumFactor = 1.0f;
-    private static final float killsLowFactor = 0.1f;
-    private static final float deathsHighFactor = 2.0f;
-    private static final float deathsMediumFactor = 1.0f;
-    private static final float deathsLowFactor = 0.1f;
-
     private UUID uuid;
     private int clanPlayerID;
     private String lastKnownName;
@@ -62,15 +53,8 @@ public class ClanPlayerImpl implements ClanPlayer, Cloneable, CommandSender {
     private RankImpl rank;
     private ClanImpl clan;
 
-    private int killsHigh;
-    private int killsMedium;
-    private int killsLow;
-    private int deathsHigh;
-    private int deathsMedium;
-    private int deathsLow;
+    private KillDeath killDeath;
 
-    // TODO SPONGE: Command shit, FUCK ME
-    // private LastExecutedPageCommand lastPageCommand;
     private ClanInvite clanInvite;
     private LastOnlineImpl lastOnline = new LastOnlineImpl();
     private PlayerChatState chatState = PlayerChatState.GLOBAL;
@@ -86,12 +70,13 @@ public class ClanPlayerImpl implements ClanPlayer, Cloneable, CommandSender {
         this.clan = builder.clan;
         this.lastKnownName = builder.lastKnownName;
 
-        this.killsHigh = builder.killsHigh;
-        this.killsMedium = builder.killsMedium;
-        this.killsLow = builder.killsLow;
-        this.deathsHigh = builder.deathsHigh;
-        this.deathsMedium = builder.deathsMedium;
-        this.deathsLow = builder.deathsLow;
+        killDeath = new KillDeath();
+        killDeath.setKills(KillDeathFactor.HIGH, builder.killsHigh);
+        killDeath.setKills(KillDeathFactor.MEDIUM, builder.killsMedium);
+        killDeath.setKills(KillDeathFactor.LOW, builder.killsLow);
+        killDeath.setDeaths(KillDeathFactor.HIGH, builder.deathsHigh);
+        killDeath.setDeaths(KillDeathFactor.MEDIUM, builder.deathsMedium);
+        killDeath.setDeaths(KillDeathFactor.LOW, builder.deathsLow);
 
         this.lastOnline = builder.lastOnline;
         this.rank = builder.rank;
@@ -133,51 +118,13 @@ public class ClanPlayerImpl implements ClanPlayer, Cloneable, CommandSender {
     }
 
     @Override
-    public boolean isMemberOf(String clanTag) {
-        if (this.clan != null) {
-            return clan.getTag().toLowerCase().equals(clanTag.toLowerCase());
-        }
-        return false;
-    }
-
-    @Override
     public boolean isMemberOfAClan() {
         return clan != null;
     }
 
     @Override
-    public int getKills() {
-        return getKillsHigh() + getKillsMedium() + getKillsLow();
-    }
-
-    @Override
-    public double getKillsWeighted() {
-        return ((getKillsHigh() * killsHighFactor) + (getKillsMedium() * killsMediumFactor) + (getKillsLow() * killsLowFactor));
-    }
-
-    @Override
-    public int getDeaths() {
-        return getDeathsHigh() + getDeathsMedium() + getDeathsLow();
-    }
-
-    @Override
-    public double getDeathsWeighted() {
-        return ((getDeathsHigh() * deathsHighFactor) + (getDeathsMedium() * deathsMediumFactor) + (getDeathsLow() * deathsLowFactor));
-    }
-
-    @Override
-    public double getKDR() {
-        double kdr = 0;
-        double killsWeighted = getKillsWeighted();
-        double deathsWeighted = getDeathsWeighted();
-        if (deathsWeighted < 1) {
-            deathsWeighted = 1;
-        }
-        kdr = killsWeighted / deathsWeighted;
-
-        int ix = (int) (kdr * 10.0); // scale it
-        double dbl2 = ((double) ix) / 10.0;
-        return dbl2;
+    public KillDeath getKillDeath() {
+      return killDeath;
     }
 
     @Override
@@ -237,114 +184,6 @@ public class ClanPlayerImpl implements ClanPlayer, Cloneable, CommandSender {
             return rank.hasPermission(permission);
         }
         return true;
-    }
-
-    public int addKillHigh() {
-        int kills = getKillsHigh();
-        kills++;
-        setKillsHigh(kills);
-        return kills;
-    }
-
-    public int addKillMedium() {
-        int kills = getKillsMedium();
-        kills++;
-        setKillsMedium(kills);
-        return kills;
-    }
-
-    public int addKillLow() {
-        int kills = getKillsLow();
-        kills++;
-        setKillsLow(kills);
-        return kills;
-    }
-
-    @Override
-    public void setKillsHigh(int kills) {
-        this.killsHigh = kills;
-        TaskForwarder.sendUpdateClanPlayer(this);
-    }
-
-    @Override
-    public void setKillsMedium(int kills) {
-        this.killsMedium = kills;
-        TaskForwarder.sendUpdateClanPlayer(this);
-    }
-
-    @Override
-    public void setKillsLow(int kills) {
-        this.killsLow = kills;
-        TaskForwarder.sendUpdateClanPlayer(this);
-    }
-
-    @Override
-    public int getKillsHigh() {
-        return killsHigh;
-    }
-
-    @Override
-    public int getKillsMedium() {
-        return killsMedium;
-    }
-
-    @Override
-    public int getKillsLow() {
-        return killsLow;
-    }
-
-    @Override
-    public int getDeathsHigh() {
-        return deathsHigh;
-    }
-
-    @Override
-    public int getDeathsMedium() {
-        return deathsMedium;
-    }
-
-    @Override
-    public int getDeathsLow() {
-        return deathsLow;
-    }
-
-    public int addDeathHigh() {
-        int deaths = getDeathsHigh();
-        deaths++;
-        setDeathsHigh(deaths);
-        return deaths;
-    }
-
-    public int addDeathMedium() {
-        int deaths = getDeathsMedium();
-        deaths++;
-        setDeathsMedium(deaths);
-        return deaths;
-    }
-
-    public int addDeathLow() {
-        int deaths = getDeathsLow();
-        deaths++;
-        setDeathsLow(deaths);
-        return deaths;
-    }
-
-    @Override
-    public void setDeathsHigh(int deathsHigh) {
-        this.deathsHigh = deathsHigh;
-        TaskForwarder.sendUpdateClanPlayer(this);
-    }
-
-    @Override
-    public void setDeathsMedium(int deathsMedium) {
-        this.deathsMedium = deathsMedium;
-        TaskForwarder.sendUpdateClanPlayer(this);
-    }
-
-    @Override
-    public void setDeathsLow(int deathsLow) {
-        this.deathsLow = deathsLow;
-        TaskForwarder.sendUpdateClanPlayer(this);
     }
 
     @Override

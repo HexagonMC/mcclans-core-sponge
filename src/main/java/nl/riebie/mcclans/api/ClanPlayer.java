@@ -59,130 +59,13 @@ public interface ClanPlayer {
      */
     boolean isMemberOfAClan();
 
-    /**
-     * Get the weighted kills of this player
-     *
-     * @return the weighted kills of this player
-     */
-    double getKillsWeighted();
 
     /**
-     * Get the total unweighted kills of this clanPlayer
+     * Get the kill/death ratio of this clanPlayer
      *
-     * @return the unweighted kills of this clanPlayer
+     * @return the  kill/death ratio of this clanPlayer
      */
-    int getKills();
-
-    /**
-     * Get the high factored kills of this clanPlayer
-     *
-     * @return the high factored kills of this clanPlayer
-     */
-    int getKillsHigh();
-
-    /**
-     * Get the medium factored kills of this clanPlayer
-     *
-     * @return the medium factored kills of this clanPlayer
-     */
-    int getKillsMedium();
-
-    /**
-     * Get the low factored kills of this clanPlayer
-     *
-     * @return the low factored kills of this clanPlayer
-     */
-    int getKillsLow();
-
-    /**
-     * Get the weighted deaths of this player
-     *
-     * @return the weighted deaths of this player
-     */
-    double getDeathsWeighted();
-
-    /**
-     * Get the unweighted deaths of this player
-     *
-     * @return the unweighted deaths of this player
-     */
-    int getDeaths();
-
-    /**
-     * Get the high factored deaths of this clanPlayer
-     *
-     * @return the high factored deaths of this clanPlayer
-     */
-    int getDeathsHigh();
-
-    /**
-     * Get the medium factored deaths of this clanPlayer
-     *
-     * @return the medium factored deaths of this clanPlayer
-     */
-    int getDeathsMedium();
-
-    /**
-     * Get the low factored deaths of this clanPlayer
-     *
-     * @return the low factored deaths of this clanPlayer
-     */
-    int getDeathsLow();
-
-    /**
-     * Get the average weighted kill/death ratio of this clanPlayer
-     *
-     * @return the average weighted kill/death ratio of this clanPlayer
-     */
-    double getKDR();
-
-    /**
-     * Set the high factored kills of this clanPlayer
-     *
-     * @param kills
-     *            the high factored kills of this clanPlayer
-     */
-    void setKillsHigh(int kills);
-
-    /**
-     * Set the medium factored kills of this clanPlayer
-     *
-     * @param kills
-     *            the medium factored kills of this clanPlayer
-     */
-    void setKillsMedium(int kills);
-
-    /**
-     * Set the low factored kills of this clanPlayer
-     *
-     * @param kills
-     *            the low factored kills of this clanPlayer
-     */
-    void setKillsLow(int kills);
-
-    /**
-     * Set the high factored deaths of this clanPlayer
-     *
-     * @param kills
-     *            the high factored deaths of this clanPlayer
-     */
-    void setDeathsHigh(int kills);
-
-    /**
-     * Set the medium factored deaths of this clanPlayer
-     *
-     * @param kills
-     *            the medium factored deaths of this clanPlayer
-     */
-    void setDeathsMedium(int kills);
-
-    /**
-     * Set the low factored deaths of this clanPlayer
-     *
-     * @param kills
-     *            the low factored deaths of this clanPlayer
-     */
-    void setDeathsLow(int kills);
+    KillDeath getKillDeath();
 
     /**
      * Get the rank of the player

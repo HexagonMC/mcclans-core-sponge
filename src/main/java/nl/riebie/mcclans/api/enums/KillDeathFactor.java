@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 riebie, Kippers <https://bitbucket.org/Kippers/mcclans-core-sponge>
+ *  Copyright (c) 2016 riebie, Kippers < https://bitbucket.org/Kippers/mcclans-core-sponge>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -18,23 +18,30 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
+ *
  */
 
-package nl.riebie.mcclans.enums;
+package nl.riebie.mcclans.api.enums;
 
 /**
  * Created by Kippers on 19-1-2016.
  */
 public enum KillDeathFactor {
-    LOW("Low"), MEDIUM("Medium"), HIGH("High");
+    LOW("Low", 0.1f), MEDIUM("Medium", 1.0f), HIGH("High", 2.0f);
 
     private String userFriendlyName;
+    private float factor;
 
-    KillDeathFactor(String userFriendlyName) {
+    KillDeathFactor(String userFriendlyName, float factor) {
         this.userFriendlyName = userFriendlyName;
+        this.factor = factor;
     }
 
     public String getUserFriendlyName() {
         return userFriendlyName;
+    }
+
+    public float getFactor() {
+        return factor;
     }
 }

@@ -26,6 +26,7 @@ import nl.riebie.mcclans.ClansImpl;
 import nl.riebie.mcclans.api.Clan;
 import nl.riebie.mcclans.api.ClanPlayer;
 import nl.riebie.mcclans.api.Rank;
+import nl.riebie.mcclans.api.enums.KillDeathFactor;
 import nl.riebie.mcclans.api.enums.Permission;
 import nl.riebie.mcclans.api.exceptions.NotDefaultImplementationException;
 import nl.riebie.mcclans.config.Config;
@@ -227,85 +228,49 @@ public class ClanImpl implements Clan, Cloneable {
     }
 
     @Override
-    public int getKills() {
+    public int getTotalKills() {
         int kills = 0;
         for (ClanPlayerImpl member : members) {
-            kills += member.getKills();
+            kills += member.getKillDeath().getTotalKills();
         }
         return kills;
     }
 
     @Override
-    public int getKillsHigh() {
+    public int getKills(KillDeathFactor killDeathFactor) {
         int kills = 0;
         for (ClanPlayerImpl member : members) {
-            kills += member.getKillsHigh();
+            kills += member.getKillDeath().getKills(killDeathFactor);
         }
         return kills;
     }
 
     @Override
-    public int getKillsMedium() {
-        int kills = 0;
-        for (ClanPlayerImpl member : members) {
-            kills += member.getKillsMedium();
-        }
-        return kills;
-    }
-
-    @Override
-    public int getKillsLow() {
-        int kills = 0;
-        for (ClanPlayerImpl member : members) {
-            kills += member.getKillsLow();
-        }
-        return kills;
-    }
-
-    @Override
-    public int getDeaths() {
+    public int getTotalDeaths() {
         int deaths = 0;
         for (ClanPlayerImpl member : members) {
-            deaths += member.getDeaths();
+            deaths += member.getKillDeath().getTotalDeaths();
         }
         return deaths;
     }
 
     @Override
-    public int getDeathsHigh() {
+    public int getDeaths(KillDeathFactor factor) {
         int deaths = 0;
         for (ClanPlayerImpl member : members) {
-            deaths += member.getDeathsHigh();
-        }
-        return deaths;
-    }
-
-    @Override
-    public int getDeathsMedium() {
-        int deaths = 0;
-        for (ClanPlayerImpl member : members) {
-            deaths += member.getDeathsMedium();
-        }
-        return deaths;
-    }
-
-    @Override
-    public int getDeathsLow() {
-        int deaths = 0;
-        for (ClanPlayerImpl member : members) {
-            deaths += member.getDeathsLow();
+            deaths += member.getKillDeath().getDeaths(factor);
         }
         return deaths;
     }
 
     @Override
     public double getKDR() {
-        double kdr = 0;
+        double kdr;
         double killsWeighted = 0;
         double deathsWeighted = 0;
         for (ClanPlayerImpl member : members) {
-            killsWeighted += member.getKillsWeighted();
-            deathsWeighted += member.getDeathsWeighted();
+            killsWeighted += member.getKillDeath().getKillsWeighted();
+            deathsWeighted += member.getKillDeath().getDeathsWeighted();
         }
         if (members.size() > 0) {
             if (deathsWeighted < 1) {

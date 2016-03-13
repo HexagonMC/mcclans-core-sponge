@@ -23,6 +23,7 @@
 package nl.riebie.mcclans.commands.implementations;
 
 import nl.riebie.mcclans.ClansImpl;
+import nl.riebie.mcclans.api.enums.KillDeathFactor;
 import nl.riebie.mcclans.commands.annotations.Command;
 import nl.riebie.mcclans.commands.annotations.Parameter;
 import nl.riebie.mcclans.database.DatabaseHandler;
@@ -51,18 +52,18 @@ public class ClanAdminClanPlayerCommands {
     @Command(name = "setdeaths", description = "Set the deaths of a player", spongePermission = "mcclans.admin.clanplayer.setdeaths")
     public void clanPlayerSetDeathsCommand(CommandSource commandSource, @Parameter(name = "playerName") ClanPlayerImpl targetClanPlayer,
                                            @Parameter(name = "highDeaths") int high, @Parameter(name = "mediumDeaths") int medium, @Parameter(name = "lowDeaths") int low) {
-        targetClanPlayer.setDeathsHigh(high);
-        targetClanPlayer.setDeathsMedium(medium);
-        targetClanPlayer.setDeathsLow(low);
+        targetClanPlayer.getKillDeath().setDeaths(KillDeathFactor.HIGH, high);
+        targetClanPlayer.getKillDeath().setDeaths(KillDeathFactor.MEDIUM, medium);
+        targetClanPlayer.getKillDeath().setDeaths(KillDeathFactor.LOW, low);
         Messages.sendBasicMessage(commandSource, Messages.PLAYER_STATISTICS_SUCCESSFULLY_MODIFIED);
     }
 
     @Command(name = "setkills", description = "Set the kills of a player", spongePermission = "mcclans.admin.clanplayer.setkills")
     public void clanPlayerSetKillsCommand(CommandSource commandSource, @Parameter(name = "playerName") ClanPlayerImpl targetClanPlayer,
                                           @Parameter(name = "highDeaths") int high, @Parameter(name = "mediumDeaths") int medium, @Parameter(name = "lowDeaths") int low) {
-        targetClanPlayer.setKillsHigh(high);
-        targetClanPlayer.setKillsMedium(medium);
-        targetClanPlayer.setKillsLow(low);
+        targetClanPlayer.getKillDeath().setKills(KillDeathFactor.HIGH, high);
+        targetClanPlayer.getKillDeath().setKills(KillDeathFactor.MEDIUM, medium);
+        targetClanPlayer.getKillDeath().setKills(KillDeathFactor.LOW, low);
         Messages.sendBasicMessage(commandSource, Messages.PLAYER_STATISTICS_SUCCESSFULLY_MODIFIED);
     }
 

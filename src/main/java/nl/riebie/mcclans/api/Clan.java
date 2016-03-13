@@ -22,6 +22,7 @@
 
 package nl.riebie.mcclans.api;
 
+import nl.riebie.mcclans.api.enums.KillDeathFactor;
 import nl.riebie.mcclans.api.enums.Permission;
 import nl.riebie.mcclans.api.exceptions.NotDefaultImplementationException;
 import org.spongepowered.api.text.Text;
@@ -103,56 +104,30 @@ public interface Clan {
      *
      * @return the unweighted kills of all the members in this clan
      */
-    int getKills();
+    int getTotalKills();
 
     /**
-     * Get the total high factored kills of all the members in this clan
+     * Get the total factored kills of all the members in this clan
      *
-     * @return the high factored kills of all the members in this clan
+     * @param killDeathFactor the factor
+     * @return the factored kills of all the members in this clan
      */
-    int getKillsHigh();
-
-    /**
-     * Get the total medium factored kills of all the members in this clan
-     *
-     * @return the medium factored kills of all the members in this clan
-     */
-    int getKillsMedium();
-
-    /**
-     * Get the total low factored kills of all the members in this clan
-     *
-     * @return the low factored kills of all the members in this clan
-     */
-    int getKillsLow();
+    int getKills(KillDeathFactor killDeathFactor);
 
     /**
      * Get the total unweighted deaths of all the members in this clan
      *
      * @return the unweighted deaths of all the members in this clan
      */
-    int getDeaths();
+    int getTotalDeaths();
 
     /**
-     * Get the total high factored deaths of all the members in this clan
+     * Get the total factored deaths of all the members in this clan
      *
-     * @return the high factored deaths of all the members in this clan
+     * @param killDeathFactor the factor
+     * @return the factored deaths of all the members in this clan
      */
-    int getDeathsHigh();
-
-    /**
-     * Get the total medium factored deaths of all the members in this clan
-     *
-     * @return the medium factored deaths of all the members in this clan
-     */
-    int getDeathsMedium();
-
-    /**
-     * Get the total low factored deaths of all the members in this clan
-     *
-     * @return the low factored deaths of all the members in this clan
-     */
-    int getDeathsLow();
+    int getDeaths(KillDeathFactor killDeathFactor);
 
     /**
      * Get the average weighted kill/death ratio of all the members in this clan

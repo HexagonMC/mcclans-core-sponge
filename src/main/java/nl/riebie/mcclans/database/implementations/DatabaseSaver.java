@@ -22,6 +22,7 @@
 
 package nl.riebie.mcclans.database.implementations;
 
+import nl.riebie.mcclans.api.enums.KillDeathFactor;
 import nl.riebie.mcclans.api.enums.Permission;
 import nl.riebie.mcclans.clan.ClanImpl;
 import nl.riebie.mcclans.clan.RankImpl;
@@ -86,12 +87,12 @@ public class DatabaseSaver extends DataSaver {
             clanID = clanPlayer.getClan().getID();
             rankID = clanPlayer.getRank().getID();
         }
-        int killsHigh = clanPlayer.getKillsHigh();
-        int killsMedium = clanPlayer.getKillsMedium();
-        int killsLow = clanPlayer.getKillsLow();
-        int deathsHigh = clanPlayer.getDeathsHigh();
-        int deathsMedium = clanPlayer.getDeathsMedium();
-        int deathsLow = clanPlayer.getDeathsLow();
+        int killsHigh = clanPlayer.getKillDeath().getKills(KillDeathFactor.HIGH);
+        int killsMedium = clanPlayer.getKillDeath().getKills(KillDeathFactor.MEDIUM);
+        int killsLow = clanPlayer.getKillDeath().getKills(KillDeathFactor.LOW);
+        int deathsHigh = clanPlayer.getKillDeath().getDeaths(KillDeathFactor.HIGH);
+        int deathsMedium = clanPlayer.getKillDeath().getDeaths(KillDeathFactor.MEDIUM);
+        int deathsLow = clanPlayer.getKillDeath().getDeaths(KillDeathFactor.LOW);
 
         boolean ffProtection = clanPlayer.isFfProtected();
         long lastOnlineTime = clanPlayer.getLastOnline().getTime();
@@ -115,12 +116,12 @@ public class DatabaseSaver extends DataSaver {
             clanID = clanPlayer.getClan().getID();
             rankID = clanPlayer.getRank().getID();
         }
-        int killsHigh = clanPlayer.getKillsHigh();
-        int killsMedium = clanPlayer.getKillsMedium();
-        int killsLow = clanPlayer.getKillsLow();
-        int deathsHigh = clanPlayer.getDeathsHigh();
-        int deathsMedium = clanPlayer.getDeathsMedium();
-        int deathsLow = clanPlayer.getDeathsLow();
+        int killsHigh = clanPlayer.getKillDeath().getKills(KillDeathFactor.HIGH);
+        int killsMedium = clanPlayer.getKillDeath().getKills(KillDeathFactor.MEDIUM);
+        int killsLow = clanPlayer.getKillDeath().getKills(KillDeathFactor.LOW);
+        int deathsHigh = clanPlayer.getKillDeath().getDeaths(KillDeathFactor.HIGH);
+        int deathsMedium = clanPlayer.getKillDeath().getDeaths(KillDeathFactor.MEDIUM);
+        int deathsLow = clanPlayer.getKillDeath().getDeaths(KillDeathFactor.LOW);
 
         boolean ffProtection = clanPlayer.isFfProtected();
         long lastOnlineTime = clanPlayer.getLastOnline().getTime();

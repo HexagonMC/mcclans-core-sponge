@@ -24,6 +24,8 @@ package nl.riebie.mcclans.commands.implementations;
 
 import nl.riebie.mcclans.ClansImpl;
 import nl.riebie.mcclans.MCClans;
+import nl.riebie.mcclans.api.KillDeath;
+import nl.riebie.mcclans.api.enums.KillDeathFactor;
 import nl.riebie.mcclans.api.enums.Permission;
 import nl.riebie.mcclans.clan.ClanImpl;
 import nl.riebie.mcclans.clan.RankFactory;
@@ -331,7 +333,7 @@ public class ClanCommands {
                 row.setValue("Rank", Text.of(String.valueOf(i + 1)));
                 row.setValue("Name", Text.of(clanPlayer.getName()));
                 row.setValue("Clan", clanTag);
-                row.setValue("KDR", Text.of(String.valueOf(clanPlayer.getKDR())));
+                row.setValue("KDR", Text.of(String.valueOf(clanPlayer.getKillDeath())));
 
             }
         });
@@ -370,8 +372,10 @@ public class ClanCommands {
         table.setValue("Owner", Text.of(clan.getOwner().getName()));
         table.setValue("Members", Text.of(String.valueOf(clan.getMembers().size())));
         table.setValue("Allies", generateAllyList(clan));
-        table.setValue("Kills", Utils.formatKdr(clan.getKills(), clan.getKillsHigh(), clan.getKillsMedium(), clan.getKillsLow()));
-        table.setValue("Deaths", Utils.formatKdr(clan.getDeaths(), clan.getDeathsHigh(), clan.getDeathsMedium(), clan.getDeathsLow()));
+        table.setValue("Kills", Utils.formatKdr(clan.getTotalKills(),
+                clan.getKills(KillDeathFactor.HIGH), clan.getKills(KillDeathFactor.MEDIUM), clan.getKills(KillDeathFactor.LOW)));
+        table.setValue("Deaths", Utils.formatKdr(clan.getTotalDeaths(),
+                clan.getDeaths(KillDeathFactor.HIGH), clan.getDeaths(KillDeathFactor.MEDIUM), clan.getDeaths(KillDeathFactor.LOW)));
         table.setValue("KDR", Text.of(String.valueOf(clan.getKDR())));
         table.setValue("Created", Text.of(clan.getCreationDateUserFriendly()));
         table.draw(commandSource, 0);
@@ -421,16 +425,12 @@ public class ClanCommands {
         }
         java.util.Collections.sort(members, new MemberComparator());
 
-        HorizontalTable<Player> table = new HorizontalTable<Player>("Clan coordinates " + clan.getName(), 10, new TableAdapter<Player>() {
+        HorizontalTable<Player> table = new HorizontalTable<Player>("Clan coordinates " + clan.getName(), 10, (row, player, index) -> {
+            if (player.isOnline()) {
+                Location<World> location = player.getLocation();
+                row.setValue("Player", Text.of(player.getName()));
+                row.setValue("Location", Utils.formatLocation(location));
 
-            @Override
-            public void fillRow(Row row, Player player, int index) {
-                if (player.isOnline()) {
-                    Location<World> location = player.getLocation();
-                    row.setValue("Player", Text.of(player.getName()));
-                    row.setValue("Location", Utils.formatLocation(location));
-
-                }
             }
         });
         table.defineColumn("Player", 30);
@@ -464,17 +464,16 @@ public class ClanCommands {
         List<ClanPlayerImpl> members = clan.getMembersImpl();
         java.util.Collections.sort(members, new MemberComparator());
 
-        HorizontalTable<ClanPlayerImpl> table = new HorizontalTable<ClanPlayerImpl>("Clan statistics " + clan.getName(), 10,
-                new TableAdapter<ClanPlayerImpl>() {
+        HorizontalTable<ClanPlayerImpl> table = new HorizontalTable<>("Clan statistics " + clan.getName(), 10,
+                (row, member, index) -> {
+                    row.setValue("Player", Text.of(member.getName()));
+                    KillDeath killDeath = member.getKillDeath();
+                    row.setValue("KDR", Text.of(String.valueOf(killDeath.getKDR())));
+                    row.setValue("Kills", Utils.formatKdr(killDeath.getTotalKills(),
+                            killDeath.getKills(KillDeathFactor.HIGH), killDeath.getKills(KillDeathFactor.MEDIUM), killDeath.getKills(KillDeathFactor.LOW)));
+                    row.setValue("Deaths", Utils.formatKdr(killDeath.getTotalDeaths(),
+                            killDeath.getDeaths(KillDeathFactor.HIGH), killDeath.getDeaths(KillDeathFactor.MEDIUM), killDeath.getDeaths(KillDeathFactor.LOW)));
 
-                    @Override
-                    public void fillRow(Row row, ClanPlayerImpl member, int index) {
-                        row.setValue("Player", Text.of(member.getName()));
-                        row.setValue("KDR", Text.of(String.valueOf(member.getKDR())));
-                        row.setValue("Kills", Utils.formatKdr(member.getKills(), member.getKillsHigh(), member.getKillsMedium(), member.getKillsLow()));
-                        row.setValue("Deaths", Utils.formatKdr(member.getDeaths(), member.getDeathsHigh(), member.getDeathsMedium(), member.getDeathsLow()));
-
-                    }
                 });
         table.defineColumn("Player", 25);
         table.defineColumn("KDR", 10);

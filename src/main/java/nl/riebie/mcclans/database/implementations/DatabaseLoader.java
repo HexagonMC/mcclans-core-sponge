@@ -30,10 +30,10 @@ import java.sql.SQLException;
 
 public class DatabaseLoader extends DataLoader {
 
-	private final String GET_CLANS_QUERY = "SELECT * FROM mcc_clans";
-	private final String GET_CLANS_ALLIES_QUERY = "SELECT * FROM mcc_clans_allies";
-	private final String GET_CLANPLAYERS_QUERY = "SELECT * FROM mcc_clanplayers";
-	private final String GET_RANKS_QUERY = "SELECT * FROM mcc_ranks";
+	private static final String GET_CLANS_QUERY = "SELECT * FROM mcc_clans";
+	private static final String GET_CLANS_ALLIES_QUERY = "SELECT * FROM mcc_clans_allies";
+	private static final String GET_CLANPLAYERS_QUERY = "SELECT * FROM mcc_clanplayers";
+	private static final String GET_RANKS_QUERY = "SELECT * FROM mcc_ranks";
 
 	private final DatabaseConnectionOwner databaseConnectionOwner = DatabaseConnectionOwner.getInstance();
 

@@ -33,9 +33,9 @@ public class ClanPlayerKdrComparator implements Comparator<ClanPlayerImpl> {
 
     @Override
     public int compare(ClanPlayerImpl player, ClanPlayerImpl player2) {
-        if (player.getKDR() < player2.getKDR()) {
+        if (player.getKillDeath().getKDR() < player2.getKillDeath().getKDR()) {
             return 1;
-        } else if (player.getKDR() > player2.getKDR()) {
+        } else if (player.getKillDeath().getKDR() > player2.getKillDeath().getKDR()) {
             return -1;
         }
         return 0;

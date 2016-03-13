@@ -39,8 +39,8 @@ public class MemberComparator implements Comparator<ClanPlayerImpl> {
             return -1;
         }
 
-        double player1Kdr = player.getKDR();
-        double player2Kdr = player2.getKDR();
+        double player1Kdr = player.getKillDeath().getKDR();
+        double player2Kdr = player2.getKillDeath().getKDR();
         if (player1Kdr < player2Kdr) {
             return 1;
         } else if (player1Kdr > player2Kdr) {

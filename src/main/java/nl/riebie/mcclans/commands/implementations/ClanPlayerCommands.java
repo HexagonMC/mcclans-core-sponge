@@ -22,6 +22,8 @@
 
 package nl.riebie.mcclans.commands.implementations;
 
+import nl.riebie.mcclans.api.KillDeath;
+import nl.riebie.mcclans.api.enums.KillDeathFactor;
 import nl.riebie.mcclans.api.enums.Permission;
 import nl.riebie.mcclans.clan.ClanImpl;
 import nl.riebie.mcclans.clan.RankFactory;
@@ -109,9 +111,10 @@ public class ClanPlayerCommands {
             lastOnlineMessage = Text.of(targetClanPlayer.getLastOnline().getDifferenceInText());
         }
         table.setValue("Last Online", Text.of(lastOnlineMessage));
-        table.setValue("Kills", Utils.formatKdr(targetClanPlayer.getKills(), targetClanPlayer.getKillsHigh(), targetClanPlayer.getKillsMedium(), targetClanPlayer.getKillsLow()));
-        table.setValue("Deaths", Utils.formatKdr(targetClanPlayer.getDeaths(), targetClanPlayer.getDeathsHigh(), targetClanPlayer.getDeathsMedium(), targetClanPlayer.getDeathsLow()));
-        table.setValue("KDR", Text.of(String.valueOf(targetClanPlayer.getKDR())));
+        KillDeath kdr = targetClanPlayer.getKillDeath();
+        table.setValue("Kills", Utils.formatKdr(kdr.getTotalKills(), kdr.getKills(KillDeathFactor.HIGH), kdr.getKills(KillDeathFactor.MEDIUM), kdr.getKills(KillDeathFactor.LOW)));
+        table.setValue("Deaths", Utils.formatKdr(kdr.getTotalDeaths(), kdr.getDeaths(KillDeathFactor.HIGH), kdr.getDeaths(KillDeathFactor.MEDIUM), kdr.getDeaths(KillDeathFactor.LOW)));
+        table.setValue("KDR", Text.of(String.valueOf(kdr.getKDR())));
 
         if (clanPlayer.equals(targetClanPlayer)
                 || (clanPlayer.getClan() != null && targetClanPlayer.getClan() != null && clanPlayer.getClan().isPlayerFriendlyToThisClan(
