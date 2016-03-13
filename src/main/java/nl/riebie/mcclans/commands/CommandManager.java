@@ -38,6 +38,7 @@ import nl.riebie.mcclans.messages.Messages;
 import nl.riebie.mcclans.player.ClanPlayerImpl;
 import nl.riebie.mcclans.table.HorizontalTable;
 import nl.riebie.mcclans.table.TableAdapter;
+import org.apache.commons.lang3.ArrayUtils;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.source.ConsoleSource;
 import org.spongepowered.api.entity.living.player.Player;
@@ -59,13 +60,11 @@ public class CommandManager {
 
     private static final int COMMANDS_PER_PAGE = 5;
 
-    private Map<String, FilledCommand> aliasesMap = new HashMap<>();
+    private Map<String, String[]> aliasesMap = new HashMap<>();
 
     private Map<String, FilledCommand> filledCommandMap = new HashMap<>();
 
     private Map<FilledCommand, Object> commandStructureMap = new HashMap<>();
-
-    private Map<String, List<String>> aliasesPathMap = new HashMap<>();
 
     private String rootValue;
 
@@ -101,21 +100,23 @@ public class CommandManager {
     private void loadConfig() {
         Map<String, String> aliases = Config.getMap(Config.COMMAND_ALIASES, String.class, String.class);
         for (Map.Entry<String, String> aliasSet : aliases.entrySet()) {
-            String value = aliasSet.getValue().replace("/", "");
-            String key = aliasSet.getKey().replace("/", "");
-            List<String> alias = aliasesPathMap.get(value);
-            if (alias == null) {
-                alias = new ArrayList<>();
-                aliasesPathMap.put(value, alias);
-            }
-            alias.add(key);
+            String alias = aliasSet.getKey().replace("/", "");
+            String[] command = aliasSet.getValue().replace("/", "").split(" ");
+            aliasesMap.put(alias, ArrayUtils.subarray(command, 1, command.length));
         }
     }
 
+    /*    List<String> configAliases = aliasesPathMap.get(filledCommand.getFullPath());
+        if (configAliases != null) {
+            for (String alias : configAliases) {
+                String[] aliasPrefix = filledCommand.getFullPath().split(" ");
+                aliasesMap.put(alias, ArrayUtils.subarray(aliasPrefix, 1, aliasPrefix.length));
+            }
+        }*/
     public List<CommandRoot> registerCommandStructure(String tag, Class<?> commandStructure) {
         loadConfig();
         rootValue = tag;
-        registerCommandStructure(tag, commandStructure, null);
+        registerCommandStructure(commandStructure, null);
         List<CommandRoot> roots = new ArrayList<>();
         roots.add(new CommandRoot(rootValue, this));
         for (String alias : aliasesMap.keySet()) {
@@ -125,7 +126,7 @@ public class CommandManager {
         return roots;
     }
 
-    public void registerCommandStructure(String tag, Class<?> commandStructure, FilledCommand parent) {
+    public void registerCommandStructure(Class<?> commandStructure, FilledCommand parent) {
         try {
             Object commandStructureInstance = commandStructure.newInstance();
             for (Method method : commandStructure.getMethods()) {
@@ -150,21 +151,17 @@ public class CommandManager {
             if (aliasesAnnotation != null) {
                 String[] aliases = aliasesAnnotation.value();
                 for (String alias : aliases) {
-                    aliasesMap.put(alias, filledCommand);
+                    String[] aliasPrefix = filledCommand.getFullPath().split(" ");
+                    aliasesMap.put(alias, ArrayUtils.subarray(aliasPrefix, 1, aliasPrefix.length));
                 }
             }
-            List<String> configAliases = aliasesPathMap.get(filledCommand.getFullPath());
-            if(configAliases != null){
-                for(String alias : configAliases){
-                    aliasesMap.put(alias, filledCommand);
-                }
-            }
+
             for (java.lang.reflect.Parameter parameter : method.getParameters()) {
                 handleParameter(parameter, filledCommand);
             }
             ChildGroup childGroupAnnotation = method.getAnnotation(ChildGroup.class);
             if (childGroupAnnotation != null) {
-                registerCommandStructure("", childGroupAnnotation.value(), filledCommand);
+                registerCommandStructure(childGroupAnnotation.value(), filledCommand);
             }
         }
     }
@@ -258,41 +255,41 @@ public class CommandManager {
 
     public void executeCommand(CommandSource commandSource, String root, String[] args) {
         CommandSender commandSender = getCommandSender(commandSource);
-        String firstParam;
-        FilledCommand filledCommand;
-        int startIndex = 1;
-        if (!root.equals(rootValue)) {
-            startIndex = 0;
-            filledCommand = aliasesMap.get(root);
-            if (filledCommand == null) {
-                throw new IllegalStateException(String.format("Unkown root: %s", root));
-            }
-        } else {
-            firstParam = args[0];
-            filledCommand = filledCommandMap.get(firstParam);
-            if (firstParam.equals("page")) {
-                filledCommand = lastExecutedPageCommand.get(commandSender);
-                int page = Integer.valueOf(args[1]);
 
-                if (filledCommand.hasChildren()) {
-                    sendContextHelp(commandSender, commandSource, filledCommand, page);
-                    return;
-                } else {
-                    Object[] objects = lastExecutedPageCommandData.get(commandSender);
-                    objects[objects.length - 1] = page;
-                    filledCommand.execute(commandStructureMap.get(filledCommand), objects);
-                }
-                return;
-            } else if (firstParam.equals("help")) {
-                int page = args.length > 1 ? Integer.valueOf(args[1]) : 1;
-                sendHelp(commandSource, page);
-                return;
+
+        if (!root.equals(rootValue)) {
+
+            String[] aliasPrefix = aliasesMap.get(root);
+            args = ArrayUtils.addAll(aliasPrefix, args);
+            if (aliasPrefix == null) {
+                throw new IllegalStateException(String.format("Unknown root: %s", root));
             }
         }
+        String firstParam = args[0];
+        FilledCommand filledCommand = filledCommandMap.get(firstParam);
+        if (firstParam.equals("page")) {
+            filledCommand = lastExecutedPageCommand.get(commandSender);
+            int page = Integer.valueOf(args[1]);
+
+            if (filledCommand.hasChildren()) {
+                sendContextHelp(commandSender, commandSource, filledCommand, page);
+                return;
+            } else {
+                Object[] objects = lastExecutedPageCommandData.get(commandSender);
+                objects[objects.length - 1] = page;
+                filledCommand.execute(commandStructureMap.get(filledCommand), objects);
+            }
+            return;
+        } else if (firstParam.equals("help")) {
+            int page = args.length > 1 ? Integer.valueOf(args[1]) : 1;
+            sendHelp(commandSource, page);
+            return;
+        }
+
 
         if (filledCommand != null) {
             int i;
-            for (i = startIndex; i < args.length; i++) {
+            for (i = 1; i < args.length; i++) {
                 String arg = args[i];
                 FilledCommand child = filledCommand.getChild(arg);
                 if (child == null) {
