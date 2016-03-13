@@ -24,48 +24,34 @@ package nl.riebie.mcclans.config.constraints;
 
 import nl.riebie.mcclans.config.model.ConfigOption;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Kippers on 09/01/2016.
  */
-public class OneOfStringConstraint implements ConfigOption.Constraint {
-
-    private boolean mCaseSensitive;
-    private List<String> mPossibilities;
-
-    public OneOfStringConstraint(boolean caseSensitive, String... possibilities) {
-        this.mCaseSensitive = caseSensitive;
-        this.mPossibilities = Arrays.asList(possibilities);
-    }
+public class ValidAliasMapConstraint implements ConfigOption.Constraint {
 
     @Override
     public String getConstraintDescription() {
-        String delimiter = ", ";
-
-        StringBuilder sb = new StringBuilder();
-
-        for (String s : mPossibilities) {
-            sb.append(s).append(delimiter);
-        }
-
-        sb.deleteCharAt(sb.length() - delimiter.length());
-
-        return "must be one of: " + sb.toString();
+        return "alias must be one word and start with \"/\", aliased command must start with \"/clan\"";
     }
 
     @Override
     public boolean meetsConstraint(Object value) {
-        if (value instanceof String) {
-            String valueString = (String) value;
-            for (String possibility : mPossibilities) {
-                boolean match = (mCaseSensitive) ? possibility.equals(valueString) : possibility.equalsIgnoreCase(valueString);
-                if (match) {
-                    return true;
+        if (value instanceof Map) {
+            for (Map.Entry<?, ?> entry : ((Map<?, ?>) value).entrySet()) {
+                if (String.class.isInstance(entry.getKey()) && String.class.isInstance(entry.getValue())) {
+                    String mapKey = String.class.cast(entry.getKey());
+                    String mapValue = String.class.cast(entry.getValue());
+                    if (!mapKey.startsWith("/") || mapKey.contains(" ")) {
+                        return false;
+                    }
+                    if (!mapValue.startsWith("/clan")) {
+                        return false;
+                    }
                 }
             }
-            return false;
+            return true;
         } else {
             return false;
         }
