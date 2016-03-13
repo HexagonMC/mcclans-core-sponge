@@ -152,7 +152,7 @@ public class Config {
         commandAliases.put("/personalff", "/clan friendlyfire personal toggle");
 
         ConfigSection commandAliasesConfigSection = ConfigSection.builder(SECTION_COMMAND_ALIASES).setConfigOptions(
-                ConfigOption.builder(COMMAND_ALIASES, commandAliases).addConstraints(new ValidAliasMapConstraint()).build()
+                ConfigOption.builder(COMMAND_ALIASES, commandAliases).addConstraints(new ValidAliasMapConstraint()).setValueIfConstraintFailed(Collections.EMPTY_MAP).build()
         ).build();
 
         configSections.add(generalConfigSection);
@@ -218,11 +218,12 @@ public class Config {
                     MessageBoolean meetsConstraints = configOption.meetsConstraints(value);
                     if (!meetsConstraints.bool) {
                         MCClans.getPlugin().getLogger().warn("Could not load config option " + configOption.key + " (" + value + "): " + meetsConstraints.message);
+                        // Only change runtime value
                         value = configOption.valueIfConstraintFailed;
-                        //subNode.setValue(configOption.value);
                     }
                 } else {
                     MCClans.getPlugin().getLogger().warn("Could not load config option " + configOption.key + " (" + value + "): needs to be a " + isOfType.message);
+                    // Change runtime and config file value to the default
                     value = configOption.value;
                     subNode.setValue(configOption.value);
                 }
