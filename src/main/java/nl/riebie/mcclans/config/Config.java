@@ -26,6 +26,7 @@ import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
 import nl.riebie.mcclans.MCClans;
+import nl.riebie.mcclans.config.constraints.ValidAliasMapConstraint;
 import nl.riebie.mcclans.config.model.ConfigOption;
 import nl.riebie.mcclans.config.model.ConfigSection;
 import nl.riebie.mcclans.utils.MessageBoolean;
@@ -151,7 +152,7 @@ public class Config {
         commandAliases.put("/personalff", "/clan friendlyfire personal");
 
         ConfigSection commandAliasesConfigSection = ConfigSection.builder(SECTION_COMMAND_ALIASES).setConfigOptions(
-                ConfigOption.builder(COMMAND_ALIASES, commandAliases).build()
+                ConfigOption.builder(COMMAND_ALIASES, commandAliases).addConstraints(new ValidAliasMapConstraint()).build()
         ).build();
 
         configSections.add(generalConfigSection);
@@ -218,7 +219,7 @@ public class Config {
                     if (!meetsConstraints.bool) {
                         MCClans.getPlugin().getLogger().warn("Could not load config option " + configOption.key + " (" + value + "): " + meetsConstraints.message);
                         value = configOption.valueIfConstraintFailed;
-                        subNode.setValue(configOption.value);
+                        //subNode.setValue(configOption.value);
                     }
                 } else {
                     MCClans.getPlugin().getLogger().warn("Could not load config option " + configOption.key + " (" + value + "): needs to be a " + isOfType.message);
