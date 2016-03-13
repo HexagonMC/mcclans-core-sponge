@@ -22,8 +22,6 @@
 
 package nl.riebie.mcclans.commands;
 
-import nl.riebie.mcclans.commands.implementations.ClanCommands;
-import org.spongepowered.api.Server;
 import org.spongepowered.api.command.CommandCallable;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
