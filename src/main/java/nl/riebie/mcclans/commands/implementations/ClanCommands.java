@@ -217,7 +217,7 @@ public class ClanCommands {
         ClansImpl clansImpl = ClansImpl.getInstance();
         ClanImpl clan = clanPlayer.getClan();
         Messages.sendBroadcastMessageClanDisbandedBy(clan.getName(), clan.getTagColored(), commandSource.getName());
-        clansImpl.disbandClan(clan.getTag());
+        clansImpl.disbandClan(clan);
     }
 
     @Command(name = "remove", description = "Remove a player from your clan", isPlayerOnly = true, isClanOnly = true, clanPermission = Permission.remove, spongePermission = "mcclans.user.remove")

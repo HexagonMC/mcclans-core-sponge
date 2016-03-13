@@ -194,32 +194,35 @@ public class ClansImpl implements Clans {
     }
 
     @Override
-    public void disbandClan(String tag) {
-        ClanImpl clan = clans.get(tag.toLowerCase());
+    public void disbandClan(Clan disbandedClan) {
+        if (disbandedClan instanceof ClanImpl) {
+            ClanImpl clan = (ClanImpl) disbandedClan;
+            for (ClanPlayerImpl clanPlayer : clan.getMembersImpl()) {
+                clanPlayer.setClan(null);
+                clanPlayer.setRank(null);
+            }
+            List<RankImpl> ranks = clan.getRankImpls();
+            for (RankImpl rank : ranks) {
+                clan.removeRank(rank.getName());
+            }
+            for (ClanPlayerImpl invitedPlayer : clan.getInvitedPlayersImpl()) {
+                invitedPlayer.resetClanInvite();
+            }
+            for (ClanImpl ally : clan.getAlliesImpl()) {
+                ally.removeAlly(clan);
+            }
+            for (ClanImpl invitedAlly : clan.getInvitedAlliesImpl()) {
+                invitedAlly.resetInvitingAlly();
+            }
 
-        for (ClanPlayerImpl clanPlayer : clan.getMembersImpl()) {
-            clanPlayer.setClan(null);
-            clanPlayer.setRank(null);
-        }
-        List<RankImpl> ranks = clan.getRankImpls();
-        for (RankImpl rank : ranks) {
-            clan.removeRank(rank.getName());
-        }
-        for (ClanPlayerImpl invitedPlayer : clan.getInvitedPlayersImpl()) {
-            invitedPlayer.resetClanInvite();
-        }
-        for (ClanImpl ally : clan.getAlliesImpl()) {
-            ally.removeAlly(clan.getTag());
-        }
-        for (ClanImpl invitedAlly : clan.getInvitedAlliesImpl()) {
-            invitedAlly.resetInvitingAlly();
-        }
+            clans.remove(clan.getTag().toLowerCase());
 
-        clans.remove(tag.toLowerCase());
-
-        EventDispatcher.getInstance().dispatchClanDisbandEvent(clan);
-        TaskForwarder.sendDeleteClan(clan.getID());
-        updateClanTagCache();
+            EventDispatcher.getInstance().dispatchClanDisbandEvent(clan);
+            TaskForwarder.sendDeleteClan(clan.getID());
+            updateClanTagCache();
+        } else {
+            throw new NotDefaultImplementationException(disbandedClan.getClass());
+        }
     }
 
     @Override
@@ -257,7 +260,7 @@ public class ClansImpl implements Clans {
             ClanInvite clanInvite = clanPlayerImpl.getClanInvite();
             if (clan != null) {
                 if (clan.getOwner().equals(clanPlayer)) {
-                    disbandClan(clan.getTag());
+                    disbandClan(clan);
                 } else {
                     clan.removeMember(playerName);
                 }

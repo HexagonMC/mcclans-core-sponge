@@ -32,12 +32,12 @@ public interface LastOnline {
      *
      * @return time passed in milliseconds
      */
-    public long getTime();
+    long getTime();
 
     /**
      * Get a user friendly representation of the time passed since the player was last online
      *
      * @return user friendly representation of the time passed
      */
-    public String getDifferenceInText();
+    String getDifferenceInText();
 }

@@ -43,14 +43,14 @@ public interface Clan {
      *
      * @return all the members in this clan
      */
-    public List<ClanPlayer> getMembers();
+    List<ClanPlayer> getMembers();
 
     /**
      * Returns the number of members in this clan
      *
      * @return the number of members in this clan
      */
-    public int getMemberCount();
+    int getMemberCount();
 
     /**
      * Returns the clanplayer if the given player is a member of this clan
@@ -58,7 +58,7 @@ public interface Clan {
      * @param uuid the uuid of a player
      * @return the clanplayer if the given player is a member of this clan
      */
-    public ClanPlayer getMember(UUID uuid);
+    ClanPlayer getMember(UUID uuid);
 
     /**
      * Returns true if the given player is a member of this clan
@@ -66,7 +66,7 @@ public interface Clan {
      * @param uuid the uuid of a player
      * @return true if the given player is a member of this clan
      */
-    public boolean isPlayerMember(UUID uuid);
+    boolean isPlayerMember(UUID uuid);
 
     /**
      * Returns true if the given player is friendly to this clan
@@ -75,119 +75,119 @@ public interface Clan {
      * @return true if the given player is friendly to this clan
      * @throws NotDefaultImplementationException if the given ClanPlayer is not created by MCClans
      */
-    public boolean isPlayerFriendlyToThisClan(ClanPlayer clanPlayer);
+    boolean isPlayerFriendlyToThisClan(ClanPlayer clanPlayer);
 
     /**
      * Returns all the ranks available in this clan
      *
      * @return all the ranks available in this clan
      */
-    public List<Rank> getRanks();
+    List<Rank> getRanks();
 
     /**
      * Sets the home location of this clan
      *
      * @param location position of the new home location
      */
-    public void setHome(Location<World> location);
+    void setHome(Location<World> location);
 
     /**
      * Get the home location of this clan
      *
      * @return position of the home location
      */
-    public Location<World> getHome();
+    Location<World> getHome();
 
     /**
      * Get the total unweighted kills of all the members in this clan
      *
      * @return the unweighted kills of all the members in this clan
      */
-    public int getKills();
+    int getKills();
 
     /**
      * Get the total high factored kills of all the members in this clan
      *
      * @return the high factored kills of all the members in this clan
      */
-    public int getKillsHigh();
+    int getKillsHigh();
 
     /**
      * Get the total medium factored kills of all the members in this clan
      *
      * @return the medium factored kills of all the members in this clan
      */
-    public int getKillsMedium();
+    int getKillsMedium();
 
     /**
      * Get the total low factored kills of all the members in this clan
      *
      * @return the low factored kills of all the members in this clan
      */
-    public int getKillsLow();
+    int getKillsLow();
 
     /**
      * Get the total unweighted deaths of all the members in this clan
      *
      * @return the unweighted deaths of all the members in this clan
      */
-    public int getDeaths();
+    int getDeaths();
 
     /**
      * Get the total high factored deaths of all the members in this clan
      *
      * @return the high factored deaths of all the members in this clan
      */
-    public int getDeathsHigh();
+    int getDeathsHigh();
 
     /**
      * Get the total medium factored deaths of all the members in this clan
      *
      * @return the medium factored deaths of all the members in this clan
      */
-    public int getDeathsMedium();
+    int getDeathsMedium();
 
     /**
      * Get the total low factored deaths of all the members in this clan
      *
      * @return the low factored deaths of all the members in this clan
      */
-    public int getDeathsLow();
+    int getDeathsLow();
 
     /**
      * Get the average weighted kill/death ratio of all the members in this clan
      *
      * @return the average weighted kill/death ratio of all the members in this clan
      */
-    public double getKDR();
+    double getKDR();
 
     /**
      * Change the name of the clan
      *
      * @param name the new name of the clan
      */
-    public void setName(String name);
+    void setName(String name);
 
     /**
      * Get the name of the clan
      *
      * @return the name of the clan
      */
-    public String getName();
+    String getName();
 
     /**
      * Get the tag that identifies this clan
      *
      * @return the tag of this clan
      */
-    public String getTag();
+    String getTag();
 
     /**
      * Get the colored tag that identifies this clan
      *
      * @return the colored tag of this clan
      */
-    public Text getTagColored();
+    Text getTagColored();
 
     /**
      * Get a rank object with a given name
@@ -195,7 +195,7 @@ public interface Clan {
      * @param rank name of the rank to be retrieved
      * @return a Rank object
      */
-    public Rank getRank(String rank);
+    Rank getRank(String rank);
 
     /**
      * Rename a rank
@@ -203,7 +203,7 @@ public interface Clan {
      * @param oldName name of the rank to be renamed
      * @param newName new name for the rank
      */
-    public void renameRank(String oldName, String newName);
+    void renameRank(String oldName, String newName);
 
     /**
      * Check if this clan contains a rank with the given name
@@ -211,7 +211,7 @@ public interface Clan {
      * @param name name of the rank to be checked
      * @return true of the clan contains the given rank
      */
-    public boolean containsRank(String name);
+    boolean containsRank(String name);
 
     /**
      * Set the owner of this clan
@@ -219,44 +219,35 @@ public interface Clan {
      * @param clanPlayer the ClanPlayer of the new owner of this clan
      * @throws NotDefaultImplementationException if the given ClanPlayer is not created by MCClans
      */
-    public void setOwner(ClanPlayer clanPlayer);
+    void setOwner(ClanPlayer clanPlayer);
 
     /**
      * Get the owner of this clan
      *
      * @return the ClanPlayer of the owner of this clan
      */
-    public ClanPlayer getOwner();
+    ClanPlayer getOwner();
 
     /**
      * Get the color of the tag that identifies this clan
      *
      * @return the color of the tag of this clan
      */
-    public TextColor getTagColor();
+    TextColor getTagColor();
 
     /**
      * Set the color of the clan tag
      *
      * @param textColor the the color to be set
      */
-    public boolean setTagColor(TextColor textColor);
+    boolean setTagColor(TextColor textColor);
 
     /**
-     * Get the clan of the given clanTag if it is an ally of this clan
+     * Remove a clan from the allies list of this clan
      *
-     * @param clanTag the clanTag of a clan
-     * @return the clan of the given clanTag if it is an ally of this clan
+     * @param clan the clan to be removed from the allies list
      */
-    public Clan getAlly(String clanTag);
-
-    /**
-     * Check if the given clan is an ally of this clan
-     *
-     * @param clanTag the clanTag of a clan
-     * @return true if the clan of the given clanTag is an ally of this clan
-     */
-    public boolean isClanAllyOfThisClan(String clanTag);
+    void removeAlly(Clan clan);
 
     /**
      * Check if the given clan is an ally of this clan
@@ -264,28 +255,28 @@ public interface Clan {
      * @param clan a clan
      * @return true if the given clan is an ally of this clan
      */
-    public boolean isClanAllyOfThisClan(Clan clan);
+    boolean isClanAllyOfThisClan(Clan clan);
 
     /**
      * Set if the clan is inviteable for ally requests
      *
      * @param inviteable true if the clan is inviteable
      */
-    public void setAllowingAllyInvites(boolean inviteable);
+    void setAllowingAllyInvites(boolean inviteable);
 
     /**
      * Get if the clan is inviteable for ally requests
      *
      * @return true if the clan is inviteable
      */
-    public boolean isAllowingAllyInvites();
+    boolean isAllowingAllyInvites();
 
     /**
      * Send a message to all the members of this clan
      *
      * @param message the message to be sent
      */
-    public void sendMessage(Text... message);
+    void sendMessage(Text... message);
 
     /**
      * Send a message to all the members of this clan with the given permission
@@ -293,40 +284,40 @@ public interface Clan {
      * @param message    the message to be sent
      * @param permission the permission needed by the members to receive this message
      */
-    public void sendMessage(Permission permission, Text... message);
+    void sendMessage(Permission permission, Text... message);
 
     /**
      * Get a list of all the allies of this clan
      *
      * @return a list with the Clan objects of the allies of this clan
      */
-    public List<Clan> getAllies();
+    List<Clan> getAllies();
 
     /**
      * Get the creation date of this clan
      *
      * @return the creation date of this clan
      */
-    public Date getCreationDate();
+    Date getCreationDate();
 
     /**
      * Get the creation date of this clan in a user friendly format
      *
      * @return the creation date of this clan in a user friendly format
      */
-    public String getCreationDateUserFriendly();
+    String getCreationDateUserFriendly();
 
     /**
      * Check if the friendly fire protection is on
      *
      * @return true if the friendly fire protection is on
      */
-    public boolean isFfProtected();
+    boolean isFfProtected();
 
     /**
      * Set if the friendly fire protection is on
      *
      * @param ffProtection if set to true the friendly fire protection is on
      */
-    public void setFfProtection(boolean ffProtection);
+    void setFfProtection(boolean ffProtection);
 }

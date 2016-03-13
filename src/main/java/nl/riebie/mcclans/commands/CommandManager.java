@@ -256,9 +256,7 @@ public class CommandManager {
     public void executeCommand(CommandSource commandSource, String root, String[] args) {
         CommandSender commandSender = getCommandSender(commandSource);
 
-
         if (!root.equals(rootValue)) {
-
             String[] aliasPrefix = aliasesMap.get(root);
             args = ArrayUtils.addAll(aliasPrefix, args);
             if (aliasPrefix == null) {

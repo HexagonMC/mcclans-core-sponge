@@ -162,7 +162,7 @@ public class ClanImpl implements Clan, Cloneable {
                 if (clan.getTag().equals(tag)) {
                     return true;
                 }
-                if (isClanAllyOfThisClan(clan.getTag())) {
+                if (isClanAllyOfThisClan(clan)) {
                     return true;
                 }
             }
@@ -531,11 +531,11 @@ public class ClanImpl implements Clan, Cloneable {
 
     @Override
     public List<Clan> getAllies() {
-        return new ArrayList<Clan>(allies);
+        return new ArrayList<>(allies);
     }
 
     public List<ClanImpl> getAlliesImpl() {
-        return new ArrayList<ClanImpl>(allies);
+        return new ArrayList<>(allies);
     }
 
     public void addAlly(Clan clan) {
@@ -551,47 +551,20 @@ public class ClanImpl implements Clan, Cloneable {
     }
 
     @Override
-    public ClanImpl getAlly(String clanTag) {
-        for (ClanImpl ally : getAlliesImpl()) {
-            if (ally.getTag().toLowerCase().equals(clanTag.toLowerCase())) {
-                return ally;
+    public void removeAlly(Clan ally) {
+        if (ally instanceof ClanImpl) {
+            ClanImpl clanImpl = (ClanImpl) ally;
+            if (ally != null) {
+                allies.remove(clanImpl);
+                TaskForwarder.sendDeleteClanAlly(getID(), clanImpl.getID());
             }
-        }
-        return null;
-    }
-
-    public void removeAlly(String clanTag) {
-        ClanImpl ally = getAlly(clanTag);
-        if (ally != null) {
-            allies.remove(ally);
-            TaskForwarder.sendDeleteClanAlly(getID(), ally.getID());
+        } else {
+            throw new NotDefaultImplementationException(ally.getClass());
         }
     }
 
     public List<ClanImpl> getInvitedAlliesImpl() {
-        return new ArrayList<ClanImpl>(invitedAllies);
-    }
-
-    public void addInvitedAlly(ClanImpl clan) {
-        if (!invitedAllies.contains(clan)) {
-            invitedAllies.add(clan);
-        }
-    }
-
-    public ClanImpl getInvitedAlly(String clanTag) {
-        for (ClanImpl ally : getInvitedAlliesImpl()) {
-            if (ally.getTag().toLowerCase().equals(clanTag.toLowerCase())) {
-                return ally;
-            }
-        }
-        return null;
-    }
-
-    public void removeInvitedAlly(String clanTag) {
-        ClanImpl ally = getAlly(clanTag);
-        if (ally != null) {
-            invitedAllies.remove(ally);
-        }
+        return new ArrayList<>(invitedAllies);
     }
 
     public void setInvitingAlly(ClanImpl clan) {
@@ -615,16 +588,6 @@ public class ClanImpl implements Clan, Cloneable {
     @Override
     public boolean isAllowingAllyInvites() {
         return allowAllyInvites;
-    }
-
-    @Override
-    public boolean isClanAllyOfThisClan(String clanTag) {
-        for (ClanImpl ally : getAlliesImpl()) {
-            if (ally.getTag().toLowerCase().equals(clanTag.toLowerCase())) {
-                return true;
-            }
-        }
-        return false;
     }
 
     @Override

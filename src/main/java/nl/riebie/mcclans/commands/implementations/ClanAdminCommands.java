@@ -142,7 +142,7 @@ public class ClanAdminCommands {
         ClansImpl clansImpl = ClansImpl.getInstance();
 
         Messages.sendBroadcastMessageClanDisbandedBy(clan.getName(), clan.getTagColored(), commandSource.getName());
-        clansImpl.disbandClan(clan.getTag());
+        clansImpl.disbandClan(clan);
     }
 
     @Command(name = "home", description = "Teleport to a clan home", isPlayerOnly = true, spongePermission = "mcclans.admin.home")
