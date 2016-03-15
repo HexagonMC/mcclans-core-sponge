@@ -23,7 +23,7 @@
 package nl.riebie.mcclans;
 
 import com.google.inject.Inject;
-import nl.riebie.mcclans.api.Clans;
+import nl.riebie.mcclans.api.ClanService;
 import nl.riebie.mcclans.commands.CommandRoot;
 import nl.riebie.mcclans.commands.implementations.ClanCommands;
 import nl.riebie.mcclans.config.Config;
@@ -74,7 +74,7 @@ public class MCClans {
     @Listener
     public void onPreInitialize(GamePreInitializationEvent event) {
         stats.start();
-        Sponge.getServiceManager().setProvider(this, Clans.class, ClansImpl.getInstance());
+        Sponge.getServiceManager().setProvider(this, ClanService.class, ClansImpl.getInstance());
     }
 
     @Listener

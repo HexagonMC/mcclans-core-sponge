@@ -30,7 +30,7 @@ import java.util.UUID;
 /**
  * Created by Kippers on 19-1-2016.
  */
-public interface Clans {
+public interface ClanService {
     /**
      * Create a Clan
      *

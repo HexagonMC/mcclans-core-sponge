@@ -24,7 +24,7 @@ package nl.riebie.mcclans;
 
 import nl.riebie.mcclans.api.Clan;
 import nl.riebie.mcclans.api.ClanPlayer;
-import nl.riebie.mcclans.api.Clans;
+import nl.riebie.mcclans.api.ClanService;
 import nl.riebie.mcclans.api.events.ClanMemberJoinEvent;
 import nl.riebie.mcclans.api.events.ClanMemberLeaveEvent;
 import nl.riebie.mcclans.api.exceptions.NotDefaultImplementationException;
@@ -46,7 +46,7 @@ import java.util.*;
 /**
  * Created by Kippers on 19-1-2016.
  */
-public class ClansImpl implements Clans {
+public class ClansImpl implements ClanService {
 
     private Map<String, ClanImpl> clans = new HashMap<String, ClanImpl>();
     private Map<UUID, ClanPlayerImpl> clanPlayers = new HashMap<UUID, ClanPlayerImpl>();
