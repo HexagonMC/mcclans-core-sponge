@@ -1,2 +1,3 @@
 rootProject.name = 'MCClans'
+include 'mcclans-api'
 
