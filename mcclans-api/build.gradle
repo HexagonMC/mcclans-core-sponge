@@ -1,5 +1,5 @@
 group 'nl.riebie'
-version '0.1'
+version rootProject.version
 
 apply plugin: 'java'
 
@@ -11,6 +11,10 @@ repositories {
         name = 'sponge'
         url = 'http://repo.spongepowered.org/maven'
     }
+}
+
+jar {
+    archiveName = "MCClans-API-" + project.version + '.jar'
 }
 
 dependencies {
