@@ -13,6 +13,10 @@ repositories {
     }
 }
 
+jar {
+    archiveName = "MCClans-API-" + project.version + '.jar'
+}
+
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.11'
     compile 'org.spongepowered:spongeapi:4.0.2'
