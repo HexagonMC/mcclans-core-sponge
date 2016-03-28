@@ -65,6 +65,10 @@ public class DatabaseSaver extends DataSaver {
     protected void saveStarted() throws Exception {
         databaseConnectionOwner.startTransaction();
         DatabaseHandler.getInstance().truncateDatabase();
+
+        // Store data version
+        PreparedStatement query = getInsertDataVersionQuery(DatabaseHandler.CURRENT_DATA_VERSION);
+        databaseConnectionOwner.executeTransactionStatement(query);
     }
 
     @Override
@@ -75,6 +79,16 @@ public class DatabaseSaver extends DataSaver {
     @Override
     protected void saveCancelled() {
         databaseConnectionOwner.cancelTransaction();
+    }
+
+    public static PreparedStatement getInsertDataVersionQuery(int dataVersion) {
+        return QueryGenerator.createInsertQuery(
+                "mcc_dataversion",
+                databaseConnectionOwner.getConnection()
+        ).value(
+                "dataversion",
+                dataVersion
+        ).create();
     }
 
     public static PreparedStatement getInsertClanPlayerQuery(ClanPlayerImpl clanPlayer) {

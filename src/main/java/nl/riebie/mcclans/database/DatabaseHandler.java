@@ -22,28 +22,31 @@
 
 package nl.riebie.mcclans.database;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import nl.riebie.mcclans.ClansImpl;
 import nl.riebie.mcclans.MCClans;
 import nl.riebie.mcclans.clan.ClanImpl;
 import nl.riebie.mcclans.config.Config;
 import nl.riebie.mcclans.database.implementations.DatabaseLoader;
 import nl.riebie.mcclans.database.implementations.DatabaseSaver;
-import nl.riebie.mcclans.database.implementations.XmlLoader;
-import nl.riebie.mcclans.database.implementations.XmlSaver;
+import nl.riebie.mcclans.database.implementations.JsonLoader;
+import nl.riebie.mcclans.database.implementations.JsonSaver;
 import nl.riebie.mcclans.database.interfaces.DataLoader;
 import nl.riebie.mcclans.database.interfaces.DataSaver;
 import nl.riebie.mcclans.player.ClanPlayerImpl;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.scheduler.Task;
 
-import javax.security.auth.login.Configuration;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DatabaseHandler {
 
+    public static final int CURRENT_DATA_VERSION = 1;
+
     private List<ClanPlayerImpl> markedClanPlayers = new ArrayList<ClanPlayerImpl>();
+
+    private final String CREATE_TABLE_DATAVERSION_QUERY = "CREATE TABLE IF NOT EXISTS `mcc_dataversion` " + "( "
+            + "`dataversion` INT(11) NOT NULL " + "PRIMARY KEY (`dataversion`) " + ") ENGINE=InnoDB;";
 
     private final String CREATE_TABLE_CLANS_QUERY = "CREATE TABLE IF NOT EXISTS `mcc_clans` "
             + "( "
@@ -88,6 +91,7 @@ public class DatabaseHandler {
 
     public void setupDatabase() {
         DatabaseConnectionOwner databaseConnectionOwner = DatabaseConnectionOwner.getInstance();
+        databaseConnectionOwner.executeStatement(CREATE_TABLE_DATAVERSION_QUERY);
         databaseConnectionOwner.executeStatement(CREATE_TABLE_CLANS_QUERY);
         databaseConnectionOwner.executeStatement(CREATE_TABLE_CLANS_ALLIES_QUERY);
         databaseConnectionOwner.executeStatement(CREATE_TABLE_CLANPLAYERS_QUERY);
@@ -96,6 +100,7 @@ public class DatabaseHandler {
 
     public void clearDatabase() {
         DatabaseConnectionOwner databaseConnectionOwner = DatabaseConnectionOwner.getInstance();
+        databaseConnectionOwner.executeStatement("DROP TABLE mcc_dataversion");
         databaseConnectionOwner.executeStatement("DROP TABLE mcc_clans");
         databaseConnectionOwner.executeStatement("DROP TABLE mcc_clans_allies");
         databaseConnectionOwner.executeStatement("DROP TABLE mcc_clanplayers");
@@ -104,6 +109,7 @@ public class DatabaseHandler {
 
     public void truncateDatabase() {
         DatabaseConnectionOwner databaseConnectionOwner = DatabaseConnectionOwner.getInstance();
+        databaseConnectionOwner.executeStatement("DELETE FROM mcc_dataversion");
         databaseConnectionOwner.executeStatement("DELETE FROM mcc_clans");
         databaseConnectionOwner.executeStatement("DELETE FROM mcc_clans_allies");
         databaseConnectionOwner.executeStatement("DELETE FROM mcc_clanplayers");
@@ -115,17 +121,17 @@ public class DatabaseHandler {
         if (Config.getBoolean(Config.USE_DATABASE)) {
             dataSaver = new DatabaseSaver();
         } else {
-            dataSaver = new XmlSaver();
+            dataSaver = new JsonSaver();
         }
         return dataSaver.save();
     }
 
     public boolean load() {
         DataLoader dataLoader;
-        if (Config.getBoolean(Config.USE_DATABASE) && !XmlLoader.loadFilesPresent()) {
+        if (Config.getBoolean(Config.USE_DATABASE) && !JsonLoader.loadFilesPresent()) {
             dataLoader = new DatabaseLoader();
         } else {
-            dataLoader = new XmlLoader();
+            dataLoader = new JsonLoader();
         }
         if (dataLoader.load()) {
             markedClanPlayers = dataLoader.getMarkedClanPlayers();
@@ -155,9 +161,9 @@ public class DatabaseHandler {
         taskBuilder.execute(new Runnable() {
             @Override
             public void run() {
-                XmlSaver xmlSaver = new XmlSaver();
-                xmlSaver.useBackupLocation();
-                xmlSaver.save(clans, clanPlayers);
+                JsonSaver jsonSaver = new JsonSaver();
+                jsonSaver.useBackupLocation();
+                jsonSaver.save(clans, clanPlayers);
                 MCClans.getPlugin().getLogger().info("System backup finished", false);
             }
         });

@@ -28,6 +28,12 @@ import nl.riebie.mcclans.clan.ClanImpl;
 import nl.riebie.mcclans.clan.RankFactory;
 import nl.riebie.mcclans.clan.RankImpl;
 import nl.riebie.mcclans.config.Config;
+import nl.riebie.mcclans.database.DatabaseHandler;
+import nl.riebie.mcclans.database.exceptions.DataException;
+import nl.riebie.mcclans.database.exceptions.DataVersionTooHighException;
+import nl.riebie.mcclans.database.implementations.DatabaseLoader;
+import nl.riebie.mcclans.database.upgrade.DataUpgradeComparator;
+import nl.riebie.mcclans.database.upgrade.interfaces.DataUpgrade;
 import nl.riebie.mcclans.player.ClanPlayerImpl;
 import nl.riebie.mcclans.player.LastOnlineImpl;
 import nl.riebie.mcclans.utils.Utils;
@@ -54,6 +60,8 @@ public abstract class DataLoader {
 
     public boolean load() {
         if (initialize()) {
+            upgradeIfNeeded();
+
             loadClans();
             loadRanks();
             loadClanPlayers();
@@ -80,6 +88,38 @@ public abstract class DataLoader {
     }
 
     protected abstract boolean initialize();
+
+    protected abstract int getDataVersion();
+
+    protected abstract List<DataUpgrade> getDataUpgrades(List<DataUpgrade> dataUpgrades);
+
+    private void upgradeIfNeeded() {
+        int dataVersion = getDataVersion();
+        if (DatabaseHandler.CURRENT_DATA_VERSION > dataVersion) {
+            if (this instanceof DatabaseLoader) {
+                // TODO add database upgrades
+                throw new DataException("Automatic database version upgrades are not currently supported. Follow the documentation to upgrade your data manually") {
+                };
+            }
+
+            MCClans.getPlugin().getLogger().info("Starting data upgrade from version " + dataVersion + " to " + DatabaseHandler.CURRENT_DATA_VERSION);
+
+            List<DataUpgrade> dataUpgrades = new ArrayList<>();
+            for (DataUpgrade dataUpgrade : getDataUpgrades(new ArrayList<>())) {
+                if (dataUpgrade.getVersion() > dataVersion) {
+                    dataUpgrades.add(dataUpgrade);
+                }
+            }
+            // Perform upgrades in order
+            Collections.sort(dataUpgrades, new DataUpgradeComparator());
+            for (DataUpgrade dataUpgrade : dataUpgrades) {
+                dataUpgrade.upgrade();
+                MCClans.getPlugin().getLogger().info("Finished data upgrade to version " + dataUpgrade.getVersion());
+            }
+        } else if (DatabaseHandler.CURRENT_DATA_VERSION < dataVersion) {
+            throw new DataVersionTooHighException(dataVersion, DatabaseHandler.CURRENT_DATA_VERSION);
+        }
+    }
 
     protected abstract void loadClans();
 
