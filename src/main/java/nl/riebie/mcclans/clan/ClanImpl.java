@@ -30,7 +30,7 @@ import nl.riebie.mcclans.api.enums.KillDeathFactor;
 import nl.riebie.mcclans.api.enums.Permission;
 import nl.riebie.mcclans.api.exceptions.NotDefaultImplementationException;
 import nl.riebie.mcclans.config.Config;
-import nl.riebie.mcclans.database.TaskForwarder;
+import nl.riebie.mcclans.persistence.TaskForwarder;
 import nl.riebie.mcclans.events.EventDispatcher;
 import nl.riebie.mcclans.player.ClanPlayerImpl;
 import org.spongepowered.api.text.Text;

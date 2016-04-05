@@ -31,7 +31,7 @@ import nl.riebie.mcclans.commands.annotations.*;
 import nl.riebie.mcclans.commands.constraints.length.LengthConstraints;
 import nl.riebie.mcclans.commands.constraints.regex.RegexConstraints;
 import nl.riebie.mcclans.comparators.MemberComparator;
-import nl.riebie.mcclans.database.DatabaseHandler;
+import nl.riebie.mcclans.persistence.DatabaseHandler;
 import nl.riebie.mcclans.messages.Messages;
 import nl.riebie.mcclans.player.ClanPlayerImpl;
 import nl.riebie.mcclans.table.HorizontalTable;

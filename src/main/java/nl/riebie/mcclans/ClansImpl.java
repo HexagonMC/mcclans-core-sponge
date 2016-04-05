@@ -33,7 +33,7 @@ import nl.riebie.mcclans.clan.RankFactory;
 import nl.riebie.mcclans.clan.RankImpl;
 import nl.riebie.mcclans.comparators.ClanKdrComparator;
 import nl.riebie.mcclans.config.Config;
-import nl.riebie.mcclans.database.TaskForwarder;
+import nl.riebie.mcclans.persistence.TaskForwarder;
 import nl.riebie.mcclans.events.ClanPlayerKillEvent;
 import nl.riebie.mcclans.events.EventDispatcher;
 import nl.riebie.mcclans.player.ClanInvite;

@@ -26,7 +26,6 @@ import nl.riebie.mcclans.ClansImpl;
 import nl.riebie.mcclans.api.enums.KillDeathFactor;
 import nl.riebie.mcclans.commands.annotations.Command;
 import nl.riebie.mcclans.commands.annotations.Parameter;
-import nl.riebie.mcclans.database.DatabaseHandler;
 import nl.riebie.mcclans.messages.Messages;
 import nl.riebie.mcclans.player.ClanPlayerImpl;
 import nl.riebie.mcclans.utils.UUIDUtils;

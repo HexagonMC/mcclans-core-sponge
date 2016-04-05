@@ -28,7 +28,7 @@ import nl.riebie.mcclans.api.exceptions.NotDefaultImplementationException;
 import nl.riebie.mcclans.clan.ClanImpl;
 import nl.riebie.mcclans.clan.RankImpl;
 import nl.riebie.mcclans.config.Config;
-import nl.riebie.mcclans.database.TaskForwarder;
+import nl.riebie.mcclans.persistence.TaskForwarder;
 import nl.riebie.mcclans.api.enums.KillDeathFactor;
 import nl.riebie.mcclans.enums.PlayerChatState;
 import nl.riebie.mcclans.utils.UUIDUtils;
