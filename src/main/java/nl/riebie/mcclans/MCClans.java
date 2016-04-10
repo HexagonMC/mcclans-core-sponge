@@ -27,9 +27,9 @@ import nl.riebie.mcclans.api.ClanService;
 import nl.riebie.mcclans.commands.CommandRoot;
 import nl.riebie.mcclans.commands.implementations.ClanCommands;
 import nl.riebie.mcclans.config.Config;
-import nl.riebie.mcclans.database.DatabaseConnectionOwner;
-import nl.riebie.mcclans.database.DatabaseHandler;
-import nl.riebie.mcclans.database.TaskExecutor;
+import nl.riebie.mcclans.persistence.DatabaseConnectionOwner;
+import nl.riebie.mcclans.persistence.DatabaseHandler;
+import nl.riebie.mcclans.persistence.TaskExecutor;
 import nl.riebie.mcclans.enums.DBMSType;
 import nl.riebie.mcclans.listeners.*;
 import nl.riebie.mcclans.metrics.MetricsWrapper;
@@ -48,6 +48,7 @@ import org.spongepowered.api.service.ProviderRegistration;
 import org.spongepowered.api.service.economy.Currency;
 import org.spongepowered.api.service.economy.EconomyService;
 import org.spongepowered.api.service.user.UserStorageService;
+import org.spongepowered.api.text.Text;
 
 import java.io.File;
 import java.util.List;
@@ -70,6 +71,8 @@ public class MCClans {
 
     @Inject
     public MetricsWrapper stats;
+
+    private boolean loadError = false;
 
     @Listener
     public void onPreInitialize(GamePreInitializationEvent event) {
@@ -114,7 +117,14 @@ public class MCClans {
             DatabaseHandler.getInstance().setupDatabase();
             getLogger().info("Starting load from database...", true);
             long databaseLoadStartTime = System.currentTimeMillis();
-            DatabaseHandler.getInstance().load();
+            try {
+                DatabaseHandler.getInstance().load();
+            } catch (Exception e) {
+                loadError = true;
+                getLogger().error("MCClans: Fatal error during data load: " + e.getMessage());
+                Sponge.getServer().shutdown(Text.of("MCClans: Fatal error during data load!"));
+                throw e;
+            }
             getLogger().info("Finished loading in: " + (System.currentTimeMillis() - databaseLoadStartTime) + "ms", true);
             DatabaseHandler.getInstance().removeMarkedInactiveClanPlayers();
             getLogger().info("Database updater starting...", false);
@@ -123,13 +133,20 @@ public class MCClans {
             }
             registerDatabasePollingTask();
         } else {
-            getLogger().info("Starting load from xml...", true);
+            getLogger().info("Starting load from flat file...", true);
             long databaseLoadStartTime = System.currentTimeMillis();
-            if (DatabaseHandler.getInstance().load()) {
-                getLogger().info("Finished loading in: " + (System.currentTimeMillis() - databaseLoadStartTime) + "ms", true);
-                DatabaseHandler.getInstance().removeMarkedInactiveClanPlayers();
-            } else {
-                getLogger().info("No data loaded from xml", true);
+            try {
+                if (DatabaseHandler.getInstance().load()) {
+                    getLogger().info("Finished loading in: " + (System.currentTimeMillis() - databaseLoadStartTime) + "ms", true);
+                    DatabaseHandler.getInstance().removeMarkedInactiveClanPlayers();
+                } else {
+                    getLogger().info("No data loaded from flat file", true);
+                }
+            } catch (Exception e) {
+                loadError = true;
+                getLogger().error("MCClans: Fatal error during data load: " + e.getMessage());
+                Sponge.getServer().shutdown(Text.of("MCClans: Fatal error during data load!"));
+                throw e;
             }
         }
 
@@ -150,7 +167,7 @@ public class MCClans {
         CommandManager cmdService = Sponge.getCommandManager();
         nl.riebie.mcclans.commands.CommandManager commandManager = new nl.riebie.mcclans.commands.CommandManager();
         List<CommandRoot> commandRoots = commandManager.registerCommandStructure("clan", ClanCommands.class);
-        for(CommandRoot commandRoot : commandRoots) {
+        for (CommandRoot commandRoot : commandRoots) {
             cmdService.register(this, commandRoot, commandRoot.getRoot());
         }
     }
@@ -165,9 +182,20 @@ public class MCClans {
 
     @Listener
     public void onServerStop(GameStoppingServerEvent event) {
+        if (loadError) {
+            if (Config.getBoolean(Config.USE_DATABASE)) {
+                TaskExecutor.getInstance().terminate();
+                DatabaseConnectionOwner.getInstance().close();
+            }
+
+            // Do not save data if loading failed, to prevent overwriting good data
+            return;
+        }
+
         if (Config.getBoolean(Config.USE_DATABASE)) {
             getLogger().info("Database updater shutting down...", false);
             TaskExecutor.getInstance().terminate();
+
             getLogger().info("Database updater successfully shut down", false);
             getLogger().info("Starting save to database...", true);
             long databaseSaveStartTime = System.currentTimeMillis();
@@ -178,18 +206,18 @@ public class MCClans {
             }
             DatabaseConnectionOwner.getInstance().close();
         } else {
-            getLogger().info("Starting save to xml...", true);
+            getLogger().info("Starting save to flat file..", true);
             long databaseSaveStartTime = System.currentTimeMillis();
             if (DatabaseHandler.getInstance().save()) {
-                getLogger().info("Successfully saved to xml in: " + (System.currentTimeMillis() - databaseSaveStartTime) + "ms", true);
+                getLogger().info("Successfully saved to flat file in: " + (System.currentTimeMillis() - databaseSaveStartTime) + "ms", true);
             } else {
-                getLogger().error("Error saving xml!", true);
+                getLogger().error("Error saving flat file!", true);
             }
         }
     }
 
     private void registerBackupTask() {
-        File backupFolder = new File(getXmlDataFolder(), "backup");
+        File backupFolder = new File(getDataFolder(), "backup");
         File lastBackup = FileUtils.getLastModifiedFileInFolder(backupFolder);
         long nextBackupInTicks;
         if (lastBackup != null) {
@@ -240,7 +268,7 @@ public class MCClans {
         return plugin;
     }
 
-    public File getXmlDataFolder() {
+    public File getDataFolder() {
         return new File(configDir, "data");
     }
 

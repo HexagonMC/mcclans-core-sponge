@@ -25,7 +25,7 @@ package nl.riebie.mcclans.clan;
 import nl.riebie.mcclans.api.Rank;
 import nl.riebie.mcclans.api.enums.Permission;
 import nl.riebie.mcclans.api.enums.PermissionModifyResponse;
-import nl.riebie.mcclans.database.TaskForwarder;
+import nl.riebie.mcclans.persistence.TaskForwarder;
 
 import java.util.ArrayList;
 import java.util.List;
