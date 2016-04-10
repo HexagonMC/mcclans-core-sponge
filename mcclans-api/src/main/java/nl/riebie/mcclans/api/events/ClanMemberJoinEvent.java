@@ -24,6 +24,8 @@ package nl.riebie.mcclans.api.events;
 
 import nl.riebie.mcclans.api.Clan;
 import nl.riebie.mcclans.api.ClanPlayer;
+import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.cause.NamedCause;
 
 /**
  * Created by Kippers on 19-1-2016.
@@ -34,6 +36,7 @@ public class ClanMemberJoinEvent extends ClanEvent {
     private ClanPlayer clanMember;
 
     public ClanMemberJoinEvent(Clan clan, ClanPlayer clanMember) {
+        super(Cause.of(NamedCause.source(clanMember)));
         this.clan = clan;
         this.clanMember = clanMember;
     }

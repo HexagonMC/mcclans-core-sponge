@@ -1,5 +1,7 @@
 package nl.riebie.mcclans.api.permissions;
 
+import java.util.List;
+
 /**
  * Created by riebie on 10/04/2016.
  */
@@ -29,4 +31,11 @@ public interface ClanPermissionManager {
      * @return the ClanPermission for a given name
      */
     ClanPermission getClanPermission(String name);
+
+    /**
+     * Get all the active ClanPermissions
+     *
+     * @return a list of all the active ClanPermissions
+     */
+    List<ClanPermission> getClanPermissions();
 }

@@ -23,7 +23,6 @@
 package nl.riebie.mcclans.commands.implementations;
 
 import nl.riebie.mcclans.ClansImpl;
-import nl.riebie.mcclans.api.enums.Permission;
 import nl.riebie.mcclans.clan.ClanImpl;
 import nl.riebie.mcclans.clan.RankFactory;
 import nl.riebie.mcclans.clan.RankImpl;
@@ -184,7 +183,7 @@ public class ClanAdminCommands {
             invitedClanPlayer.inviteToClan(clan);
             clan.addInvitedPlayer(invitedClanPlayer);
             Messages.sendInvitedToClan(player, clan.getName(), clan.getTagColored());
-            Messages.sendClanBroadcastMessagePlayerInvitedToTheClan(clan, player.getName(), commandSource.getName(), Permission.invite);
+            Messages.sendClanBroadcastMessagePlayerInvitedToTheClan(clan, player.getName(), commandSource.getName(), "invite");
         }
     }
 

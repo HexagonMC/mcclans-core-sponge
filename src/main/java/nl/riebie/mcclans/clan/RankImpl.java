@@ -22,9 +22,10 @@
 
 package nl.riebie.mcclans.clan;
 
+import nl.riebie.mcclans.ClansImpl;
 import nl.riebie.mcclans.api.Rank;
-import nl.riebie.mcclans.api.enums.Permission;
 import nl.riebie.mcclans.api.enums.PermissionModifyResponse;
+import nl.riebie.mcclans.api.permissions.ClanPermissionManager;
 import nl.riebie.mcclans.persistence.TaskForwarder;
 
 import java.util.ArrayList;
@@ -36,7 +37,7 @@ import java.util.List;
 public class RankImpl implements Rank {
     private int rankID;
     private String name;
-    private List<Permission> permissions = new ArrayList<Permission>();
+    private List<String> permissions = new ArrayList<>();
     private boolean changeable;
 
     private RankImpl(Builder builder) {
@@ -61,19 +62,19 @@ public class RankImpl implements Rank {
     }
 
     @Override
-    public List<Permission> getPermissions() {
-        return new ArrayList<>(permissions);
+    public List<String> getPermissions() {
+        return permissions;
     }
 
     public String getPermissionsAsString() {
         String permissions = "";
         int i = 0;
-        List<Permission> permissionList = getPermissions();
-        for (Permission perm : permissionList) {
+        List<String> permissionList = getPermissions();
+        for (String perm : permissionList) {
             if (i != 0) {
                 permissions += ",";
             }
-            permissions += perm.name();
+            permissions += perm;
             i++;
         }
         return permissions;
@@ -81,49 +82,22 @@ public class RankImpl implements Rank {
 
     @Override
     public PermissionModifyResponse addPermission(String permission) {
-        if (Permission.isUsablePermission(permission)) {
-            Permission permEnum = Permission.valueOf(permission);
-            if (hasPermission(permEnum)) {
+        ClanPermissionManager clanPermissionManager = ClansImpl.getInstance().getClanPermissionManager();
+        if (clanPermissionManager.isActiveClanPermission(permission)) {
+            if (hasPermission(permission)) {
                 return PermissionModifyResponse.ALREADY_CONTAINS_PERMISSION;
             } else {
-                permissions.add(permEnum);
+                permissions.add(permission.toLowerCase());
                 TaskForwarder.sendUpdateRank(this);
                 return PermissionModifyResponse.SUCCESSFULLY_MODIFIED;
             }
         } else {
             return PermissionModifyResponse.NOT_A_VALID_PERMISSION;
-        }
-    }
-
-    @Override
-    public PermissionModifyResponse addPermission(Permission permission) {
-        if (hasPermission(permission)) {
-            return PermissionModifyResponse.ALREADY_CONTAINS_PERMISSION;
-        } else {
-            permissions.add(permission);
-            TaskForwarder.sendUpdateRank(this);
-            return PermissionModifyResponse.SUCCESSFULLY_MODIFIED;
         }
     }
 
     @Override
     public PermissionModifyResponse removePermission(String permission) {
-        if (Permission.isUsablePermission(permission)) {
-            Permission permEnum = Permission.valueOf(permission);
-            if (hasPermission(permEnum)) {
-                permissions.remove(permEnum);
-                TaskForwarder.sendUpdateRank(this);
-                return PermissionModifyResponse.SUCCESSFULLY_MODIFIED;
-            } else {
-                return PermissionModifyResponse.DOES_NOT_CONTAIN_PERMISSION;
-            }
-        } else {
-            return PermissionModifyResponse.NOT_A_VALID_PERMISSION;
-        }
-    }
-
-    @Override
-    public PermissionModifyResponse removePermission(Permission permission) {
         if (hasPermission(permission)) {
             permissions.remove(permission);
             TaskForwarder.sendUpdateRank(this);
@@ -134,15 +108,10 @@ public class RankImpl implements Rank {
     }
 
     @Override
-    public boolean hasPermission(Permission permission) {
-        return permissions.contains(permission);
-    }
-
-    @Override
     public boolean hasPermission(String permission) {
-        if (Permission.isUsablePermission(permission)) {
-            Permission permEnum = Permission.valueOf(permission);
-            return hasPermission(permEnum);
+        ClanPermissionManager clanPermissionManager = ClansImpl.getInstance().getClanPermissionManager();
+        if (clanPermissionManager.isActiveClanPermission(permission)) {
+            return permissions.contains(permission.toLowerCase());
         }
         return false;
     }

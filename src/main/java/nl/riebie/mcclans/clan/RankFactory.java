@@ -23,7 +23,6 @@
 package nl.riebie.mcclans.clan;
 
 import nl.riebie.mcclans.ClansImpl;
-import nl.riebie.mcclans.api.enums.Permission;
 
 /**
  * Created by Kippers on 19-1-2016.
@@ -51,36 +50,36 @@ public class RankFactory {
     public RankImpl createOwner() {
         if (owner == null) {
             owner = new RankImpl.Builder(OWNER_ID, OWNER_IDENTIFIER).unchangeable().build();
-            owner.addPermission(Permission.home.name());
-            owner.addPermission(Permission.sethome.name());
-            owner.addPermission(Permission.invite.name());
-            owner.addPermission(Permission.remove.name());
-            owner.addPermission(Permission.disband.name());
-            owner.addPermission(Permission.friendlyfire.name());
-            owner.addPermission(Permission.coords.name());
-            owner.addPermission(Permission.tag.name());
-            owner.addPermission(Permission.rank.name());
-            owner.addPermission(Permission.setrank.name());
-            owner.addPermission(Permission.ally.name());
-            owner.addPermission(Permission.clanchat.name());
-            owner.addPermission(Permission.allychat.name());
+            owner.addPermission("home");
+            owner.addPermission("sethome");
+            owner.addPermission("invite");
+            owner.addPermission("remove");
+            owner.addPermission("disband");
+            owner.addPermission("friendlyfire");
+            owner.addPermission("coords");
+            owner.addPermission("tag");
+            owner.addPermission("rank");
+            owner.addPermission("setrank");
+            owner.addPermission("ally");
+            owner.addPermission("clanchat");
+            owner.addPermission("allychat");
         }
         return owner;
     }
 
     public RankImpl createMember() {
         RankImpl rank = new RankImpl.Builder(ClansImpl.getInstance().getNextAvailableRankID(), MEMBER_IDENTIFIER).build();
-        rank.addPermission(Permission.home.name());
-        rank.addPermission(Permission.coords.name());
-        rank.addPermission(Permission.clanchat.name());
-        rank.addPermission(Permission.allychat.name());
+        rank.addPermission("home");
+        rank.addPermission("coords");
+        rank.addPermission("clanchat");
+        rank.addPermission("allychat");
         return rank;
     }
 
     public RankImpl createRecruit() {
         if (recruit == null) {
             recruit = new RankImpl.Builder(RECRUIT_ID, RECRUIT_IDENTIFIER).unchangeable().build();
-            recruit.addPermission(Permission.clanchat.name());
+            recruit.addPermission("clanchat");
         }
 
         return recruit;

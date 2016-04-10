@@ -22,8 +22,8 @@
 
 package nl.riebie.mcclans.api;
 
-import nl.riebie.mcclans.api.enums.Permission;
 import nl.riebie.mcclans.api.enums.PermissionModifyResponse;
+import nl.riebie.mcclans.api.permissions.ClanPermission;
 
 import java.util.List;
 
@@ -43,7 +43,7 @@ public interface Rank {
      *
      * @return a List containing all the Permissions of this Rank
      */
-    List<Permission> getPermissions();
+    List<String> getPermissions();
 
     /**
      * Add a permission to this Rank
@@ -54,14 +54,6 @@ public interface Rank {
     PermissionModifyResponse addPermission(String permission);
 
     /**
-     * Add a permission to this Rank
-     *
-     * @param permission a permission
-     * @return PermissionModifyResponse enum value
-     */
-    PermissionModifyResponse addPermission(Permission permission);
-
-    /**
      * Remove a permission from this Rank
      *
      * @param permission the name of a permission
@@ -69,13 +61,6 @@ public interface Rank {
      */
     PermissionModifyResponse removePermission(String permission);
 
-    /**
-     * Remove a permission from this Rank
-     *
-     * @param permission a permission
-     * @return PermissionModifyResponse enum value
-     */
-    PermissionModifyResponse removePermission(Permission permission);
 
 
     /**
@@ -86,11 +71,4 @@ public interface Rank {
      */
     boolean hasPermission(String permission);
 
-    /**
-     * Check if this Rank contains the given permission
-     *
-     * @param permission a Permission enum value
-     * @return true if the Rank contains the given Permission
-     */
-    boolean hasPermission(Permission permission);
 }

@@ -26,7 +26,7 @@ import nl.riebie.mcclans.ClansImpl;
 import nl.riebie.mcclans.api.Clan;
 import nl.riebie.mcclans.api.ClanPlayer;
 import nl.riebie.mcclans.api.CommandSender;
-import nl.riebie.mcclans.api.enums.Permission;
+import nl.riebie.mcclans.api.permissions.ClanPermission;
 import nl.riebie.mcclans.clan.ClanImpl;
 import nl.riebie.mcclans.commands.filledparameters.*;
 import nl.riebie.mcclans.commands.annotations.*;
@@ -83,7 +83,7 @@ public class CommandManager {
         registerParameterValidator(new FloatParser(), "decimal number", float.class, Float.class);
         registerParameterValidator(new BooleanParser(), "value (on/off)", boolean.class, Boolean.class);
 
-        registerParameterValidator(new PermissionParser(), "permission", Permission.class);
+        registerParameterValidator(new PermissionParser(), "permission", ClanPermission.class);
         registerParameterValidator(new ToggleParser(), "value (on/off/toggle)", Toggle.class);
         registerParameterValidator(new ClanParser(), "clanTag", Clan.class, ClanImpl.class);
         registerParameterValidator(new ClanPlayerParser(), "player name", ClanPlayer.class, ClanPlayerImpl.class);
@@ -303,9 +303,9 @@ public class CommandManager {
                 commandSource.sendMessage(Text.of("This command can only be used of you are a member of a clan"));
                 return;
             }
-            Permission permission = filledCommand.getClanPermission();
-            if (permission != Permission.none && !commandSender.checkPermission(permission)) {
-                Messages.sendYouDoNotHaveTheRequiredPermission(commandSource, permission.name());
+            String permission = filledCommand.getClanPermission();
+            if (!permission.equals("none") && !commandSender.checkPermission(permission)) {
+                Messages.sendYouDoNotHaveTheRequiredPermission(commandSource, permission);
                 return;
             }
             if (filledCommand.hasChildren()) {

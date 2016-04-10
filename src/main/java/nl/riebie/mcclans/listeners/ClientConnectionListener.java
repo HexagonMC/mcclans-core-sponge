@@ -24,7 +24,6 @@ package nl.riebie.mcclans.listeners;
 
 import nl.riebie.mcclans.ClansImpl;
 import nl.riebie.mcclans.MCClans;
-import nl.riebie.mcclans.api.enums.Permission;
 import nl.riebie.mcclans.clan.ClanImpl;
 import nl.riebie.mcclans.messages.Messages;
 import nl.riebie.mcclans.player.ClanInvite;
@@ -62,7 +61,7 @@ public class ClientConnectionListener {
             // Check if player's clan has a pending ally invite
             ClanImpl clan = clanPlayer.getClan();
             if (clan != null) {
-                if (clanPlayer.getRank().hasPermission(Permission.ally)) {
+                if (clanPlayer.getRank().hasPermission("ally")) {
                     final ClanImpl invitingAlly = clan.getInvitingAlly();
                     if (invitingAlly != null) {
                         Task.Builder taskBuilder = Sponge.getScheduler().createTaskBuilder();

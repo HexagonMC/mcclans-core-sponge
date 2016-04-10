@@ -22,7 +22,6 @@
 
 package nl.riebie.mcclans.commands.implementations;
 
-import nl.riebie.mcclans.api.enums.Permission;
 import nl.riebie.mcclans.clan.ClanImpl;
 import nl.riebie.mcclans.commands.Toggle;
 import nl.riebie.mcclans.commands.annotations.Command;
@@ -39,7 +38,7 @@ public class ClanFriendlyFireCommands {
     private final static String CLAN_FRIENDLY_FIRE_DESCRIPTION = "Toggle the clan's friendly fire protection";
     private final static String PLAYER_FRIENDLY_FIRE_DESCRIPTION = "Toggle your personal friendly fire protection";
 
-    @Command(name = "clan", description = CLAN_FRIENDLY_FIRE_DESCRIPTION, isPlayerOnly = true, isClanOnly = true, clanPermission = Permission.friendlyfire, spongePermission = "mcclans.user.friendlyfire.clan")
+    @Command(name = "clan", description = CLAN_FRIENDLY_FIRE_DESCRIPTION, isPlayerOnly = true, isClanOnly = true, clanPermission = "friendlyfire", spongePermission = "mcclans.user.friendlyfire.clan")
     public void clanFriendlyFireCommand(ClanPlayerImpl clanPlayer, @Parameter(name = "toggle") Toggle friendlyFireToggle) {
         ClanImpl clan = clanPlayer.getClan();
         boolean ffProtected = friendlyFireToggle.getBoolean(clan.isFfProtected());

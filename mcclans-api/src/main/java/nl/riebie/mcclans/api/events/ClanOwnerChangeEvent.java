@@ -24,6 +24,8 @@ package nl.riebie.mcclans.api.events;
 
 import nl.riebie.mcclans.api.Clan;
 import nl.riebie.mcclans.api.ClanPlayer;
+import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.cause.NamedCause;
 
 /**
  * Created by Kippers on 19-1-2016.
@@ -35,6 +37,7 @@ public class ClanOwnerChangeEvent extends ClanEvent {
     private ClanPlayer newOwner;
 
     public ClanOwnerChangeEvent(Clan clan, ClanPlayer previousOwner, ClanPlayer newOwner) {
+        super(Cause.of(NamedCause.owner(newOwner)));
         this.clan = clan;
         this.previousOwner = previousOwner;
         this.newOwner = newOwner;

@@ -23,7 +23,6 @@
 package nl.riebie.mcclans.commands.filledparameters;
 
 
-import nl.riebie.mcclans.api.enums.Permission;
 import nl.riebie.mcclans.commands.annotations.Command;
 
 import java.lang.reflect.InvocationTargetException;
@@ -38,7 +37,7 @@ public final class FilledCommand {
 
     private String name;
     private Method method;
-    private Permission clanPermission;
+    private String clanPermission;
     private String spongePermission;
     private String description;
     private List<FilledParameter> parameters = new ArrayList<>();
@@ -147,7 +146,7 @@ public final class FilledCommand {
         return hasPageParameter;
     }
 
-    public Permission getClanPermission() {
+    public String getClanPermission() {
         return clanPermission;
     }
 

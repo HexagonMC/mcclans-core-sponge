@@ -22,8 +22,6 @@
 
 package nl.riebie.mcclans.commands.annotations;
 
-import nl.riebie.mcclans.api.enums.Permission;
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -37,7 +35,7 @@ import java.lang.annotation.Target;
 public @interface Command {
     String name();
     String description() default "";
-    Permission clanPermission() default Permission.none;
+    String clanPermission() default "none";
     boolean isPlayerOnly() default false;
     boolean isClanOnly() default false;
     String spongePermission();

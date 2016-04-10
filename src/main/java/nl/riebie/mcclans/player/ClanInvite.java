@@ -22,7 +22,6 @@
 
 package nl.riebie.mcclans.player;
 
-import nl.riebie.mcclans.api.enums.Permission;
 import nl.riebie.mcclans.clan.ClanImpl;
 import nl.riebie.mcclans.clan.RankFactory;
 import nl.riebie.mcclans.messages.Messages;
@@ -51,7 +50,7 @@ public class ClanInvite {
     public void decline() {
         clan.removeInvitedPlayer(clanPlayer.getName());
         clanPlayer.resetClanInvite();
-        Messages.sendClanBroadcastMessagePlayerDeclinedClanInvite(clan, clanPlayer.getName(), Permission.invite);
+        Messages.sendClanBroadcastMessagePlayerDeclinedClanInvite(clan, clanPlayer.getName(), "invite");
     }
 
     public ClanImpl getClan() {

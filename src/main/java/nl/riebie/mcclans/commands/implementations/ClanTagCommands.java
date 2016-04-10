@@ -22,7 +22,6 @@
 
 package nl.riebie.mcclans.commands.implementations;
 
-import nl.riebie.mcclans.api.enums.Permission;
 import nl.riebie.mcclans.clan.ClanImpl;
 import nl.riebie.mcclans.commands.annotations.Command;
 import nl.riebie.mcclans.commands.annotations.Parameter;
@@ -36,7 +35,7 @@ import org.spongepowered.api.text.format.TextColor;
  */
 public class ClanTagCommands {
 
-    @Command(name = "color", description = "Change the clan tag color", isPlayerOnly = true, isClanOnly = true, clanPermission = Permission.tag, spongePermission = "mcclans.user.tag.color")
+    @Command(name = "color", description = "Change the clan tag color", isPlayerOnly = true, isClanOnly = true, clanPermission = "tag", spongePermission = "mcclans.user.tag.color")
     public void tagColorCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer, @Parameter(name = "tagColor") TextColor textColor) {
         ClanImpl clan = clanPlayer.getClan();
         clan.setTagColor(textColor);

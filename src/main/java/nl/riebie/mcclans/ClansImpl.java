@@ -283,15 +283,15 @@ public class ClansImpl implements ClanService {
 
     @Override
     public List<Clan> getClans() {
-        return new ArrayList<Clan>(clans.values());
+        return new ArrayList<>(clans.values());
     }
 
     public List<ClanImpl> getClanImpls() {
-        return new ArrayList<ClanImpl>(clans.values());
+        return new ArrayList<>(clans.values());
     }
 
     public List<ClanPlayerImpl> getClanPlayerImpls() {
-        List<ClanPlayerImpl> copiedClanPlayers = new ArrayList<ClanPlayerImpl>();
+        List<ClanPlayerImpl> copiedClanPlayers = new ArrayList<>();
         for (ClanPlayerImpl clanPlayer : clanPlayers.values()) {
             if (!clanPlayer.getName().equals("CONSOLE")) {
                 copiedClanPlayers.add(clanPlayer);

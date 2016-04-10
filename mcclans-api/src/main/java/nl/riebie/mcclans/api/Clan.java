@@ -23,7 +23,6 @@
 package nl.riebie.mcclans.api;
 
 import nl.riebie.mcclans.api.enums.KillDeathFactor;
-import nl.riebie.mcclans.api.enums.Permission;
 import nl.riebie.mcclans.api.exceptions.NotDefaultImplementationException;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColor;
@@ -259,7 +258,7 @@ public interface Clan {
      * @param message    the message to be sent
      * @param permission the permission needed by the members to receive this message
      */
-    void sendMessage(Permission permission, Text... message);
+    void sendMessage(String permission, Text... message);
 
     /**
      * Get a list of all the allies of this clan

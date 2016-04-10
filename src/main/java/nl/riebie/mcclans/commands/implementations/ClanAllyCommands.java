@@ -22,7 +22,6 @@
 
 package nl.riebie.mcclans.commands.implementations;
 
-import nl.riebie.mcclans.api.enums.Permission;
 import nl.riebie.mcclans.clan.ClanImpl;
 import nl.riebie.mcclans.commands.Toggle;
 import nl.riebie.mcclans.commands.annotations.Command;
@@ -36,7 +35,7 @@ import org.spongepowered.api.command.CommandSource;
  */
 public class ClanAllyCommands {
 
-    @Command(name = "accept", description = "Accept a pending ally invite", isPlayerOnly = true, isClanOnly = true, clanPermission = Permission.ally, spongePermission = "mcclans.user.ally.accept")
+    @Command(name = "accept", description = "Accept a pending ally invite", isPlayerOnly = true, isClanOnly = true, clanPermission = "ally", spongePermission = "mcclans.user.ally.accept")
     public void allyAcceptCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer) {
         ClanImpl invitedClan = clanPlayer.getClan();
         ClanImpl invitingClan = invitedClan.getInvitingAlly();
@@ -52,7 +51,7 @@ public class ClanAllyCommands {
         }
     }
 
-    @Command(name = "decline", description = "Decline a pending ally invite", isPlayerOnly = true, isClanOnly = true, clanPermission = Permission.ally, spongePermission = "mcclans.user.ally.decline")
+    @Command(name = "decline", description = "Decline a pending ally invite", isPlayerOnly = true, isClanOnly = true, clanPermission =  "ally", spongePermission = "mcclans.user.ally.decline")
     public void allyDeclineCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer) {
         ClanImpl invitedClan = clanPlayer.getClan();
         ClanImpl invitingClan = invitedClan.getInvitingAlly();
@@ -61,13 +60,13 @@ public class ClanAllyCommands {
         } else {
             Messages.sendBasicMessage(commandSource, Messages.ALLY_INVITE_DECLINED);
             invitedClan.resetInvitingAlly();
-            Messages.sendClanBroadcastMessageClanHasDeclinedToBecomeAllies(invitingClan, invitedClan.getName(), Permission.ally);
+            Messages.sendClanBroadcastMessageClanHasDeclinedToBecomeAllies(invitingClan, invitedClan.getName(),  "ally");
             Messages.sendClanBroadcastMessagePlayerHasDeclinedToBecomeAlliesWithClan(invitedClan, clanPlayer.getName(), invitingClan.getName(),
-                    Permission.ally);
+                    "ally");
         }
     }
 
-    @Command(name = "invite", description = "Invite another clan to become an ally", isPlayerOnly = true, isClanOnly = true, clanPermission = Permission.ally, spongePermission = "mcclans.user.ally.invite")
+    @Command(name = "invite", description = "Invite another clan to become an ally", isPlayerOnly = true, isClanOnly = true, clanPermission =  "ally", spongePermission = "mcclans.user.ally.invite")
     public void allyInviteCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer, @Parameter(name = "clanTag") ClanImpl invitedClan) {
         ClanImpl invitingClan = clanPlayer.getClan();
         if (invitingClan.equals(invitedClan)) {
@@ -81,14 +80,14 @@ public class ClanAllyCommands {
         } else {
             invitedClan.setInvitingAlly(invitingClan);
             Messages.sendClanBroadcastMessageClanHasBeenInvitedToBecomeAlliesBy(invitingClan, invitedClan.getName(), clanPlayer.getName(),
-                    Permission.ally);
+                    "ally");
 
             Messages.sendClanBroadcastMessageYourClanHasBeenInvitedToBecomeAlliesWithClan(invitedClan, invitingClan.getName(),
-                    invitingClan.getTagColored(), Permission.ally);
+                    invitingClan.getTagColored(),  "ally");
         }
     }
 
-    @Command(name = "inviteable", description = "Change if the clan is accepting ally invites", isPlayerOnly = true, isClanOnly = true, clanPermission = Permission.ally, spongePermission = "mcclans.user.ally.inviteable")
+    @Command(name = "inviteable", description = "Change if the clan is accepting ally invites", isPlayerOnly = true, isClanOnly = true, clanPermission = "ally", spongePermission = "mcclans.user.ally.inviteable")
     public void allyInviteableCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer, @Parameter(name = "toggle") Toggle toggle) {
         ClanImpl clan = clanPlayer.getClan();
 
@@ -102,7 +101,7 @@ public class ClanAllyCommands {
         }
     }
 
-    @Command(name = "remove", description = "Remove an allied clan", isPlayerOnly = true, isClanOnly = true, clanPermission = Permission.ally, spongePermission = "mcclans.user.ally.remove")
+    @Command(name = "remove", description = "Remove an allied clan", isPlayerOnly = true, isClanOnly = true, clanPermission = "ally", spongePermission = "mcclans.user.ally.remove")
     public void allyRemoveCommand(ClanPlayerImpl clanPlayer, @Parameter(name = "clanTag") ClanImpl ally) {
         ClanImpl clan = clanPlayer.getClan();
         if(clan.isClanAllyOfThisClan(ally)){

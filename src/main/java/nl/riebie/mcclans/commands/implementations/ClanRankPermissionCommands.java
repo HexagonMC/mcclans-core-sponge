@@ -22,8 +22,9 @@
 
 package nl.riebie.mcclans.commands.implementations;
 
-import nl.riebie.mcclans.api.enums.Permission;
+import nl.riebie.mcclans.ClansImpl;
 import nl.riebie.mcclans.api.enums.PermissionModifyResponse;
+import nl.riebie.mcclans.api.permissions.ClanPermission;
 import nl.riebie.mcclans.clan.ClanImpl;
 import nl.riebie.mcclans.clan.RankImpl;
 import nl.riebie.mcclans.commands.annotations.Command;
@@ -44,9 +45,9 @@ import java.util.List;
  */
 public class ClanRankPermissionCommands {
 
-    @Command(name = "add", description = "Adds the given permissions to a rank", isPlayerOnly = true, isClanOnly = true, clanPermission = Permission.rank, spongePermission = "mcclans.user.rank.permission.add")
+    @Command(name = "add", description = "Adds the given permissions to a rank", isPlayerOnly = true, isClanOnly = true, clanPermission = "rank", spongePermission = "mcclans.user.rank.permission.add")
     public void clanRankPermissionAddCommand(CommandSource sender, ClanPlayerImpl clanPlayer, @Parameter(name = "rankName") String rankName,
-                                             @Multiline(listType = Permission.class) @Parameter(name = "permissions") List<Permission> permissions) {
+                                             @Multiline(listType = ClanPermission.class) @Parameter(name = "permissions") List<ClanPermission> permissions) {
 
         ClanImpl clan = clanPlayer.getClan();
         if (clan == null) {
@@ -64,15 +65,15 @@ public class ClanRankPermissionCommands {
         }
 
         Messages.sendRankSuccessfullyModified(sender, rankName);
-        for (Permission permission : permissions) {
-            PermissionModifyResponse response = rank.addPermission(permission);
+        for (ClanPermission permission : permissions) {
+            PermissionModifyResponse response = rank.addPermission(permission.getName());
 
             switch (response) {
                 case ALREADY_CONTAINS_PERMISSION:
-                    Messages.sendAddingPermissionFailedRankAlreadyHasThisPermission(sender, permission.name());
+                    Messages.sendAddingPermissionFailedRankAlreadyHasThisPermission(sender, permission.getName());
                     break;
                 case SUCCESSFULLY_MODIFIED:
-                    Messages.sendSuccessfullyAddedThisPermission(sender, permission.name());
+                    Messages.sendSuccessfullyAddedThisPermission(sender, permission.getName());
                     break;
                 default:
                     break;
@@ -80,9 +81,9 @@ public class ClanRankPermissionCommands {
         }
     }
 
-    @Command(name = "set", description = "Sets the given permissions to a rank", isPlayerOnly = true, isClanOnly = true, clanPermission = Permission.rank, spongePermission = "mcclans.user.rank.permission.set")
+    @Command(name = "set", description = "Sets the given permissions to a rank", isPlayerOnly = true, isClanOnly = true, clanPermission = "rank", spongePermission = "mcclans.user.rank.permission.set")
     public void clanRankPermissionSetCommand(CommandSource sender, ClanPlayerImpl clanPlayer, @Parameter(name = "rankName") String rankName,
-                                             @Multiline(listType = Permission.class) @Parameter(name = "permissions") List<Permission> permissions) {
+                                             @Multiline(listType = ClanPermission.class) @Parameter(name = "permissions") List<ClanPermission> permissions) {
         ClanImpl clan = clanPlayer.getClan();
         if (clan == null) {
             Messages.sendWarningMessage(sender, Messages.YOU_ARE_NOT_IN_A_CLAN);
@@ -100,22 +101,22 @@ public class ClanRankPermissionCommands {
 
         Messages.sendRankSuccessfullyModified(sender, rankName);
 
-        List<Permission> oldPermissions = rank.getPermissions();
+        List<String> oldPermissions = rank.getPermissions();
 
-        for (Permission permission : oldPermissions) {
-            rank.removePermission(permission.name());
+        for (String permission : oldPermissions) {
+            rank.removePermission(permission);
         }
 
 
-        for (Permission permission : permissions) {
-            rank.addPermission(permission);
-            Messages.sendSuccessfullySetThisPermission(sender, permission.name());
+        for (ClanPermission permission : permissions) {
+            rank.addPermission(permission.getName());
+            Messages.sendSuccessfullySetThisPermission(sender, permission.getName());
         }
     }
 
-    @Command(name = "remove", description = "Removes the given permissions from a rank", isPlayerOnly = true, isClanOnly = true, clanPermission = Permission.rank, spongePermission = "mcclans.user.rank.permission.remove")
+    @Command(name = "remove", description = "Removes the given permissions from a rank", isPlayerOnly = true, isClanOnly = true, clanPermission = "rank", spongePermission = "mcclans.user.rank.permission.remove")
     public void canPermissionRemoveCommand(CommandSource sender, ClanPlayerImpl clanPlayer, @Parameter(name = "rankName") String rankName,
-                                           @Multiline(listType = Permission.class) @Parameter(name = "permissions") List<Permission> permissions) {
+                                           @Multiline(listType = String.class) @Parameter(name = "permissions") List<String> permissions) {
         ClanImpl clan = clanPlayer.getClan();
         if (clan == null) {
             Messages.sendWarningMessage(sender, Messages.YOU_ARE_NOT_IN_A_CLAN);
@@ -133,15 +134,15 @@ public class ClanRankPermissionCommands {
 
         Messages.sendRankSuccessfullyModified(sender, rankName);
 
-        for (Permission permission : permissions) {
+        for (String permission : permissions) {
             PermissionModifyResponse response = rank.removePermission(permission);
 
             switch (response) {
                 case DOES_NOT_CONTAIN_PERMISSION:
-                    Messages.sendRemovingPermissionFailedRankDoesNotHaveThisPermission(sender, permission.name());
+                    Messages.sendRemovingPermissionFailedRankDoesNotHaveThisPermission(sender, permission);
                     break;
                 case SUCCESSFULLY_MODIFIED:
-                    Messages.sendSuccessfullyRemovedThisPermission(sender, permission.name());
+                    Messages.sendSuccessfullyRemovedThisPermission(sender, permission);
                     break;
                 default:
                     break;
@@ -151,15 +152,15 @@ public class ClanRankPermissionCommands {
 
     @Command(name = "view", description = "View all available permissions", spongePermission = "mcclans.user.rank.permission.view")
     public void clanPermissonViewCommand(CommandSource sender, @PageParameter int page) {
-        HorizontalTable<Permission> table = new HorizontalTable<>("Permissions", 10,
-                (TableAdapter<Permission>) (row, permission, index) -> {
-                    row.setValue("Permission", Text.of(permission.name()));
+        HorizontalTable<ClanPermission> table = new HorizontalTable<>("Permissions", 10,
+                (TableAdapter<ClanPermission>) (row, permission, index) -> {
+                    row.setValue("Permission", Text.of(permission.getName()));
                     row.setValue("Description", Text.of(permission.getDescription()));
                 });
         table.defineColumn("Permission", 20);
         table.defineColumn("Description", 20);
 
-        List<Permission> permissions = Permission.getUsablePermissions();
+        List<ClanPermission> permissions = ClansImpl.getInstance().getClanPermissionManager().getClanPermissions();
 
         table.draw(permissions, page, sender);
     }

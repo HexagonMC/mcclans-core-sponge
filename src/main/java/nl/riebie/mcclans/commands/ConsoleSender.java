@@ -23,7 +23,6 @@
 package nl.riebie.mcclans.commands;
 
 import nl.riebie.mcclans.api.CommandSender;
-import nl.riebie.mcclans.api.enums.Permission;
 import org.spongepowered.api.command.source.ConsoleSource;
 import org.spongepowered.api.text.Text;
 
@@ -44,7 +43,7 @@ public class ConsoleSender implements CommandSender {
     }
 
     @Override
-    public boolean checkPermission(Permission permission) {
+    public boolean checkPermission(String permission) {
         return true;
     }
 }

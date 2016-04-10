@@ -23,7 +23,6 @@
 package nl.riebie.mcclans.player;
 
 import nl.riebie.mcclans.api.*;
-import nl.riebie.mcclans.api.enums.Permission;
 import nl.riebie.mcclans.api.exceptions.NotDefaultImplementationException;
 import nl.riebie.mcclans.clan.ClanImpl;
 import nl.riebie.mcclans.clan.RankImpl;
@@ -178,7 +177,7 @@ public class ClanPlayerImpl implements ClanPlayer, Cloneable, CommandSender {
     }
 
     @Override
-    public boolean checkPermission(Permission permission) {
+    public boolean checkPermission(String permission) {
         Rank rank = getRank();
         if (rank != null) {
             return rank.hasPermission(permission);

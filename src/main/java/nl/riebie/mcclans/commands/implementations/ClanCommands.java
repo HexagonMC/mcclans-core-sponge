@@ -26,7 +26,6 @@ import nl.riebie.mcclans.ClansImpl;
 import nl.riebie.mcclans.MCClans;
 import nl.riebie.mcclans.api.KillDeath;
 import nl.riebie.mcclans.api.enums.KillDeathFactor;
-import nl.riebie.mcclans.api.enums.Permission;
 import nl.riebie.mcclans.clan.ClanImpl;
 import nl.riebie.mcclans.clan.RankFactory;
 import nl.riebie.mcclans.clan.RankImpl;
@@ -173,7 +172,7 @@ public class ClanCommands {
         table.draw(clans, page, commandSource);
     }
 
-    @Command(name = "invite", description = "Invite a player to your clan", isPlayerOnly = true, isClanOnly = true, clanPermission = Permission.invite, spongePermission = "mcclans.user.invite")
+    @Command(name = "invite", description = "Invite a player to your clan", isPlayerOnly = true, isClanOnly = true, clanPermission = "invite", spongePermission = "mcclans.user.invite")
     public void clanInviteCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer, @Parameter(name = "playerName") String playerName) {
         // TODO SPONGE: Check if command is properly and fully implemented
         ClanImpl clan = clanPlayer.getClan();
@@ -204,7 +203,7 @@ public class ClanCommands {
             } else {
                 invitedClanPlayer.inviteToClan(clan);
                 clan.addInvitedPlayer(invitedClanPlayer);
-                Messages.sendClanBroadcastMessagePlayerInvitedToTheClan(clan, invitedClanPlayerName, player.getName(), Permission.invite);
+                Messages.sendClanBroadcastMessagePlayerInvitedToTheClan(clan, invitedClanPlayerName, player.getName(), "invite");
                 if (invitedPlayer != null && invitedPlayer.isOnline()) {
                     Messages.sendInvitedToClan(invitedPlayer, clan.getName(), clan.getTagColored());
                 }
@@ -214,7 +213,7 @@ public class ClanCommands {
         }
     }
 
-    @Command(name = "disband", description = "Disband a clan", isPlayerOnly = true, isClanOnly = true, clanPermission = Permission.disband, spongePermission = "mcclans.user.disband")
+    @Command(name = "disband", description = "Disband a clan", isPlayerOnly = true, isClanOnly = true, clanPermission = "disband", spongePermission = "mcclans.user.disband")
     public void clanDisbandCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer) {
         ClansImpl clansImpl = ClansImpl.getInstance();
         ClanImpl clan = clanPlayer.getClan();
@@ -222,7 +221,7 @@ public class ClanCommands {
         clansImpl.disbandClan(clan);
     }
 
-    @Command(name = "remove", description = "Remove a player from your clan", isPlayerOnly = true, isClanOnly = true, clanPermission = Permission.remove, spongePermission = "mcclans.user.remove")
+    @Command(name = "remove", description = "Remove a player from your clan", isPlayerOnly = true, isClanOnly = true, clanPermission = "remove", spongePermission = "mcclans.user.remove")
     public void clanRemoveCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer, @Parameter(name = "playerName") ClanPlayerImpl toBeRemovedClanPlayer) {
         ClanImpl clan = clanPlayer.getClan();
         if (clan != null) {
@@ -412,7 +411,7 @@ public class ClanCommands {
         }
     }
 
-    @Command(name = "coords", description = "See the coordinates of your clan members", isPlayerOnly = true, isClanOnly = true, clanPermission = Permission.coords, spongePermission = "mcclans.user.coords")
+    @Command(name = "coords", description = "See the coordinates of your clan members", isPlayerOnly = true, isClanOnly = true, clanPermission = "coords", spongePermission = "mcclans.user.coords")
     public void clanCoordsCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer, @PageParameter int page) {
         ClanImpl clan = clanPlayer.getClan();
         List<Player> onlineMembers = new ArrayList<Player>();
@@ -483,7 +482,7 @@ public class ClanCommands {
         table.draw(members, page, commandSource);
     }
 
-    @Command(name = "home", description = "Teleport to your clan home", isPlayerOnly = true, isClanOnly = true, clanPermission = Permission.home, spongePermission = "mcclans.user.home")
+    @Command(name = "home", description = "Teleport to your clan home", isPlayerOnly = true, isClanOnly = true, clanPermission = "home", spongePermission = "mcclans.user.home")
     public void clanHomeCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer) {
         Player player = (Player) commandSource;
         Location<World> teleportLocation = clanPlayer.getClan().getHome();
@@ -515,7 +514,7 @@ public class ClanCommands {
         ).submit(MCClans.getPlugin());
     }
 
-    @Command(name = "sethome", description = "Set the location of your clan home", isPlayerOnly = true, isClanOnly = true, clanPermission = Permission.sethome, spongePermission = "mcclans.user.sethome")
+    @Command(name = "sethome", description = "Set the location of your clan home", isPlayerOnly = true, isClanOnly = true, clanPermission = "sethome", spongePermission = "mcclans.user.sethome")
     public void clanSetHomeCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer) {
         Player player = (Player) commandSource;
         ClanImpl clan = clanPlayer.getClan();

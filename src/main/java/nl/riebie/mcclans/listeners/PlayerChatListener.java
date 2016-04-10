@@ -23,7 +23,6 @@
 package nl.riebie.mcclans.listeners;
 
 import nl.riebie.mcclans.ClansImpl;
-import nl.riebie.mcclans.api.enums.Permission;
 import nl.riebie.mcclans.channels.AllyMessageChannel;
 import nl.riebie.mcclans.channels.ClanMessageChannel;
 import nl.riebie.mcclans.clan.ClanImpl;
@@ -97,7 +96,7 @@ public class PlayerChatListener {
                 }
                 break;
             case CLAN:
-                if (clanPlayer.getRank().hasPermission(Permission.clanchat)) {
+                if (clanPlayer.getRank().hasPermission("clanchat")) {
                     event.setMessage(event.getRawMessage());
                     event.setChannel(ClanMessageChannel.getFor(clanPlayer));
 //                    Text newMessage = Text.join(
@@ -121,11 +120,11 @@ public class PlayerChatListener {
                 } else {
                     event.setCancelled(true);
                     clanPlayer.setChatState(PlayerChatState.GLOBAL);
-                    Messages.sendYouDoNotHaveTheRequiredPermission(player, Permission.clanchat.name());
+                    Messages.sendYouDoNotHaveTheRequiredPermission(player, "clanchat");
                 }
                 break;
             case ALLY:
-                if (clanPlayer.getRank().hasPermission(Permission.allychat)) {
+                if (clanPlayer.getRank().hasPermission("allychat")) {
                     event.setMessage(event.getRawMessage());
                     event.setChannel(AllyMessageChannel.getFor(clanPlayer));
 //                    Text newMessage = Text.join(
@@ -157,7 +156,7 @@ public class PlayerChatListener {
                 } else {
                     event.setCancelled(true);
                     clanPlayer.setChatState(PlayerChatState.GLOBAL);
-                    Messages.sendYouDoNotHaveTheRequiredPermission(player, Permission.allychat.name());
+                    Messages.sendYouDoNotHaveTheRequiredPermission(player, "allychat");
                 }
                 break;
         }

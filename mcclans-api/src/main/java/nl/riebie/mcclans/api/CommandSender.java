@@ -22,7 +22,6 @@
 
 package nl.riebie.mcclans.api;
 
-import nl.riebie.mcclans.api.enums.Permission;
 import org.spongepowered.api.text.Text;
 
 /**
@@ -32,5 +31,5 @@ public interface CommandSender {
 
     void sendMessage(Text... message);
 
-    boolean checkPermission(Permission permission);
+    boolean checkPermission(String permission);
 }

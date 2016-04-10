@@ -24,7 +24,6 @@ package nl.riebie.mcclans.commands.implementations;
 
 import nl.riebie.mcclans.api.KillDeath;
 import nl.riebie.mcclans.api.enums.KillDeathFactor;
-import nl.riebie.mcclans.api.enums.Permission;
 import nl.riebie.mcclans.clan.ClanImpl;
 import nl.riebie.mcclans.clan.RankFactory;
 import nl.riebie.mcclans.clan.RankImpl;
@@ -49,7 +48,7 @@ import java.util.Optional;
  */
 public class ClanPlayerCommands {
 
-    @Command(name = "setrank", description = "Set the rank of a member of your clan", isPlayerOnly = true, isClanOnly = true, clanPermission = Permission.setrank, spongePermission = "mcclans.user.player.info")
+    @Command(name = "setrank", description = "Set the rank of a member of your clan", isPlayerOnly = true, isClanOnly = true, clanPermission = "setrank", spongePermission = "mcclans.user.player.info")
     public void playerSetRankCommand(CommandSource sender, ClanPlayerImpl clanPlayer, @Parameter(name = "playerName") ClanPlayerImpl targetPlayer,
                                      @Parameter(name = "rankName") String rankName) {
 

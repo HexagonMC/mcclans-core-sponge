@@ -23,18 +23,21 @@
 package nl.riebie.mcclans.commands.parsers;
 
 
-import nl.riebie.mcclans.api.enums.Permission;
+import nl.riebie.mcclans.ClansImpl;
+import nl.riebie.mcclans.api.permissions.ClanPermission;
+import nl.riebie.mcclans.api.permissions.ClanPermissionManager;
 import nl.riebie.mcclans.commands.filledparameters.NormalFilledParameter;
 
 /**
  * Created by riebie on 17/01/2016.
  */
-public class PermissionParser implements ParameterParser<Permission> {
+public class PermissionParser implements ParameterParser<ClanPermission> {
 
     @Override
-    public ParseResult<Permission> parseValue(String value, NormalFilledParameter parameter) {
-        if (Permission.contains(value)) {
-            return ParseResult.newSuccessResult(Permission.valueOf(value));
+    public ParseResult<ClanPermission> parseValue(String value, NormalFilledParameter parameter) {
+        ClanPermissionManager clanPermissionManager = ClansImpl.getInstance().getClanPermissionManager();
+        if (clanPermissionManager.isActiveClanPermission(value)) {
+            return ParseResult.newSuccessResult(clanPermissionManager.getClanPermission(value));
         } else {
             return ParseResult.newErrorResult(String.format("%s is not a valid permission", value));
         }

@@ -27,7 +27,6 @@ import nl.riebie.mcclans.api.Clan;
 import nl.riebie.mcclans.api.ClanPlayer;
 import nl.riebie.mcclans.api.Rank;
 import nl.riebie.mcclans.api.enums.KillDeathFactor;
-import nl.riebie.mcclans.api.enums.Permission;
 import nl.riebie.mcclans.api.exceptions.NotDefaultImplementationException;
 import nl.riebie.mcclans.config.Config;
 import nl.riebie.mcclans.persistence.TaskForwarder;
@@ -456,7 +455,7 @@ public class ClanImpl implements Clan, Cloneable {
     }
 
     @Override
-    public void sendMessage(Permission permission, Text... message) {
+    public void sendMessage(String permission, Text... message) {
         for (ClanPlayerImpl clanPlayer : getMembersImpl()) {
             if (clanPlayer.getRank().hasPermission(permission)) {
                 clanPlayer.sendMessage(message);

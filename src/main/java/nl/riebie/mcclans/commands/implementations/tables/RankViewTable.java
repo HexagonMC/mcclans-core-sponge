@@ -25,7 +25,6 @@ package nl.riebie.mcclans.commands.implementations.tables;
 import java.util.ArrayList;
 import java.util.List;
 
-import nl.riebie.mcclans.api.enums.Permission;
 import nl.riebie.mcclans.clan.RankImpl;
 import nl.riebie.mcclans.table.HorizontalTable;
 import nl.riebie.mcclans.table.Row;
@@ -65,11 +64,11 @@ public class RankViewTable {
             public void fillRow(Row row, RankImpl rank, int index) {
                 Text.Builder perms = Text.builder();
                 int i = 0;
-                for (Permission perm : rank.getPermissions()) {
+                for (String perm : rank.getPermissions()) {
                     if (i != 0) {
                         perms.append(Text.of(", "));
                     }
-                    perms.append(Text.builder().color(TextColors.GRAY).append(Text.of(perm.name())).build());
+                    perms.append(Text.builder().color(TextColors.GRAY).append(Text.of(perm)).build());
                     i++;
                 }
                 row.setValue("Rank", Text.of(rank.getName()));

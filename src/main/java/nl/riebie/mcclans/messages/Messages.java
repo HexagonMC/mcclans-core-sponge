@@ -22,7 +22,6 @@
 
 package nl.riebie.mcclans.messages;
 
-import nl.riebie.mcclans.api.enums.Permission;
 import nl.riebie.mcclans.clan.ClanImpl;
 import nl.riebie.mcclans.player.ClanPlayerImpl;
 import nl.riebie.mcclans.utils.Utils;
@@ -173,7 +172,7 @@ public class Messages {
         clan.sendMessage(message);
     }
 
-    public static void sendClanBroadcastMessagePlayerDeclinedClanInvite(ClanImpl clan, String playerName, Permission permission) {
+    public static void sendClanBroadcastMessagePlayerDeclinedClanInvite(ClanImpl clan, String playerName, String permission) {
         Text message = Text.join(
                 Text.builder("Player ").color(BASIC_CHAT_COLOR).build(),
                 Text.builder(playerName).color(BASIC_HIGHLIGHT).build(),
@@ -182,7 +181,7 @@ public class Messages {
         clan.sendMessage(permission, message);
     }
 
-    public static void sendClanBroadcastMessagePlayerInvitedToTheClan(ClanImpl clan, String playerName, String inviterName, Permission permission) {
+    public static void sendClanBroadcastMessagePlayerInvitedToTheClan(ClanImpl clan, String playerName, String inviterName, String permission) {
         Text message = Text.join(
                 Text.builder("Player ").color(BASIC_CHAT_COLOR).build(),
                 Text.builder(playerName).color(BASIC_HIGHLIGHT).build(),
@@ -193,7 +192,7 @@ public class Messages {
     }
 
     public static void sendClanBroadcastMessageClanHasBeenInvitedToBecomeAlliesBy(ClanImpl clan, String clanName, String inviterName,
-                                                                                  Permission permission) {
+                                                                                  String permission) {
         Text message = Text.join(
                 Text.builder("Clan ").color(BASIC_CHAT_COLOR).build(),
                 Text.builder(clanName).color(BASIC_HIGHLIGHT).build(),
@@ -203,7 +202,7 @@ public class Messages {
         clan.sendMessage(permission, message);
     }
 
-    public static void sendClanBroadcastMessageClanHasDeclinedToBecomeAllies(ClanImpl clan, String clanName, Permission permission) {
+    public static void sendClanBroadcastMessageClanHasDeclinedToBecomeAllies(ClanImpl clan, String clanName, String permission) {
         Text message = Text.join(
                 Text.builder("Clan ").color(BASIC_CHAT_COLOR).build(),
                 Text.builder(clanName).color(BASIC_HIGHLIGHT).build(),
@@ -213,7 +212,7 @@ public class Messages {
     }
 
     public static void sendClanBroadcastMessagePlayerHasDeclinedToBecomeAlliesWithClan(ClanImpl clan, String playerName, String clanName,
-                                                                                       Permission permission) {
+                                                                                       String permission) {
         Text message = Text.join(
                 Text.builder("Player ").color(BASIC_CHAT_COLOR).build(),
                 Text.builder(playerName).color(BASIC_HIGHLIGHT).build(),
@@ -224,7 +223,7 @@ public class Messages {
     }
 
     public static void sendClanBroadcastMessageYourClanHasBeenInvitedToBecomeAlliesWithClan(ClanImpl clan, String clanName, Text coloredClanTag,
-                                                                                            Permission permission) {
+                                                                                            String permission) {
         Text message1 = Text.of("");
         Text message2 = Text.join(
                 Text.builder("Your clan has been invited to become allies with ").color(BASIC_CHAT_COLOR).build(),
