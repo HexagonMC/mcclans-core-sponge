@@ -30,22 +30,15 @@ import org.spongepowered.api.event.impl.AbstractEvent;
  * Created by Kippers on 19-1-2016.
  */
 public abstract class ClanEvent extends AbstractEvent {
-//    private static final HandlerList handlers = new HandlerList();
-//
-//    @Override
-//    public HandlerList getHandlers() {
-//        return handlers;
-//    }
-//
-//    public static HandlerList getHandlerList() {
-//        return handlers;
-//    }
+    private final Cause cause;
+
+    public ClanEvent(Cause cause){
+        this.cause = cause;
+    }
 
     @Override
     public Cause getCause() {
-        return Cause.of(
-                NamedCause.of("ClanEvent", this)
-        );
+        return cause;
     }
 
 

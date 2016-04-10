@@ -182,7 +182,7 @@ public class ClansImpl implements ClanService {
                 ownerImpl.setRank(newClan.getRank(RankFactory.getOwnerIdentifier()));
                 ownerImpl.setClan(newClan);
                 clans.put(tag.toLowerCase(), newClan);
-                EventDispatcher.getInstance().dispatchClanCreateEvent(newClan);
+                EventDispatcher.getInstance().dispatchClanCreateEvent(newClan, owner);
                 TaskForwarder.sendInsertClan(newClan);
                 updateClanTagCache();
                 return newClan;

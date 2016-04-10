@@ -42,8 +42,8 @@ public class EventDispatcher {
         return _instance;
     }
 
-    public void dispatchClanCreateEvent(Clan clan) {
-        dispatchEvent(new ClanCreateEvent(clan));
+    public void dispatchClanCreateEvent(Clan clan, ClanPlayer owner) {
+        dispatchEvent(new ClanCreateEvent(clan, owner));
     }
 
     public void dispatchClanDisbandEvent(Clan clan) {
