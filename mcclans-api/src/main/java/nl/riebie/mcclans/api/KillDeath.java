@@ -25,96 +25,29 @@ package nl.riebie.mcclans.api;
 
 import nl.riebie.mcclans.api.enums.KillDeathFactor;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
- * Created by riebie on 13/03/2016.
+ * Created by riebie on 10/04/2016.
  */
-public class KillDeath {
+public interface KillDeath {
+    int getKills(KillDeathFactor factor);
 
-    private Map<KillDeathFactor, Integer> deathsMap = new HashMap<>();
-    private Map<KillDeathFactor, Integer> killsMap = new HashMap<>();
+    int getDeaths(KillDeathFactor factor);
 
-    public int getKills(KillDeathFactor factor) {
-        Integer kills = killsMap.get(factor);
-        return kills == null ? 0 : kills;
-    }
+    void setKills(KillDeathFactor factor, int kills);
 
-    public int getDeaths(KillDeathFactor factor) {
-        Integer deaths = deathsMap.get(factor);
-        return deaths == null ? 0 : deaths;
-    }
+    void setDeaths(KillDeathFactor factor, int deaths);
 
-    public void setKills(KillDeathFactor factor, int kills) {
-        killsMap.put(factor, kills);
-    }
+    void addKill(KillDeathFactor factor);
 
-    public void setDeaths(KillDeathFactor factor, int deaths) {
-        deathsMap.put(factor, deaths);
-    }
+    void addDeath(KillDeathFactor factor);
 
-    public void addKill(KillDeathFactor factor) {
-        Integer kills = killsMap.get(factor);
-        if (kills == null) {
-            killsMap.put(factor, 1);
-        } else {
-            killsMap.put(factor, kills + 1);
-        }
-    }
+    float getKillsWeighted();
 
-    public void addDeath(KillDeathFactor factor) {
-        Integer deaths = deathsMap.get(factor);
-        if (deaths == null) {
-            deathsMap.put(factor, 1);
-        } else {
-            deathsMap.put(factor, deaths + 1);
-        }
-    }
+    float getDeathsWeighted();
 
-    public float getKillsWeighted(){
-        float kills = 0;
-        for (Map.Entry<KillDeathFactor, Integer> entry: killsMap.entrySet()) {
-            kills += entry.getValue() * entry.getKey().getFactor();
-        }
-        return kills;
-    }
+    int getTotalKills();
 
-    public float getDeathsWeighted(){
-        float deaths = 0;
-        for (Map.Entry<KillDeathFactor, Integer> entry: deathsMap.entrySet()) {
-            deaths += entry.getValue() * entry.getKey().getFactor();
-        }
-        return deaths;
-    }
+    int getTotalDeaths();
 
-    public int getTotalKills() {
-        int kills = 0;
-        for (int kill : killsMap.values()) {
-            kills += kill;
-        }
-        return kills;
-    }
-
-    public int getTotalDeaths() {
-        int deaths = 0;
-        for (int death : deathsMap.values()) {
-            deaths += death;
-        }
-        return deaths;
-    }
-
-    public float getKDR(){
-        float kdr;
-        float killsWeighted = getKillsWeighted();
-        float deathsWeighted = getDeathsWeighted();
-        if (deathsWeighted < 1) {
-            deathsWeighted = 1;
-        }
-        kdr = killsWeighted / deathsWeighted;
-
-        int ix = (int) (kdr * 10.0f); // scale it
-        float dbl2 = ((float) ix) / 10.0f;
-        return dbl2;
-    }
+    float getKDR();
 }

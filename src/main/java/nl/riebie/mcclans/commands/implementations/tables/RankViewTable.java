@@ -25,6 +25,7 @@ package nl.riebie.mcclans.commands.implementations.tables;
 import java.util.ArrayList;
 import java.util.List;
 
+import nl.riebie.mcclans.ClansImpl;
 import nl.riebie.mcclans.clan.RankImpl;
 import nl.riebie.mcclans.table.HorizontalTable;
 import nl.riebie.mcclans.table.Row;
@@ -58,7 +59,7 @@ public class RankViewTable {
     public void print() {
         String title = single ? "Clan rank " + rank.getName() : "Clan ranks";
 
-        HorizontalTable<RankImpl> table = new HorizontalTable<RankImpl>(title, 10, new TableAdapter<RankImpl>() {
+        HorizontalTable<RankImpl> table = new HorizontalTable<>(title, 10, new TableAdapter<RankImpl>() {
 
             @Override
             public void fillRow(Row row, RankImpl rank, int index) {
@@ -68,7 +69,12 @@ public class RankViewTable {
                     if (i != 0) {
                         perms.append(Text.of(", "));
                     }
-                    perms.append(Text.builder().color(TextColors.GRAY).append(Text.of(perm)).build());
+                    if(ClansImpl.getInstance().getClanPermissionManager().isActiveClanPermission(perm)){
+                        perms.append(Text.builder().color(TextColors.GRAY).append(Text.of(perm)).build());
+                    } else{
+                        perms.append(Text.builder().color(TextColors.RED).append(Text.of(perm)).build());
+                    }
+
                     i++;
                 }
                 row.setValue("Rank", Text.of(rank.getName()));

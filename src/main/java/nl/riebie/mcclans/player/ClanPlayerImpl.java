@@ -69,7 +69,7 @@ public class ClanPlayerImpl implements ClanPlayer, Cloneable, CommandSender {
         this.clan = builder.clan;
         this.lastKnownName = builder.lastKnownName;
 
-        killDeath = new KillDeath();
+        killDeath = new KillDeathImpl();
         killDeath.setKills(KillDeathFactor.HIGH, builder.killsHigh);
         killDeath.setKills(KillDeathFactor.MEDIUM, builder.killsMedium);
         killDeath.setKills(KillDeathFactor.LOW, builder.killsLow);

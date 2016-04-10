@@ -96,6 +96,10 @@ public class RankImpl implements Rank {
         }
     }
 
+    public void setPermissions(List<String> permissions){
+        this.permissions = permissions;
+    }
+
     @Override
     public PermissionModifyResponse removePermission(String permission) {
         if (hasPermission(permission)) {
