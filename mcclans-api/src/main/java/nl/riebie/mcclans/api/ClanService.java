@@ -23,6 +23,7 @@
 package nl.riebie.mcclans.api;
 
 import nl.riebie.mcclans.api.exceptions.NotDefaultImplementationException;
+import nl.riebie.mcclans.api.permissions.ClanPermissionManager;
 
 import java.util.List;
 import java.util.UUID;
@@ -97,5 +98,12 @@ public interface ClanService {
      * @return true if the given clanTag is free
      */
     boolean tagIsFree(String tag);
+
+    /**
+     * Get the ClanPermissionManager for registering and retrieving ClanPermissions
+     *
+     * @return  the ClanPermissionManager
+     */
+    ClanPermissionManager getClanPermissionManager();
 
 }

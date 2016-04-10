@@ -28,11 +28,13 @@ import nl.riebie.mcclans.api.ClanService;
 import nl.riebie.mcclans.api.events.ClanMemberJoinEvent;
 import nl.riebie.mcclans.api.events.ClanMemberLeaveEvent;
 import nl.riebie.mcclans.api.exceptions.NotDefaultImplementationException;
+import nl.riebie.mcclans.api.permissions.ClanPermissionManager;
 import nl.riebie.mcclans.clan.ClanImpl;
 import nl.riebie.mcclans.clan.RankFactory;
 import nl.riebie.mcclans.clan.RankImpl;
 import nl.riebie.mcclans.comparators.ClanKdrComparator;
 import nl.riebie.mcclans.config.Config;
+import nl.riebie.mcclans.permissions.ClanPermissionManagerImpl;
 import nl.riebie.mcclans.persistence.TaskForwarder;
 import nl.riebie.mcclans.events.ClanPlayerKillEvent;
 import nl.riebie.mcclans.events.EventDispatcher;
@@ -58,6 +60,8 @@ public class ClansImpl implements ClanService {
     private int highestUsedClanID = -1;
     private int highestUsedClanPlayerID = -1;
     private int highestUsedRankID = -1;
+
+    private ClanPermissionManagerImpl clanPermissionManager = new ClanPermissionManagerImpl();
 
     private static ClansImpl instance;
 
@@ -309,6 +313,12 @@ public class ClansImpl implements ClanService {
     @Override
     public boolean tagIsFree(String tag) {
         return !clans.containsKey(tag.toLowerCase());
+    }
+
+
+    @Override
+    public ClanPermissionManagerImpl getClanPermissionManager() {
+        return clanPermissionManager;
     }
 
     public void setClans(Map<String, ClanImpl> clans) {

@@ -27,6 +27,8 @@ import nl.riebie.mcclans.api.ClanService;
 import nl.riebie.mcclans.commands.CommandRoot;
 import nl.riebie.mcclans.commands.implementations.ClanCommands;
 import nl.riebie.mcclans.config.Config;
+import nl.riebie.mcclans.permissions.ClanPermissionImpl;
+import nl.riebie.mcclans.permissions.ClanPermissionManagerImpl;
 import nl.riebie.mcclans.persistence.DatabaseConnectionOwner;
 import nl.riebie.mcclans.persistence.DatabaseHandler;
 import nl.riebie.mcclans.persistence.TaskExecutor;
@@ -62,6 +64,7 @@ public class MCClans {
 
     private static MCClans plugin;
     private ServiceHelper serviceHelper = new ServiceHelper();
+
     @Inject
     private Logger logger;
 
@@ -83,6 +86,8 @@ public class MCClans {
     @Listener
     public void onServerStart(GameStartedServerEvent event) {
         plugin = this;
+
+        ClansImpl.getInstance().getClanPermissionManager().setInitialized();
 
         // Init config
         if (!Config.load(configDir)) {
