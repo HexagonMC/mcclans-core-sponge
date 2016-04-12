@@ -29,25 +29,85 @@ import nl.riebie.mcclans.api.enums.KillDeathFactor;
  * Created by riebie on 10/04/2016.
  */
 public interface KillDeath {
+
+    /**
+     * Get the kills for the provided KillDeathFactor
+     *
+     * @param factor the KillDeathFactor to get the kills for
+     * @return the kills for the provided KillDeathFactor
+     */
     int getKills(KillDeathFactor factor);
 
+    /**
+     * Get the deaths for the provided KillDeathFactor
+     *
+     * @param factor the KillDeathFactor to get the deaths for
+     * @return the deaths for the provided KillDeathFactor
+     */
     int getDeaths(KillDeathFactor factor);
 
+    /**
+     * Set the kills for the provided KillDeathFactor
+     *
+     * @param factor the KillDeathFactor to set the kills for
+     * @param kills the kills for the provided KillDeathFactor
+     */
     void setKills(KillDeathFactor factor, int kills);
 
+    /**
+     * Set the deaths for the provided KillDeathFactor
+     *
+     * @param factor the KillDeathFactor to set the deaths for
+     * @param deaths the deaths for the provided KillDeathFactor
+     */
     void setDeaths(KillDeathFactor factor, int deaths);
 
+    /**
+     * Add a kill for the provided KillDeathFactor
+     *
+     * @param factor the KillDeathFactor to add a kill for
+     */
     void addKill(KillDeathFactor factor);
 
+    /**
+     * Add a death for the provided KillDeathFactor
+     *
+     * @param factor the KillDeathFactor to add a death for
+     */
     void addDeath(KillDeathFactor factor);
 
+    /**
+     * Get the weighted kills
+     *
+     * @return the weighted kills
+     */
     float getKillsWeighted();
 
+    /**
+     * Get the weighted deaths
+     *
+     * @return the weighted deaths
+     */
     float getDeathsWeighted();
 
+    /**
+     * Get the total kills
+     *
+     * @return the total kills
+     */
     int getTotalKills();
 
+    /**
+     * Get the total deaths
+     *
+     * @return the total deaths
+     */
     int getTotalDeaths();
 
+    /**
+     * Get the weighted Kill/Death ratio
+     *
+     * @return the weighted Kill/Death ratio
+     */
     float getKDR();
 }
