@@ -120,7 +120,7 @@ public class Config {
                 ConfigOption.builder(CLAN_TAG_REGEX, "[A-Za-z0-9_]+").build(),
                 ConfigOption.builder(CLAN_TAG_CHARACTERS_MINIMUM, 2).addMinimumNumberConstraint(1).build(),
                 ConfigOption.builder(CLAN_TAG_CHARACTERS_MAXIMUM, 6).addMinimumNumberConstraint(1).build(),
-                ConfigOption.builder(CLAN_NAME_REGEX, "[A-Za-z0-9_ ]+").build(),
+                ConfigOption.builder(CLAN_NAME_REGEX, "[A-Za-z0-9_]+").build(),
                 ConfigOption.builder(CLAN_NAME_CHARACTERS_MINIMUM, 2).addMinimumNumberConstraint(1).build(),
                 ConfigOption.builder(CLAN_NAME_CHARACTERS_MAXIMUM, 30).addMinimumNumberConstraint(1).build()
         ).build();
