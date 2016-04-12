@@ -31,18 +31,19 @@ public class StringParser implements ParameterParser<String> {
 
     @Override
     public ParseResult<String> parseValue(String value, NormalFilledParameter parameter) {
-        if (parameter.getMaximalLength() == -1 || value.length() <= parameter.getMaximalLength()) {
-            if (parameter.getMinimalLength() == -1 || value.length() >= parameter.getMinimalLength()) {
-                if ("".equals(parameter.getRegex()) || value.matches(parameter.getRegex())) {
+        if ("".equals(parameter.getRegex()) || value.matches(parameter.getRegex())) {
+            if (parameter.getMaximalLength() == -1 || value.length() <= parameter.getMaximalLength()) {
+                if (parameter.getMinimalLength() == -1 || value.length() >= parameter.getMinimalLength()) {
                     return ParseResult.newSuccessResult(value);
                 } else {
-                    return ParseResult.newErrorResult(String.format("Value should (%s)", parameter.getRegex()));
+                    return ParseResult.newErrorResult("Supplied parameter too small");
                 }
             } else {
-                return ParseResult.newErrorResult("Supplied parameter too small");
+                return ParseResult.newErrorResult("Supplied parameter too long");
             }
         } else {
-            return ParseResult.newErrorResult("Supplied parameter too long");
+            return ParseResult.newErrorResult(String.format("Value should (%s)", parameter.getRegex()));
+
         }
     }
 }

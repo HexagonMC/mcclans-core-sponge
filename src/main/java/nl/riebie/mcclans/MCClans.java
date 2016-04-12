@@ -27,8 +27,6 @@ import nl.riebie.mcclans.api.ClanService;
 import nl.riebie.mcclans.commands.CommandRoot;
 import nl.riebie.mcclans.commands.implementations.ClanCommands;
 import nl.riebie.mcclans.config.Config;
-import nl.riebie.mcclans.permissions.ClanPermissionImpl;
-import nl.riebie.mcclans.permissions.ClanPermissionManagerImpl;
 import nl.riebie.mcclans.persistence.DatabaseConnectionOwner;
 import nl.riebie.mcclans.persistence.DatabaseHandler;
 import nl.riebie.mcclans.persistence.TaskExecutor;

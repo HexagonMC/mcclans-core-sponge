@@ -339,13 +339,37 @@ public class CommandManager {
                             continue;
                         } else {
                             displayParameterHelpPage(commandSource, filledCommand);
-//                            commandSender.sendMessage(Messages.getWarningMessage("Parameter should be supplied")); //TODO Sponge real error message
                             return;
                         }
                     }
                     if (normalFilledParameter.isMultiline()) {
                         Class<?> listType = normalFilledParameter.getListType();
-                        if (listType != Void.class) {
+                        if (listType == Void.class) {
+                            StringBuilder stringBuilder = new StringBuilder();
+                            for (int pIndex = index; pIndex < args.length; pIndex++) {
+                                String value = args[pIndex];
+                                if (!"".equals(normalFilledParameter.getRegex()) && !value.matches(normalFilledParameter.getRegex())) {
+                                    commandSender.sendMessage(Messages.getWarningMessage(
+                                            String.format("Error while parsing %s: Value should (%s)", args[pIndex], normalFilledParameter.getRegex())));
+                                    return;
+                                }
+                                if (pIndex != index) {
+                                    stringBuilder.append(" ");
+                                }
+                                stringBuilder.append(value);
+                            }
+                            String result = stringBuilder.toString();
+                            if (normalFilledParameter.getMaximalLength() > -1 &&
+                                    result.length() > normalFilledParameter.getMaximalLength()) {
+                                commandSender.sendMessage(Messages.getWarningMessage("Supplied parameter too long"));
+                                return;
+                            } else if (normalFilledParameter.getMinimalLength() > -1 &&
+                                    result.length() < normalFilledParameter.getMinimalLength()) {
+                                commandSender.sendMessage(Messages.getWarningMessage("Supplied parameter too small"));
+                                return;
+                            }
+                            objects[j] = isOptional ? Optional.of(result) : result;
+                        } else {
                             ParameterParser<?> parser = parameterValidatorMap.get(listType);
                             List<Object> parameterList = new ArrayList<>();
                             for (int pIndex = index; pIndex < args.length; pIndex++) {
@@ -353,28 +377,11 @@ public class CommandManager {
                                 if (result.isSuccess()) {
                                     parameterList.add(result.getItem());
                                 } else {
-                                    commandSender.sendMessage(Messages.getWarningMessage(result.getErrorMessage()));
+                                    commandSender.sendMessage(Messages.getWarningMessage(String.format("Error while parsing %s: (%s)", args[pIndex], result.getErrorMessage())));
                                     return;
                                 }
                             }
                             objects[j] = isOptional ? Optional.of(parameterList) : parameterList;
-                        } else {
-                            ParameterParser<String> parser = (ParameterParser<String>) parameterValidatorMap.get(String.class);
-                            StringBuilder stringBuilder = new StringBuilder();
-
-                            for (int pIndex = index; pIndex < args.length; pIndex++) {
-                                if (pIndex != index) {
-                                    stringBuilder.append(" ");
-                                }
-                                stringBuilder.append(args[pIndex]);
-                            }
-                            ParseResult<String> result = parser.parseValue(stringBuilder.toString(), normalFilledParameter);
-                            if (result.isSuccess()) {
-                                objects[j] = isOptional ? Optional.of(result.getItem()) : result.getItem();
-                            } else {
-                                commandSender.sendMessage(Messages.getWarningMessage(result.getErrorMessage()));
-                                return;
-                            }
                         }
                     } else {
                         ParameterParser<?> parser = parameterValidatorMap.get(type);
