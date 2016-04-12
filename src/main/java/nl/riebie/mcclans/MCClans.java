@@ -39,6 +39,7 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandManager;
 import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.game.state.GamePostInitializationEvent;
 import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
 import org.spongepowered.api.event.game.state.GameStartedServerEvent;
 import org.spongepowered.api.event.game.state.GameStoppingServerEvent;
@@ -82,10 +83,13 @@ public class MCClans {
     }
 
     @Listener
+    public void onPostInitialize(GamePostInitializationEvent event){
+        ClansImpl.getInstance().getClanPermissionManager().setInitialized();
+    }
+
+    @Listener
     public void onServerStart(GameStartedServerEvent event) {
         plugin = this;
-
-        ClansImpl.getInstance().getClanPermissionManager().setInitialized();
 
         // Init config
         if (!Config.load(configDir)) {
