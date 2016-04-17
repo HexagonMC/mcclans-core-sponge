@@ -22,7 +22,7 @@
 
 package nl.riebie.mcclans.commands;
 
-import nl.riebie.mcclans.api.CommandSender;
+import nl.riebie.mcclans.player.CommandSender;
 import org.spongepowered.api.command.source.ConsoleSource;
 import org.spongepowered.api.text.Text;
 

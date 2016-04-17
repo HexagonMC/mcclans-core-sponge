@@ -46,9 +46,9 @@ public interface ClanPlayer {
     String getName();
 
     /**
-     * Gets the clan which this player is a member of
+     * Get the clan of this ClanPlayer
      *
-     * @return the Clan object which this player is a member of
+     * @return the clan of this ClanPlayer
      */
     Clan getClan();
 

@@ -27,7 +27,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import nl.riebie.mcclans.api.CommandSender;
 import nl.riebie.mcclans.messages.Messages;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.text.Text;

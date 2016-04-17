@@ -25,7 +25,7 @@ package nl.riebie.mcclans.commands;
 import nl.riebie.mcclans.ClansImpl;
 import nl.riebie.mcclans.api.Clan;
 import nl.riebie.mcclans.api.ClanPlayer;
-import nl.riebie.mcclans.api.CommandSender;
+import nl.riebie.mcclans.player.CommandSender;
 import nl.riebie.mcclans.api.permissions.ClanPermission;
 import nl.riebie.mcclans.clan.ClanImpl;
 import nl.riebie.mcclans.commands.filledparameters.*;

@@ -20,7 +20,7 @@
  * THE SOFTWARE.
  */
 
-package nl.riebie.mcclans.api;
+package nl.riebie.mcclans.player;
 
 import org.spongepowered.api.text.Text;
 
