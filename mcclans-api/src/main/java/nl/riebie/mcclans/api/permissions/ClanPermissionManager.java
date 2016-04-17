@@ -31,34 +31,39 @@ import java.util.List;
 public interface ClanPermissionManager {
 
     /**
-     * Add a new ClanPermission
+     * Register a new ClanPermission. Can only be called during the INITIALIZATION state
      *
-     * @param name the name of the new ClanPermission
+     * @param name        the name of the new ClanPermission
      * @param description the description of the new ClanPermission
      * @return false if the given name already is used for a different Permission
+     * @throws IllegalStateException when called after the INITIALIZATION state
      */
     boolean registerClanPermission(String name, String description);
 
     /**
-     * Check if there is a registered ClanPermission for the given name
+     * Check if there is a registered ClanPermission for the given name. Should not be called before the LOAD_COMPLETE
+     * state.
      *
      * @param name the ClanPermission name to check
      * @return true if there is a registered ClanPermission for the given name
+     * @throws IllegalStateException when called before the LOAD_COMPLETE state
      */
     boolean isActiveClanPermission(String name);
 
     /**
-     * Get the ClanPermission for a given name
+     * Get the ClanPermission for a given name. Should not be called before the LOAD_COMPLETE state.
      *
      * @param name the name to get a ClanPermission for
      * @return the ClanPermission for a given name
+     * @throws IllegalStateException when called before the LOAD_COMPLETE state
      */
     ClanPermission getClanPermission(String name);
 
     /**
-     * Get all the active ClanPermissions
+     * Get all the active ClanPermissions. Should not be called before the LOAD_COMPLETE state.
      *
      * @return a list of all the active ClanPermissions
+     * @throws IllegalStateException when called before the LOAD_COMPLETE state
      */
     List<ClanPermission> getClanPermissions();
 }
