@@ -31,7 +31,7 @@ import java.util.List;
 public interface ClanPermissionManager {
 
     /**
-     * Register a new ClanPermission. Can only be called during the INITIALIZATION state
+     * Register a new ClanPermission. Should only be called during the INITIALIZATION state
      *
      * @param name        the name of the new ClanPermission
      * @param description the description of the new ClanPermission
