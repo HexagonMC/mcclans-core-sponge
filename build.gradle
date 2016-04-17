@@ -42,7 +42,7 @@ shadowJar {
     Boolean relBuild = System.getenv("REL_BUILD") as Boolean ?: false;
     if (devBuild) {
         Integer buildNumber = System.getenv("BUILD_NUMBER") as Integer ?: 0;
-        archiveName = rootProject.name + '-' + project.version + '-' + buildNumber + '.jar'
+        archiveName = rootProject.name + '-' + project.version + '-DEV-' + buildNumber + '.jar'
     } else if (relBuild) {
         archiveName = rootProject.name + '-' + project.version + '.jar'
     } else {
