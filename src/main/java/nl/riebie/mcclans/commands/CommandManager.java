@@ -85,7 +85,7 @@ public class CommandManager {
 
         registerParameterValidator(new PermissionParser(), "permission", ClanPermission.class);
         registerParameterValidator(new ToggleParser(), "value (on/off/toggle)", Toggle.class);
-        registerParameterValidator(new ClanParser(), "clanTag", Clan.class, ClanImpl.class);
+        registerParameterValidator(new ClanParser(), "clan tag", Clan.class, ClanImpl.class);
         registerParameterValidator(new ClanPlayerParser(), "player name", ClanPlayer.class, ClanPlayerImpl.class);
         registerParameterValidator(new TextColorParser(), "color", TextColor.class);
     }
@@ -292,15 +292,15 @@ public class CommandManager {
 
             if ((Config.getBoolean(Config.USE_PERMISSIONS) || filledCommand.getSpongePermission().startsWith("mcclans.admin"))
                     && !commandSource.hasPermission(filledCommand.getSpongePermission())) {
-                commandSource.sendMessage(Text.of("You're not allowed to execute this command"));
+                commandSource.sendMessage(Text.of("You do not have permission to use this command"));
                 return;
             }
             if (filledCommand.isPlayerOnly() && !(commandSource instanceof Player)) {
-                commandSource.sendMessage(Text.of("This command can only be used by players"));
+                commandSource.sendMessage(Text.of("You need to be a player to use this command"));
                 return;
             }
             if (filledCommand.isClanOnly() && (!(commandSender instanceof ClanPlayerImpl) || !((ClanPlayerImpl) commandSender).isMemberOfAClan())) {
-                commandSource.sendMessage(Text.of("This command can only be used of you are a member of a clan"));
+                commandSource.sendMessage(Text.of("You need to be a member of a clan to use this command"));
                 return;
             }
             String permission = filledCommand.getClanPermission();
@@ -365,7 +365,7 @@ public class CommandManager {
                                 return;
                             } else if (normalFilledParameter.getMinimalLength() > -1 &&
                                     result.length() < normalFilledParameter.getMinimalLength()) {
-                                commandSender.sendMessage(Messages.getWarningMessage("Supplied parameter too small"));
+                                commandSender.sendMessage(Messages.getWarningMessage("Supplied parameter too short"));
                                 return;
                             }
                             objects[j] = isOptional ? Optional.of(result) : result;
