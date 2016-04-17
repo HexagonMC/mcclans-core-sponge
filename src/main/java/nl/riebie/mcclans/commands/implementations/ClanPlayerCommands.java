@@ -115,9 +115,9 @@ public class ClanPlayerCommands {
         table.setValue("Deaths", Utils.formatKdr(kdr.getTotalDeaths(), kdr.getDeaths(KillDeathFactor.HIGH), kdr.getDeaths(KillDeathFactor.MEDIUM), kdr.getDeaths(KillDeathFactor.LOW)));
         table.setValue("KDR", Text.of(String.valueOf(kdr.getKDR())));
 
-        if (clanPlayer.equals(targetClanPlayer)
+        if (clanPlayer == null || clanPlayer.equals(targetClanPlayer)
                 || (clanPlayer.getClan() != null && targetClanPlayer.getClan() != null && clanPlayer.getClan().isPlayerFriendlyToThisClan(
-                targetClanPlayer))) {
+                targetClanPlayer))){
             table.setValue("Kill Factor", Text.builder("None").color(TextColors.GRAY).build());
             table.setValue("Death Factor", Text.builder("None").color(TextColors.GRAY).build());
         } else {

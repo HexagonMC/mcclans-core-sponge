@@ -349,7 +349,7 @@ public class CommandManager {
                             for (int pIndex = index; pIndex < args.length; pIndex++) {
                                 String value = args[pIndex];
                                 if (!"".equals(normalFilledParameter.getRegex()) && !value.matches(normalFilledParameter.getRegex())) {
-                                    commandSender.sendMessage(Messages.getWarningMessage(
+                                    commandSource.sendMessage(Messages.getWarningMessage(
                                             String.format("Error while parsing %s: Value should (%s)", args[pIndex], normalFilledParameter.getRegex())));
                                     return;
                                 }
@@ -361,11 +361,11 @@ public class CommandManager {
                             String result = stringBuilder.toString();
                             if (normalFilledParameter.getMaximalLength() > -1 &&
                                     result.length() > normalFilledParameter.getMaximalLength()) {
-                                commandSender.sendMessage(Messages.getWarningMessage("Supplied parameter too large"));
+                                commandSource.sendMessage(Messages.getWarningMessage("Supplied parameter too large"));
                                 return;
                             } else if (normalFilledParameter.getMinimalLength() > -1 &&
                                     result.length() < normalFilledParameter.getMinimalLength()) {
-                                commandSender.sendMessage(Messages.getWarningMessage("Supplied parameter too small"));
+                                commandSource.sendMessage(Messages.getWarningMessage("Supplied parameter too small"));
                                 return;
                             }
                             objects[j] = isOptional ? Optional.of(result) : result;
@@ -377,7 +377,7 @@ public class CommandManager {
                                 if (result.isSuccess()) {
                                     parameterList.add(result.getItem());
                                 } else {
-                                    commandSender.sendMessage(Messages.getWarningMessage(String.format("Error while parsing %s: (%s)", args[pIndex], result.getErrorMessage())));
+                                    commandSource.sendMessage(Messages.getWarningMessage(String.format("Error while parsing %s: (%s)", args[pIndex], result.getErrorMessage())));
                                     return;
                                 }
                             }
@@ -389,7 +389,7 @@ public class CommandManager {
                         if (parseResult.isSuccess()) {
                             objects[j] = isOptional ? Optional.of(parseResult.getItem()) : parseResult.getItem();
                         } else {
-                            commandSender.sendMessage(Messages.getWarningMessage(parseResult.getErrorMessage()));
+                            commandSource.sendMessage(Messages.getWarningMessage(parseResult.getErrorMessage()));
                             return;
                         }
                     }
@@ -614,9 +614,6 @@ public class CommandManager {
             }
 
             return clanPlayer;
-        } else if (commandSource instanceof ConsoleSource) {
-            ConsoleSource consoleSource = (ConsoleSource) commandSource;
-            return new ConsoleSender(consoleSource);
         }
         return null;
     }
