@@ -361,11 +361,11 @@ public class CommandManager {
                             String result = stringBuilder.toString();
                             if (normalFilledParameter.getMaximalLength() > -1 &&
                                     result.length() > normalFilledParameter.getMaximalLength()) {
-                                commandSender.sendMessage(Messages.getWarningMessage("Supplied parameter too long"));
+                                commandSender.sendMessage(Messages.getWarningMessage("Supplied parameter too large"));
                                 return;
                             } else if (normalFilledParameter.getMinimalLength() > -1 &&
                                     result.length() < normalFilledParameter.getMinimalLength()) {
-                                commandSender.sendMessage(Messages.getWarningMessage("Supplied parameter too short"));
+                                commandSender.sendMessage(Messages.getWarningMessage("Supplied parameter too small"));
                                 return;
                             }
                             objects[j] = isOptional ? Optional.of(result) : result;
