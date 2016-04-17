@@ -435,10 +435,9 @@ public class ClanImpl implements Clan, Cloneable {
     }
 
     @Override
-    public boolean setTagColor(TextColor tagColor) {
+    public void setTagColor(TextColor tagColor) {
         this.tagColor = tagColor;
         TaskForwarder.sendUpdateClan(this);
-        return true;
     }
 
     public boolean setTag(String newTag) {

@@ -77,10 +77,8 @@ public interface ClanPlayer {
     /**
      * Set the rank of the player
      *
-     * @param rank
-     *            the Rank object to be set
-     * @throws NotDefaultImplementationException
-     *             when using a wrong implementation of Rank
+     * @param rank the Rank object to be set
+     * @throws NotDefaultImplementationException when using a wrong implementation of Rank
      */
     void setRank(Rank rank) throws NotDefaultImplementationException;
 
@@ -101,7 +99,7 @@ public interface ClanPlayer {
     /**
      * Set if the player has friendly fire protection on
      *
-     * @return ffProtection set to true to set the friendly fire protection on for this player
+     * @param ffProtection set to true to set the friendly fire protection on for this player
      */
     void setFfProtection(boolean ffProtection);
 

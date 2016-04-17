@@ -214,7 +214,7 @@ public interface Clan {
      *
      * @param textColor the the color to be set
      */
-    boolean setTagColor(TextColor textColor);
+    void setTagColor(TextColor textColor);
 
     /**
      * Remove a clan from the allies list of this clan
