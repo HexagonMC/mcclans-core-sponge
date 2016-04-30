@@ -115,7 +115,7 @@ public class RankImpl implements Rank {
     public boolean hasPermission(String permission) {
         ClanPermissionManager clanPermissionManager = ClansImpl.getInstance().getClanPermissionManager();
         if (clanPermissionManager.isActiveClanPermission(permission)) {
-            return permissions.contains(permission.toLowerCase());
+            return rankID == RankFactory.getOwnerID() || permissions.contains(permission.toLowerCase());
         }
         return false;
     }

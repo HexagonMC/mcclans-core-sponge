@@ -50,19 +50,6 @@ public class RankFactory {
     public RankImpl createOwner() {
         if (owner == null) {
             owner = new RankImpl.Builder(OWNER_ID, OWNER_IDENTIFIER).unchangeable().build();
-            owner.addPermission("home");
-            owner.addPermission("sethome");
-            owner.addPermission("invite");
-            owner.addPermission("remove");
-            owner.addPermission("disband");
-            owner.addPermission("friendlyfire");
-            owner.addPermission("coords");
-            owner.addPermission("tag");
-            owner.addPermission("rank");
-            owner.addPermission("setrank");
-            owner.addPermission("ally");
-            owner.addPermission("clanchat");
-            owner.addPermission("allychat");
         }
         return owner;
     }
