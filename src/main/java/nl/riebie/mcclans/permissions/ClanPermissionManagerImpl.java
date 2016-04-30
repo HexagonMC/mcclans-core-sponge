@@ -31,6 +31,8 @@ public class ClanPermissionManagerImpl implements ClanPermissionManager {
         registerClanPermission("ally", "Invite or remove allies of the clan");
         registerClanPermission("clanchat", "Talk in clan chat");
         registerClanPermission("allychat", "Talk in ally chat");
+        registerClanPermission("deposit", "Deposit currency in the clan bank");
+        registerClanPermission("withdraw", "Withdraw currency from the clan bank");
     }
 
     public void setInitialized() {

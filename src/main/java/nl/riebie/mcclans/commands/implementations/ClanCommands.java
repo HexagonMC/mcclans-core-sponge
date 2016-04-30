@@ -110,6 +110,12 @@ public class ClanCommands {
         commandSource.sendMessage(Text.of("TODO"));
     }
 
+    @ChildGroup(ClanBankCommands.class)
+    @Command(name = "bank", description = "Top command for all bank commands", spongePermission = "mcclans.user.bank.helppage")
+    public void clanBankRootCommand(CommandSource commandSource) {
+        commandSource.sendMessage(Text.of("TODO"));
+    }
+
     @Command(name = "create", description = "Create a clan", isPlayerOnly = true, spongePermission = "mcclans.user.create")
     public void clanCreateCommand(
             CommandSource commandSource,

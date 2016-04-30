@@ -30,7 +30,8 @@ import nl.riebie.mcclans.config.Config;
 public enum LengthConstraints implements LengthConstraint {
     EMPTY(-1, -1),
     CLAN_NAME(Config.CLAN_NAME_CHARACTERS_MINIMUM, Config.CLAN_NAME_CHARACTERS_MAXIMUM),
-    CLAN_TAG(Config.CLAN_TAG_CHARACTERS_MINIMUM, Config.CLAN_TAG_CHARACTERS_MAXIMUM);
+    CLAN_TAG(Config.CLAN_TAG_CHARACTERS_MINIMUM, Config.CLAN_TAG_CHARACTERS_MAXIMUM),
+    POSITIVE_NUMBER(0, -1);
 
     private int minimumLength;
     private int maximumLength;

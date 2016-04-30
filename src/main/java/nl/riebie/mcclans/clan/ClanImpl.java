@@ -63,6 +63,7 @@ public class ClanImpl implements Clan, Cloneable {
     private boolean allowAllyInvites = true;
     private Date creationDate;
     private boolean ffProtection;
+    private String bankAccountIdentifier;
 
     private ClanImpl(Builder builder) {
         this.clanID = builder.clanID;
@@ -78,6 +79,7 @@ public class ClanImpl implements Clan, Cloneable {
         this.creationDate = builder.creationDate;
         this.ffProtection = builder.ffProtection;
 
+        this.bankAccountIdentifier = builder.bankAccountIdentifier;
     }
 
     public int getID() {
@@ -585,6 +587,10 @@ public class ClanImpl implements Clan, Cloneable {
         TaskForwarder.sendUpdateClan(this);
     }
 
+    public String getBankAccountIdentifier() {
+        return bankAccountIdentifier;
+    }
+
     public void setupDefaultRanks() {
         RankImpl owner = RankFactory.getInstance().createOwner();
         RankImpl member = RankFactory.getInstance().createMember();
@@ -643,6 +649,7 @@ public class ClanImpl implements Clan, Cloneable {
         private boolean acceptAllyInvites = true;
         private Date creationDate = new Date();
         private boolean ffProtection = true;
+        private String bankAccountIdentifier;
 
         public Builder(int clanID, String tag, String name) {
             this.tag = tag;
@@ -695,7 +702,16 @@ public class ClanImpl implements Clan, Cloneable {
             return this;
         }
 
+        public Builder bankAccountIdentifier(String identifier) {
+            this.bankAccountIdentifier = identifier;
+            return this;
+        }
+
         public ClanImpl build() {
+            if (bankAccountIdentifier == null) {
+                bankAccountIdentifier = UUID.randomUUID().toString();
+            }
+
             return new ClanImpl(this);
         }
     }
