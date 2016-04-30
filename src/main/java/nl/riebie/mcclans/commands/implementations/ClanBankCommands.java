@@ -43,8 +43,8 @@ import java.util.Optional;
  */
 public class ClanBankCommands {
 
-    @Command(name = "view", description = "Create a rank", isPlayerOnly = true, isClanOnly = true, spongePermission = "mcclans.user.bank.view")
-    public void clanBankViewCommand(CommandSource sender, ClanPlayerImpl clanPlayer) {
+    @Command(name = "balance", description = "View the balance of the clan bank", isPlayerOnly = true, isClanOnly = true, spongePermission = "mcclans.user.bank.balance")
+    public void clanBankBalanceCommand(CommandSource sender, ClanPlayerImpl clanPlayer) {
         if (Config.getBoolean(Config.USE_ECONOMY)) {
             ClanImpl clan = clanPlayer.getClan();
             Currency currency = MCClans.getPlugin().getServiceHelper().currency;
@@ -68,7 +68,7 @@ public class ClanBankCommands {
             boolean success = EconomyUtils.transferToBank(clan.getBankId(), clanPlayer.getUUID(), amount);
             String currencyName = MCClans.getPlugin().getServiceHelper().currency.getDisplayName().toPlain();
             if (success) {
-                Messages.sendDepositedToClanBank(sender, amount, currencyName);
+                Messages.sendClanBroadcastMessageDepositedInClanBank(clan, sender.getName(), sender, amount, currencyName);
             } else {
                 Messages.sendYouDoNotHaveEnoughCurrency(sender, amount, currencyName);
             }
@@ -84,7 +84,7 @@ public class ClanBankCommands {
             boolean success = EconomyUtils.transferFromBank(clan.getBankId(), clanPlayer.getUUID(), amount);
             String currencyName = MCClans.getPlugin().getServiceHelper().currency.getDisplayName().toPlain();
             if (success) {
-                Messages.sendWithdrawnFromClanBank(sender, amount, currencyName);
+                Messages.sendClanBroadcastMessageWithdrewFromClanBank(clan, sender.getName(), sender, amount, currencyName);
             } else {
                 Messages.sendNotEnoughCurrencyOnClanBank(sender, amount, currencyName);
             }

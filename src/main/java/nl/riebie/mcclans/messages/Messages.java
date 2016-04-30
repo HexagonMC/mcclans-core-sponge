@@ -559,22 +559,26 @@ public class Messages {
         commandSource.sendMessage(message);
     }
 
-    public static void sendDepositedToClanBank(CommandSource commandSource, double amount, String currencyName) {
+    public static void sendClanBroadcastMessageDepositedInClanBank(ClanImpl clan, String playerName, CommandSource commandSource, double amount, String currencyName) {
         Text message = Text.join(
-                Text.builder("Deposited ").color(BASIC_CHAT_COLOR).build(),
+                Text.builder("Player ").color(BASIC_CHAT_COLOR).build(),
+                Text.builder(playerName).color(BASIC_HIGHLIGHT).build(),
+                Text.builder(" deposited ").color(BASIC_CHAT_COLOR).build(),
                 Text.builder(String.valueOf(amount)).color(BASIC_HIGHLIGHT).build(),
                 Text.builder(" " + currencyName + " in the clan bank").color(BASIC_CHAT_COLOR).build()
         );
-        commandSource.sendMessage(message);
+        clan.sendMessage(message);
     }
 
-    public static void sendWithdrawnFromClanBank(CommandSource commandSource, double amount, String currencyName) {
+    public static void sendClanBroadcastMessageWithdrewFromClanBank(ClanImpl clan, String playerName, CommandSource commandSource, double amount, String currencyName) {
         Text message = Text.join(
-                Text.builder("Withdrawn ").color(BASIC_CHAT_COLOR).build(),
+                Text.builder("Player ").color(BASIC_CHAT_COLOR).build(),
+                Text.builder(playerName).color(BASIC_HIGHLIGHT).build(),
+                Text.builder(" withdrew ").color(BASIC_CHAT_COLOR).build(),
                 Text.builder(String.valueOf(amount)).color(BASIC_HIGHLIGHT).build(),
                 Text.builder(" " + currencyName + " from the clan bank").color(BASIC_CHAT_COLOR).build()
         );
-        commandSource.sendMessage(message);
+        clan.sendMessage(message);
     }
 
     public static void sendTeleportingInXSeconds(CommandSource commandSource, int seconds) {

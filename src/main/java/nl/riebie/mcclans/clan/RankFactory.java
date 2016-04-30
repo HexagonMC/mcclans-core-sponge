@@ -60,6 +60,7 @@ public class RankFactory {
         rank.addPermission("coords");
         rank.addPermission("clanchat");
         rank.addPermission("allychat");
+        rank.addPermission("deposit");
         return rank;
     }
 
