@@ -294,4 +294,11 @@ public interface Clan {
      * @param ffProtection if set to true the friendly fire protection is on
      */
     void setFfProtection(boolean ffProtection);
+
+    /**
+     * Get the identifier for the economy account of the clan bank
+     *
+     * @return the identifier for the economy account of the clan bank
+     */
+    String getBankId();
 }

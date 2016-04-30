@@ -587,6 +587,7 @@ public class ClanImpl implements Clan, Cloneable {
         TaskForwarder.sendUpdateClan(this);
     }
 
+    @Override
     public String getBankId() {
         return bankId;
     }

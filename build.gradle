@@ -7,7 +7,7 @@ apply plugin: 'java'
 sourceCompatibility = 1.8
 
 group = 'nl.riebie'
-version = '1.0'
+version = '1.1'
 description = 'MCClans allows players to group together by forming clans'
 
 jar.enabled = false
