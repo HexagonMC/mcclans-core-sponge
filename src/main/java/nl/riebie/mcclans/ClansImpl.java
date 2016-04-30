@@ -38,6 +38,8 @@ import nl.riebie.mcclans.permissions.ClanPermissionManagerImpl;
 import nl.riebie.mcclans.persistence.TaskForwarder;
 import nl.riebie.mcclans.events.ClanPlayerKillEvent;
 import nl.riebie.mcclans.events.EventDispatcher;
+import nl.riebie.mcclans.persistence.query.DataType;
+import nl.riebie.mcclans.persistence.query.table.CreateQuery;
 import nl.riebie.mcclans.player.ClanInvite;
 import nl.riebie.mcclans.player.ClanPlayerImpl;
 import nl.riebie.mcclans.utils.UUIDUtils;
