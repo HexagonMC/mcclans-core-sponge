@@ -48,7 +48,7 @@ public class ClanBankCommands {
         if (Config.getBoolean(Config.USE_ECONOMY)) {
             ClanImpl clan = clanPlayer.getClan();
             Currency currency = MCClans.getPlugin().getServiceHelper().currency;
-            Optional<Account> accountOpt = MCClans.getPlugin().getServiceHelper().economyService.getOrCreateAccount(clan.getBankAccountIdentifier());
+            Optional<Account> accountOpt = MCClans.getPlugin().getServiceHelper().economyService.getOrCreateAccount(clan.getBankId());
             if (accountOpt.isPresent()) {
                 Account account = accountOpt.get();
                 BigDecimal balance = account.getBalance(currency);
@@ -65,7 +65,7 @@ public class ClanBankCommands {
     public void clanBankDepositCommand(CommandSource sender, ClanPlayerImpl clanPlayer, @Parameter(name = "amount", length = LengthConstraints.POSITIVE_NUMBER) double amount) {
         if (Config.getBoolean(Config.USE_ECONOMY)) {
             ClanImpl clan = clanPlayer.getClan();
-            boolean success = EconomyUtils.transferToBank(clan.getBankAccountIdentifier(), clanPlayer.getUUID(), amount);
+            boolean success = EconomyUtils.transferToBank(clan.getBankId(), clanPlayer.getUUID(), amount);
             String currencyName = MCClans.getPlugin().getServiceHelper().currency.getDisplayName().toPlain();
             if (success) {
                 Messages.sendDepositedToClanBank(sender, amount, currencyName);
@@ -81,7 +81,7 @@ public class ClanBankCommands {
     public void clanBankWithdrawCommand(CommandSource sender, ClanPlayerImpl clanPlayer, @Parameter(name = "amount", length = LengthConstraints.POSITIVE_NUMBER) double amount) {
         if (Config.getBoolean(Config.USE_ECONOMY)) {
             ClanImpl clan = clanPlayer.getClan();
-            boolean success = EconomyUtils.transferFromBank(clan.getBankAccountIdentifier(), clanPlayer.getUUID(), amount);
+            boolean success = EconomyUtils.transferFromBank(clan.getBankId(), clanPlayer.getUUID(), amount);
             String currencyName = MCClans.getPlugin().getServiceHelper().currency.getDisplayName().toPlain();
             if (success) {
                 Messages.sendWithdrawnFromClanBank(sender, amount, currencyName);

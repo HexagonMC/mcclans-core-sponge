@@ -543,9 +543,9 @@ public class Messages {
 
     public static void sendNotEnoughCurrencyOnClanBank(CommandSource commandSource, double price, String currencyName) {
         Text message = Text.join(
-                Text.builder("There is no ").color(WARNING_CHAT_COLOR).build(),
+                Text.builder("The clan bank does not have ").color(WARNING_CHAT_COLOR).build(),
                 Text.builder(String.valueOf(price)).color(WARNING_HIGHLIGHT).build(),
-                Text.builder(" " + currencyName + " in the clan bank").color(WARNING_CHAT_COLOR).build()
+                Text.builder(" " + currencyName).color(WARNING_CHAT_COLOR).build()
         );
         commandSource.sendMessage(message);
     }

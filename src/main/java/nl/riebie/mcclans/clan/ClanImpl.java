@@ -63,7 +63,7 @@ public class ClanImpl implements Clan, Cloneable {
     private boolean allowAllyInvites = true;
     private Date creationDate;
     private boolean ffProtection;
-    private String bankAccountIdentifier;
+    private String bankId;
 
     private ClanImpl(Builder builder) {
         this.clanID = builder.clanID;
@@ -79,7 +79,7 @@ public class ClanImpl implements Clan, Cloneable {
         this.creationDate = builder.creationDate;
         this.ffProtection = builder.ffProtection;
 
-        this.bankAccountIdentifier = builder.bankAccountIdentifier;
+        this.bankId = builder.bankId;
     }
 
     public int getID() {
@@ -587,8 +587,8 @@ public class ClanImpl implements Clan, Cloneable {
         TaskForwarder.sendUpdateClan(this);
     }
 
-    public String getBankAccountIdentifier() {
-        return bankAccountIdentifier;
+    public String getBankId() {
+        return bankId;
     }
 
     public void setupDefaultRanks() {
@@ -649,7 +649,7 @@ public class ClanImpl implements Clan, Cloneable {
         private boolean acceptAllyInvites = true;
         private Date creationDate = new Date();
         private boolean ffProtection = true;
-        private String bankAccountIdentifier;
+        private String bankId;
 
         public Builder(int clanID, String tag, String name) {
             this.tag = tag;
@@ -702,14 +702,14 @@ public class ClanImpl implements Clan, Cloneable {
             return this;
         }
 
-        public Builder bankAccountIdentifier(String identifier) {
-            this.bankAccountIdentifier = identifier;
+        public Builder bankId(String identifier) {
+            this.bankId = identifier;
             return this;
         }
 
         public ClanImpl build() {
-            if (bankAccountIdentifier == null) {
-                bankAccountIdentifier = UUID.randomUUID().toString();
+            if (bankId == null) {
+                bankId = UUID.randomUUID().toString();
             }
 
             return new ClanImpl(this);
