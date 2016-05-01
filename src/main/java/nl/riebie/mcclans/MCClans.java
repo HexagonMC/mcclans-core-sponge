@@ -58,7 +58,7 @@ import java.util.Optional;
 /**
  * Created by Kippers on 8-12-2015.
  */
-@Plugin(id = "nl.riebie.mcclans", name = "MCClans", version = "1.0", description = "MCClans allows players to group together by forming clans")
+@Plugin(id = "nl.riebie.mcclans", name = "MCClans", version = "1.1", description = "MCClans allows players to group together by forming clans")
 public class MCClans {
 
     private static MCClans plugin;
