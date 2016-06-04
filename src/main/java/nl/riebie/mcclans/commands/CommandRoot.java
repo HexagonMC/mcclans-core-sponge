@@ -28,6 +28,7 @@ import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.text.Text;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -37,16 +38,24 @@ import java.util.Optional;
  */
 public class CommandRoot implements CommandCallable {
 
-    private final Optional<Text> desc = Optional.of(Text.of("Displays a message to all players"));
-    private final Optional<Text> help = Optional.of(Text.of("Displays a message to all players. It has no color support!"));
-    private final Text usage = Text.of("<message>");
+    private final Optional<Text> desc;
 
     private final CommandManager commandManager;
     private final String root;
 
-    public CommandRoot(String root, CommandManager commandExecutor) {
+    private CommandRoot(String root, CommandManager commandExecutor,String description) {
         this.root = root;
         this.commandManager = commandExecutor;
+
+        desc = Optional.of(Text.of(description));
+    }
+
+    public static CommandRoot newAllias(String alias, String[] fullCommand, CommandManager commandExecutor){
+        return new CommandRoot(alias, commandExecutor, String.format("alias for /clan %s", commandArrayToString(fullCommand)));
+    }
+
+    public static CommandRoot newRoot(String root, String name, CommandManager commandExecutor) {
+        return new CommandRoot(root, commandExecutor, String.format("%s top command", name));
     }
 
     public CommandResult process(CommandSource source, String arguments) throws CommandException {
@@ -55,7 +64,7 @@ public class CommandRoot implements CommandCallable {
     }
 
     public boolean testPermission(CommandSource source) {
-        return source.hasPermission("myplugin.broadcast");
+        return true;
     }
 
     public Optional<Text> getShortDescription(CommandSource source) {
@@ -63,11 +72,11 @@ public class CommandRoot implements CommandCallable {
     }
 
     public Optional<Text> getHelp(CommandSource source) {
-        return help;
+        return desc;
     }
 
     public Text getUsage(CommandSource source) {
-        return usage;
+        return desc.get();
     }
 
     public List<String> getSuggestions(CommandSource source, String arguments) throws CommandException {
@@ -76,5 +85,17 @@ public class CommandRoot implements CommandCallable {
 
     public String getRoot(){
         return root;
+    }
+
+    private static String commandArrayToString(String[] array){
+        int iMax = array.length - 1;
+        StringBuilder b = new StringBuilder();
+        for (int i = 0;i<array.length; i++) {
+            b.append(String.valueOf(array[i]));
+            if (i != iMax){
+                b.append(" ");
+            }
+        }
+        return b.toString();
     }
 }

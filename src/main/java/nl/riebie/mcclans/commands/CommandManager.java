@@ -111,9 +111,9 @@ public class CommandManager {
         rootValue = tag;
         registerCommandStructure(commandStructure, null);
         List<CommandRoot> roots = new ArrayList<>();
-        roots.add(new CommandRoot(rootValue, this));
-        for (String alias : aliasesMap.keySet()) {
-            CommandRoot commandRoot = new CommandRoot(alias, this);
+        roots.add(CommandRoot.newRoot(rootValue, "MCClans", this));
+        for (Map.Entry<String, String[]> alias : aliasesMap.entrySet()) {
+            CommandRoot commandRoot = CommandRoot.newAllias(alias.getKey(), alias.getValue(), this);
             roots.add(commandRoot);
         }
         return roots;
@@ -255,6 +255,10 @@ public class CommandManager {
             if (aliasPrefix == null) {
                 throw new IllegalStateException(String.format("Unknown root: %s", root));
             }
+        }
+        if(args.length ==0){
+            sendHelp(commandSource, 1);
+            return;
         }
         String firstParam = args[0];
         FilledCommand filledCommand = filledCommandMap.get(firstParam);
