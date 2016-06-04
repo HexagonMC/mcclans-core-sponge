@@ -33,6 +33,7 @@ dependencies {
 
 shadowJar {
     dependencies {
+        include dependency(':mcclans-api')
         include dependency('net.minecrell.mcstats:statslite-sponge')
     }
 
