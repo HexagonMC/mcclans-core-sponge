@@ -338,7 +338,7 @@ public class ClanCommands {
                 row.setValue("Rank", Text.of(String.valueOf(i + 1)));
                 row.setValue("Name", Text.of(clanPlayer.getName()));
                 row.setValue("Clan", clanTag);
-                row.setValue("KDR", Text.of(String.valueOf(clanPlayer.getKillDeath())));
+                row.setValue("KDR", Text.of(String.valueOf(clanPlayer.getKillDeath().getKDR())));
 
             }
         });
