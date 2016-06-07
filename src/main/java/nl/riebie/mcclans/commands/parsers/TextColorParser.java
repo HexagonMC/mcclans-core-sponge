@@ -25,6 +25,7 @@ package nl.riebie.mcclans.commands.parsers;
 import nl.riebie.mcclans.commands.filledparameters.NormalFilledParameter;
 import nl.riebie.mcclans.messages.Messages;
 import nl.riebie.mcclans.utils.Utils;
+import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.text.format.TextColor;
 
 /**
@@ -32,7 +33,7 @@ import org.spongepowered.api.text.format.TextColor;
  */
 public class TextColorParser implements ParameterParser<TextColor> {
     @Override
-    public ParseResult<TextColor> parseValue(String value, NormalFilledParameter parameter) {
+    public ParseResult<TextColor> parseValue(CommandSource commandSource, String value, NormalFilledParameter parameter) {
         TextColor textColor = Utils.getTextColorByName(value, null);
         if (textColor == null) {
             return ParseResult.newErrorResult(Messages.THIS_IS_NOT_A_VALID_COLOR);
