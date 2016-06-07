@@ -30,6 +30,9 @@ import nl.riebie.mcclans.config.constraints.ValidAliasMapConstraint;
 import nl.riebie.mcclans.config.model.ConfigOption;
 import nl.riebie.mcclans.config.model.ConfigSection;
 import nl.riebie.mcclans.utils.MessageBoolean;
+import nl.riebie.mcclans.utils.Utils;
+import org.spongepowered.api.text.format.TextColor;
+import org.spongepowered.api.text.format.TextColors;
 
 import java.io.File;
 import java.io.IOException;
@@ -49,6 +52,7 @@ public class Config {
     public static final String TELEPORT_COOLDOWN_SECONDS = "teleport-cooldown-seconds";
     public static final String RE_SET_CLANHOME_COOLDOWN_SECONDS = "re-set-clanhome-cooldown-seconds";
     public static final String USE_CHAT_CLAN_TAGS = "use-chat-clan-tags";
+    public static final String CLAN_TAG_DEFAULT_COLOR = "clan-tag-default-color";
     public static final String USE_COLORED_TAGS_BASED_ON_CLAN_KDR = "use-colored-tags-based-on-clan-kdr";
     public static final String ALLOW_FF_PROTECTION = "allow-ff-protection";
     public static final String LOG_PLAYER_KDR = "log-player-kdr";
@@ -106,6 +110,7 @@ public class Config {
                 ConfigOption.builder(TELEPORT_COOLDOWN_SECONDS, 120).addMinimumNumberConstraint(0).build(),
                 ConfigOption.builder(RE_SET_CLANHOME_COOLDOWN_SECONDS, 1800).addMinimumNumberConstraint(0).build(),
                 ConfigOption.builder(USE_CHAT_CLAN_TAGS, true).build(),
+                ConfigOption.builder(CLAN_TAG_DEFAULT_COLOR, TextColors.DARK_PURPLE.getName()).addColorConstraint().build(),
                 ConfigOption.builder(USE_COLORED_TAGS_BASED_ON_CLAN_KDR, true).build(),
                 ConfigOption.builder(ALLOW_FF_PROTECTION, true).build(),
                 ConfigOption.builder(LOG_PLAYER_KDR, true).build(),
@@ -248,6 +253,10 @@ public class Config {
         } else {
             return (String) value;
         }
+    }
+
+    public static TextColor getColor(String key) {
+        return Utils.getTextColorByName(getString(key), TextColors.DARK_PURPLE);
     }
 
     public static int getInteger(String key) {

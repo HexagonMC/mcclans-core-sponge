@@ -22,6 +22,7 @@
 
 package nl.riebie.mcclans.config.model;
 
+import nl.riebie.mcclans.config.constraints.ColorConstraint;
 import nl.riebie.mcclans.config.constraints.MaximumNumberConstraint;
 import nl.riebie.mcclans.config.constraints.MinimumNumberConstraint;
 import nl.riebie.mcclans.config.constraints.OneOfStringConstraint;
@@ -131,6 +132,11 @@ public class ConfigOption {
 
         public Builder addOneOfStringConstraint(boolean caseSensitive, String... possibilities) {
             mConstraints.add(new OneOfStringConstraint(caseSensitive, possibilities));
+            return this;
+        }
+
+        public Builder addColorConstraint() {
+            mConstraints.add(new ColorConstraint());
             return this;
         }
 
