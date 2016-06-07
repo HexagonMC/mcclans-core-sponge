@@ -37,6 +37,10 @@ import java.util.List;
  */
 public final class Utils {
 
+    private static List<String> worldsBlockedFromKdr;
+    private static List<String> worldsBlockedFromFf;
+    private static List<String> blockedTagsAndNames;
+
     private Utils() {
         // Private constructor
     }
@@ -186,8 +190,10 @@ public final class Utils {
     }
 
     public static boolean isWorldBlockedFromAllowingFriendlyFireProtection(String worldName) {
-        List<String> worlds = Config.getList(Config.BLOCKED_WORLDS_FF_PROTECTION, String.class);
-        for (String world : worlds) {
+        if (worldsBlockedFromFf == null) {
+            worldsBlockedFromFf = Config.getList(Config.BLOCKED_WORLDS_FF_PROTECTION, String.class);
+        }
+        for (String world : worldsBlockedFromFf) {
             if (world.equalsIgnoreCase(worldName)) {
                 return true;
             }
@@ -196,9 +202,23 @@ public final class Utils {
     }
 
     public static boolean isWorldBlockedFromLoggingPlayerKDR(String worldName) {
-        List<String> worlds = Config.getList(Config.BLOCKED_WORLDS_PLAYER_KDR, String.class);
-        for (String world : worlds) {
+        if (worldsBlockedFromKdr == null) {
+            worldsBlockedFromKdr = Config.getList(Config.BLOCKED_WORLDS_PLAYER_KDR, String.class);
+        }
+        for (String world : worldsBlockedFromKdr) {
             if (world.equalsIgnoreCase(worldName)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean isClanTagOrNameBlocked(String clanTagOrName) {
+        if (blockedTagsAndNames == null) {
+            blockedTagsAndNames = Config.getList(Config.BLOCKED_CLAN_TAGS_AND_NAMES, String.class);
+        }
+        for (String name : blockedTagsAndNames) {
+            if (name.equalsIgnoreCase(clanTagOrName)) {
                 return true;
             }
         }

@@ -58,6 +58,7 @@ public class Config {
     public static final String LOG_PLAYER_KDR = "log-player-kdr";
     public static final String BLOCKED_WORLDS_FF_PROTECTION = "blocked-worlds-ff-protection";
     public static final String BLOCKED_WORLDS_PLAYER_KDR = "blocked-worlds-player-kdr";
+    public static final String BLOCKED_CLAN_TAGS_AND_NAMES = "blocked-clan-tags-and-names";
 
     public static final String CREATE_BACKUP_AFTER_HOURS = "create-backup-after-hours";
     public static final String MAXIMUM_AMOUNT_OF_BACKUPS_BEFORE_REMOVING_OLDEST = "maximum-amount-of-backups-before-removing-oldest";
@@ -116,6 +117,7 @@ public class Config {
                 ConfigOption.builder(LOG_PLAYER_KDR, true).build(),
                 ConfigOption.builder(BLOCKED_WORLDS_FF_PROTECTION, Arrays.asList("example_world1", "example_world2")).build(),
                 ConfigOption.builder(BLOCKED_WORLDS_PLAYER_KDR, Arrays.asList("example_world1", "example_world2")).build(),
+                ConfigOption.builder(BLOCKED_CLAN_TAGS_AND_NAMES, Arrays.asList("example_name1", "example_name2")).build(),
 
                 ConfigOption.builder(CREATE_BACKUP_AFTER_HOURS, 24).addMinimumNumberConstraint(0).build(),
                 ConfigOption.builder(MAXIMUM_AMOUNT_OF_BACKUPS_BEFORE_REMOVING_OLDEST, 14).addMinimumNumberConstraint(0).build(),
