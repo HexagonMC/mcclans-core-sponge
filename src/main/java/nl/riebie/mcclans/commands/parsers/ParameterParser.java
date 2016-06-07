@@ -23,10 +23,11 @@
 package nl.riebie.mcclans.commands.parsers;
 
 import nl.riebie.mcclans.commands.filledparameters.NormalFilledParameter;
+import org.spongepowered.api.command.CommandSource;
 
 /**
  * Created by riebie on 17/01/2016.
  */
 public interface ParameterParser<T> {
-    ParseResult<T> parseValue(String value, NormalFilledParameter parameter);
+    ParseResult<T> parseValue(CommandSource commandSource, String value, NormalFilledParameter parameter);
 }

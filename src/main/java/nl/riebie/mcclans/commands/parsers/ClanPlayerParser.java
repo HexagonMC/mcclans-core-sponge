@@ -27,18 +27,46 @@ import nl.riebie.mcclans.api.ClanPlayer;
 import nl.riebie.mcclans.commands.filledparameters.NormalFilledParameter;
 import nl.riebie.mcclans.messages.Messages;
 import nl.riebie.mcclans.player.ClanPlayerImpl;
+import nl.riebie.mcclans.utils.UUIDUtils;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.text.selector.Selector;
+
+
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 
 /**
  * Created by riebie on 12/03/2016.
  */
 public class ClanPlayerParser implements ParameterParser<ClanPlayer> {
     @Override
-    public ParseResult<ClanPlayer> parseValue(String value, NormalFilledParameter parameter) {
+    public ParseResult<ClanPlayer> parseValue(CommandSource commandSource, String value, NormalFilledParameter parameter) {
+
+        if(value.startsWith("@")){
+           Set<Entity> entities = Selector.parse(value).resolve(commandSource);
+            if(entities.size() == 1 && entities.toArray()[0] instanceof Player){
+                value = ((Player)entities.toArray()[0]).getIdentifier();
+            } else{
+                return ParseResult.newErrorResult("Problem with selector");
+            }
+
+        }
         ClanPlayerImpl clanPlayer = ClansImpl.getInstance().getClanPlayer(value);
+
         if (clanPlayer != null) {
-            return ParseResult.newSuccessResult(clanPlayer);
+            return ParseResult.newSuccessResult((ClanPlayer)clanPlayer);
         } else {
-            return ParseResult.newErrorResult(Messages.PLAYER_DOES_NOT_EXIST);
+            UUID playerUUID = UUIDUtils.getUUID(value);
+            Optional<Player> playerOp = playerUUID == null ? Optional.empty() : Sponge.getServer().getPlayer(playerUUID);
+            if(playerOp.isPresent()){
+                return ParseResult.newSuccessResult(ClansImpl.getInstance().createClanPlayer(playerUUID, value));
+            } else {
+                return ParseResult.newErrorResult(Messages.PLAYER_DOES_NOT_EXIST);
+            }
         }
     }
 }
