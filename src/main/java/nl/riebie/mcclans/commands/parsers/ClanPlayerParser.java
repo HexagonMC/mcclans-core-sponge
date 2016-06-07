@@ -45,17 +45,20 @@ import java.util.UUID;
 public class ClanPlayerParser implements ParameterParser<ClanPlayer> {
     @Override
     public ParseResult<ClanPlayer> parseValue(CommandSource commandSource, String value, NormalFilledParameter parameter) {
-
+        ClanPlayerImpl clanPlayer = null;
         if(value.startsWith("@")){
            Set<Entity> entities = Selector.parse(value).resolve(commandSource);
-            if(entities.size() == 1 && entities.toArray()[0] instanceof Player){
-                value = ((Player)entities.toArray()[0]).getIdentifier();
+            if(entities.size() > 0 && entities.toArray()[0] instanceof Player){
+                UUID uuid = ((Player)entities.toArray()[0]).getUniqueId();
+                clanPlayer = ClansImpl.getInstance().getClanPlayer(uuid);
             } else{
                 return ParseResult.newErrorResult("Problem with selector");
             }
 
+        } else{
+            clanPlayer = ClansImpl.getInstance().getClanPlayer(value);
         }
-        ClanPlayerImpl clanPlayer = ClansImpl.getInstance().getClanPlayer(value);
+
 
         if (clanPlayer != null) {
             return ParseResult.newSuccessResult((ClanPlayer)clanPlayer);
