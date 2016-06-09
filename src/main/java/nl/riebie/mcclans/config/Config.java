@@ -98,6 +98,11 @@ public class Config {
 
     public static final String COMMAND_ALIASES = "command-aliases";
 
+    // ======================================== SECTION DEFAULT RANKS ======================================== //
+    private static final String SECTION_DEFAULT_RANKS = "default-ranks";
+
+    public static final String DEFAULT_RANKS = "default-ranks";
+
     // Loaded config values
     private static Map<String, Object> sConfig = new HashMap<>();
 
@@ -162,10 +167,18 @@ public class Config {
                 ConfigOption.builder(COMMAND_ALIASES, commandAliases).addConstraints(new ValidAliasMapConstraint()).setValueIfConstraintFailed(Collections.EMPTY_MAP).build()
         ).build();
 
+        Map<String, String> defaultRanks = new HashMap<>();
+        defaultRanks.put("Member", String.join(",", "home", "coords", "clanchat", "allychat", "deposit"));
+
+        ConfigSection defaultRanksConfigSection = ConfigSection.builder(SECTION_DEFAULT_RANKS).setConfigOptions(
+                ConfigOption.builder(DEFAULT_RANKS, defaultRanks).build()
+        ).build();
+
         configSections.add(generalConfigSection);
         configSections.add(databaseConfigSection);
         configSections.add(economyConfigSection);
         configSections.add(commandAliasesConfigSection);
+        configSections.add(defaultRanksConfigSection);
 
         return configSections;
     }
