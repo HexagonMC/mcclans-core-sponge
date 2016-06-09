@@ -22,10 +22,9 @@
 
 package nl.riebie.mcclans.commands.implementations.tables;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import nl.riebie.mcclans.ClansImpl;
+import nl.riebie.mcclans.api.permissions.ClanPermission;
+import nl.riebie.mcclans.clan.RankFactory;
 import nl.riebie.mcclans.clan.RankImpl;
 import nl.riebie.mcclans.table.HorizontalTable;
 import nl.riebie.mcclans.table.Row;
@@ -33,6 +32,10 @@ import nl.riebie.mcclans.table.TableAdapter;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class RankViewTable {
     int page;
@@ -64,14 +67,23 @@ public class RankViewTable {
             @Override
             public void fillRow(Row row, RankImpl rank, int index) {
                 Text.Builder perms = Text.builder();
+
+                List<String> permissions;
+                if (rank.getID() == RankFactory.getOwnerID()) {
+                    permissions = new ArrayList<>();
+                    permissions.addAll(ClansImpl.getInstance().getClanPermissionManager().getClanPermissions().stream().map(ClanPermission::getName).collect(Collectors.toList()));
+                } else {
+                    permissions = rank.getPermissions();
+                }
+
                 int i = 0;
-                for (String perm : rank.getPermissions()) {
+                for (String perm : permissions) {
                     if (i != 0) {
                         perms.append(Text.of(", "));
                     }
-                    if(ClansImpl.getInstance().getClanPermissionManager().isActiveClanPermission(perm)){
+                    if (ClansImpl.getInstance().getClanPermissionManager().isActiveClanPermission(perm)) {
                         perms.append(Text.builder().color(TextColors.GRAY).append(Text.of(perm)).build());
-                    } else{
+                    } else {
                         perms.append(Text.builder().color(TextColors.RED).append(Text.of(perm)).build());
                     }
 

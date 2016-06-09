@@ -594,11 +594,12 @@ public class ClanImpl implements Clan, Cloneable {
 
     public void setupDefaultRanks() {
         RankImpl owner = RankFactory.getInstance().createOwner();
-        RankImpl member = RankFactory.getInstance().createMember();
         RankImpl recruit = RankFactory.getInstance().createRecruit();
         ranks.put(recruit.getName().toLowerCase(), recruit);
         ranks.put(owner.getName().toLowerCase(), owner);
-        addRank(member);
+        for (RankImpl rank : RankFactory.getInstance().createDefaultRanks()) {
+            addRank(rank);
+        }
     }
 
     @Override

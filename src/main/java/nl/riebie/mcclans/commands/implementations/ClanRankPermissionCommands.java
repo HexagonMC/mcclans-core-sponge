@@ -37,6 +37,7 @@ import nl.riebie.mcclans.table.HorizontalTable;
 import nl.riebie.mcclans.table.TableAdapter;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.format.TextColors;
 
 import java.util.List;
 
@@ -155,7 +156,7 @@ public class ClanRankPermissionCommands {
         HorizontalTable<ClanPermission> table = new HorizontalTable<>("Permissions", 10,
                 (TableAdapter<ClanPermission>) (row, permission, index) -> {
                     row.setValue("Permission", Text.of(permission.getName()));
-                    row.setValue("Description", Text.of(permission.getDescription()));
+                    row.setValue("Description", Text.builder(permission.getDescription()).color(TextColors.GRAY).build());
                 });
         table.defineColumn("Permission", 20);
         table.defineColumn("Description", 20);

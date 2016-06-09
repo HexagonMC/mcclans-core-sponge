@@ -24,16 +24,18 @@ package nl.riebie.mcclans;
 
 import com.google.inject.Inject;
 import nl.riebie.mcclans.api.ClanService;
+import nl.riebie.mcclans.clan.RankFactory;
 import nl.riebie.mcclans.commands.CommandRoot;
 import nl.riebie.mcclans.commands.implementations.ClanCommands;
 import nl.riebie.mcclans.config.Config;
-import nl.riebie.mcclans.persistence.DatabaseConnectionOwner;
-import nl.riebie.mcclans.persistence.DatabaseHandler;
-import nl.riebie.mcclans.persistence.TaskExecutor;
 import nl.riebie.mcclans.enums.DBMSType;
 import nl.riebie.mcclans.listeners.*;
 import nl.riebie.mcclans.metrics.MetricsWrapper;
+import nl.riebie.mcclans.persistence.DatabaseConnectionOwner;
+import nl.riebie.mcclans.persistence.DatabaseHandler;
+import nl.riebie.mcclans.persistence.TaskExecutor;
 import nl.riebie.mcclans.utils.FileUtils;
+import nl.riebie.mcclans.utils.Pair;
 import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandManager;
@@ -52,8 +54,7 @@ import org.spongepowered.api.service.user.UserStorageService;
 import org.spongepowered.api.text.Text;
 
 import java.io.File;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * Created by Kippers on 8-12-2015.
@@ -83,7 +84,7 @@ public class MCClans {
     }
 
     @Listener
-    public void onPostInitialize(GamePostInitializationEvent event){
+    public void onPostInitialize(GamePostInitializationEvent event) {
         ClansImpl.getInstance().getClanPermissionManager().setInitialized();
     }
 
@@ -162,6 +163,16 @@ public class MCClans {
         }
 
         ClansImpl.getInstance().updateClanTagCache();
+
+        // Register default ranks
+        List<Pair<String, List<String>>> convertedDefaultRanks = new ArrayList<>();
+        Map<String, String> rawDefaultRanks = Config.getMap(Config.DEFAULT_RANKS, String.class, String.class);
+        for (Map.Entry<String, String> entry : rawDefaultRanks.entrySet()) {
+            String key = entry.getKey().replace(" ", "");
+            List<String> value = Arrays.asList(entry.getValue().replace(" ", "").split(","));
+            convertedDefaultRanks.add(Pair.createPair(key, value));
+        }
+        RankFactory.getInstance().registerDefaultRanks(convertedDefaultRanks);
 
         // Register listeners and commands
         Sponge.getEventManager().registerListeners(this, ClansImpl.getInstance());
