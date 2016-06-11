@@ -99,9 +99,9 @@ public class Config {
     public static final String COMMAND_ALIASES = "command-aliases";
 
     // ======================================== SECTION DEFAULT RANKS ======================================== //
-    private static final String SECTION_DEFAULT_RANKS = "default-ranks";
+    private static final String SECTION_DEFAULT_CLAN_RANKS = "default-clan-ranks";
 
-    public static final String DEFAULT_RANKS = "default-ranks";
+    public static final String DEFAULT_CLAN_RANKS = "default-clan-ranks";
 
     // Loaded config values
     private static Map<String, Object> sConfig = new HashMap<>();
@@ -170,8 +170,8 @@ public class Config {
         Map<String, String> defaultRanks = new HashMap<>();
         defaultRanks.put("Member", String.join(",", "home", "coords", "clanchat", "allychat", "deposit"));
 
-        ConfigSection defaultRanksConfigSection = ConfigSection.builder(SECTION_DEFAULT_RANKS).setConfigOptions(
-                ConfigOption.builder(DEFAULT_RANKS, defaultRanks).build()
+        ConfigSection defaultRanksConfigSection = ConfigSection.builder(SECTION_DEFAULT_CLAN_RANKS).setConfigOptions(
+                ConfigOption.builder(DEFAULT_CLAN_RANKS, defaultRanks).build()
         ).build();
 
         configSections.add(generalConfigSection);

@@ -166,7 +166,7 @@ public class MCClans {
 
         // Register default ranks
         List<Pair<String, List<String>>> convertedDefaultRanks = new ArrayList<>();
-        Map<String, String> rawDefaultRanks = Config.getMap(Config.DEFAULT_RANKS, String.class, String.class);
+        Map<String, String> rawDefaultRanks = Config.getMap(Config.DEFAULT_CLAN_RANKS, String.class, String.class);
         for (Map.Entry<String, String> entry : rawDefaultRanks.entrySet()) {
             String key = entry.getKey().replace(" ", "");
             List<String> value = Arrays.asList(entry.getValue().replace(" ", "").split(","));
