@@ -27,7 +27,7 @@ import nl.riebie.mcclans.config.Config;
 /**
  * Created by riebie on 14/02/2016.
  */
-public enum  RegexConstraints implements RegexConstraint {
+public enum RegexConstraints implements RegexConstraint {
     EMPTY("", false),
     CLAN_TAG(Config.CLAN_TAG_REGEX, true),
     CLAN_NAME(Config.CLAN_NAME_REGEX, true);

@@ -17,7 +17,7 @@ public class ClanPermissionManagerImpl implements ClanPermissionManager {
     private Map<String, ClanPermission> clanPermissionList = new HashMap<>();
 
     public ClanPermissionManagerImpl() {
-        registerClanPermission("none", "none usable permission");
+        registerClanPermission("none", "Non-usable permission");
         registerClanPermission("home", "Teleport to the clan home");
         registerClanPermission("sethome", "Set the clan home location");
         registerClanPermission("invite", "Invite players to the clan");

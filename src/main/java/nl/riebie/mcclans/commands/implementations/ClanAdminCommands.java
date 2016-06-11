@@ -128,7 +128,7 @@ public class ClanAdminCommands {
                     ClanImpl clanImpl = clansImpl.createClan(clanTag, clanName, targetClanPlayer);
                     Messages.sendBroadcastMessageClanCreatedBy(clanImpl.getName(), clanImpl.getTagColored(), commandSource.getName());
                 } else {
-                    Messages.sendWarningMessage(commandSource, Messages.CLANTAG_EXISTS_ALREADY);
+                    Messages.sendWarningMessage(commandSource, Messages.CLAN_TAG_EXISTS_ALREADY);
                 }
             } else {
                 Messages.sendPlayerAlreadyInClan(commandSource, targetClanPlayer.getName());

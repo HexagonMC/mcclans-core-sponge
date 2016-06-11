@@ -23,6 +23,10 @@
 package nl.riebie.mcclans.clan;
 
 import nl.riebie.mcclans.ClansImpl;
+import nl.riebie.mcclans.utils.Pair;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Kippers on 19-1-2016.
@@ -31,11 +35,11 @@ public class RankFactory {
 
     private static RankFactory instance;
     private final static String OWNER_IDENTIFIER = "Owner";
-    private final static String MEMBER_IDENTIFIER = "Member";
     private final static String RECRUIT_IDENTIFIER = "Recruit";
 
-    private static RankImpl owner;
-    private static RankImpl recruit;
+    private RankImpl owner;
+    private RankImpl recruit;
+    private List<Pair<String, List<String>>> defaultRankData = new ArrayList<>();
 
     private final static int OWNER_ID = -2;
     private final static int RECRUIT_ID = -3;
@@ -54,16 +58,6 @@ public class RankFactory {
         return owner;
     }
 
-    public RankImpl createMember() {
-        RankImpl rank = new RankImpl.Builder(ClansImpl.getInstance().getNextAvailableRankID(), MEMBER_IDENTIFIER).build();
-        rank.addPermission("home");
-        rank.addPermission("coords");
-        rank.addPermission("clanchat");
-        rank.addPermission("allychat");
-        rank.addPermission("deposit");
-        return rank;
-    }
-
     public RankImpl createRecruit() {
         if (recruit == null) {
             recruit = new RankImpl.Builder(RECRUIT_ID, RECRUIT_IDENTIFIER).unchangeable().build();
@@ -73,17 +67,37 @@ public class RankFactory {
         return recruit;
     }
 
+    public void registerDefaultRanks(List<Pair<String, List<String>>> ranks) {
+        defaultRankData.clear();
+        for (Pair<String, List<String>> rankDataItem : ranks) {
+            List<String> permissions = new ArrayList<>();
+            for (String permission : rankDataItem.getValue()) {
+                if (ClansImpl.getInstance().getClanPermissionManager().isActiveClanPermission(permission)) {
+                    permissions.add(permission);
+                }
+            }
+            defaultRankData.add(Pair.createPair(rankDataItem.getKey(), permissions));
+        }
+    }
+
+    public List<RankImpl> createDefaultRanks() {
+        List<RankImpl> ranks = new ArrayList<>();
+        for (Pair<String, List<String>> rankDataItem : defaultRankData) {
+            RankImpl rank = new RankImpl.Builder(ClansImpl.getInstance().getNextAvailableRankID(), rankDataItem.getKey()).build();
+            for (String permission : rankDataItem.getValue()) {
+                rank.addPermission(permission);
+            }
+            ranks.add(rank);
+        }
+        return ranks;
+    }
+
     public RankImpl createNewRank(String rankName) {
-        RankImpl newRank = new RankImpl.Builder(ClansImpl.getInstance().getNextAvailableRankID(), rankName).build();
-        return newRank;
+        return new RankImpl.Builder(ClansImpl.getInstance().getNextAvailableRankID(), rankName).build();
     }
 
     public static String getOwnerIdentifier() {
         return OWNER_IDENTIFIER;
-    }
-
-    public static String getMemberIdentifier() {
-        return MEMBER_IDENTIFIER;
     }
 
     public static String getRecruitIdentifier() {

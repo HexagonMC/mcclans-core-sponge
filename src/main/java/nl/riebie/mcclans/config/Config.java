@@ -30,6 +30,9 @@ import nl.riebie.mcclans.config.constraints.ValidAliasMapConstraint;
 import nl.riebie.mcclans.config.model.ConfigOption;
 import nl.riebie.mcclans.config.model.ConfigSection;
 import nl.riebie.mcclans.utils.MessageBoolean;
+import nl.riebie.mcclans.utils.Utils;
+import org.spongepowered.api.text.format.TextColor;
+import org.spongepowered.api.text.format.TextColors;
 
 import java.io.File;
 import java.io.IOException;
@@ -49,11 +52,13 @@ public class Config {
     public static final String TELEPORT_COOLDOWN_SECONDS = "teleport-cooldown-seconds";
     public static final String RE_SET_CLANHOME_COOLDOWN_SECONDS = "re-set-clanhome-cooldown-seconds";
     public static final String USE_CHAT_CLAN_TAGS = "use-chat-clan-tags";
+    public static final String CLAN_TAG_DEFAULT_COLOR = "clan-tag-default-color";
     public static final String USE_COLORED_TAGS_BASED_ON_CLAN_KDR = "use-colored-tags-based-on-clan-kdr";
     public static final String ALLOW_FF_PROTECTION = "allow-ff-protection";
     public static final String LOG_PLAYER_KDR = "log-player-kdr";
     public static final String BLOCKED_WORLDS_FF_PROTECTION = "blocked-worlds-ff-protection";
     public static final String BLOCKED_WORLDS_PLAYER_KDR = "blocked-worlds-player-kdr";
+    public static final String BLOCKED_CLAN_TAGS_AND_NAMES = "blocked-clan-tags-and-names";
 
     public static final String CREATE_BACKUP_AFTER_HOURS = "create-backup-after-hours";
     public static final String MAXIMUM_AMOUNT_OF_BACKUPS_BEFORE_REMOVING_OLDEST = "maximum-amount-of-backups-before-removing-oldest";
@@ -93,6 +98,11 @@ public class Config {
 
     public static final String COMMAND_ALIASES = "command-aliases";
 
+    // ======================================== SECTION DEFAULT RANKS ======================================== //
+    private static final String SECTION_DEFAULT_RANKS = "default-ranks";
+
+    public static final String DEFAULT_RANKS = "default-ranks";
+
     // Loaded config values
     private static Map<String, Object> sConfig = new HashMap<>();
 
@@ -106,11 +116,13 @@ public class Config {
                 ConfigOption.builder(TELEPORT_COOLDOWN_SECONDS, 120).addMinimumNumberConstraint(0).build(),
                 ConfigOption.builder(RE_SET_CLANHOME_COOLDOWN_SECONDS, 1800).addMinimumNumberConstraint(0).build(),
                 ConfigOption.builder(USE_CHAT_CLAN_TAGS, true).build(),
+                ConfigOption.builder(CLAN_TAG_DEFAULT_COLOR, TextColors.DARK_PURPLE.getName()).addColorConstraint().build(),
                 ConfigOption.builder(USE_COLORED_TAGS_BASED_ON_CLAN_KDR, true).build(),
                 ConfigOption.builder(ALLOW_FF_PROTECTION, true).build(),
                 ConfigOption.builder(LOG_PLAYER_KDR, true).build(),
                 ConfigOption.builder(BLOCKED_WORLDS_FF_PROTECTION, Arrays.asList("example_world1", "example_world2")).build(),
                 ConfigOption.builder(BLOCKED_WORLDS_PLAYER_KDR, Arrays.asList("example_world1", "example_world2")).build(),
+                ConfigOption.builder(BLOCKED_CLAN_TAGS_AND_NAMES, Arrays.asList("example_name1", "example_name2")).build(),
 
                 ConfigOption.builder(CREATE_BACKUP_AFTER_HOURS, 24).addMinimumNumberConstraint(0).build(),
                 ConfigOption.builder(MAXIMUM_AMOUNT_OF_BACKUPS_BEFORE_REMOVING_OLDEST, 14).addMinimumNumberConstraint(0).build(),
@@ -155,10 +167,18 @@ public class Config {
                 ConfigOption.builder(COMMAND_ALIASES, commandAliases).addConstraints(new ValidAliasMapConstraint()).setValueIfConstraintFailed(Collections.EMPTY_MAP).build()
         ).build();
 
+        Map<String, String> defaultRanks = new HashMap<>();
+        defaultRanks.put("Member", String.join(",", "home", "coords", "clanchat", "allychat", "deposit"));
+
+        ConfigSection defaultRanksConfigSection = ConfigSection.builder(SECTION_DEFAULT_RANKS).setConfigOptions(
+                ConfigOption.builder(DEFAULT_RANKS, defaultRanks).build()
+        ).build();
+
         configSections.add(generalConfigSection);
         configSections.add(databaseConfigSection);
         configSections.add(economyConfigSection);
         configSections.add(commandAliasesConfigSection);
+        configSections.add(defaultRanksConfigSection);
 
         return configSections;
     }
@@ -248,6 +268,10 @@ public class Config {
         } else {
             return (String) value;
         }
+    }
+
+    public static TextColor getColor(String key) {
+        return Utils.getTextColorByName(getString(key), TextColors.DARK_PURPLE);
     }
 
     public static int getInteger(String key) {

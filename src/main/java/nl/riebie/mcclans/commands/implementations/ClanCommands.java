@@ -122,6 +122,14 @@ public class ClanCommands {
             ClanPlayerImpl clanPlayer,
             @Parameter(name = "clanTag", length = LengthConstraints.CLAN_TAG, regex = RegexConstraints.CLAN_TAG) String clanTag,
             @Multiline @Parameter(name = "clanName", length = LengthConstraints.CLAN_NAME, regex = RegexConstraints.CLAN_NAME) String clanName) {
+        if (Utils.isClanTagOrNameBlocked(clanTag)) {
+            Messages.sendWarningMessage(commandSource, Messages.CLAN_TAG_BLOCKED);
+            return;
+        } else if (Utils.isClanTagOrNameBlocked(clanName)) {
+            Messages.sendWarningMessage(commandSource, Messages.CLAN_NAME_BLOCKED);
+            return;
+        }
+
         ClansImpl clansImpl = ClansImpl.getInstance();
         if (clanPlayer.getClan() == null) {
             if (clansImpl.tagIsFree(clanTag)) {
@@ -144,7 +152,7 @@ public class ClanCommands {
                     Messages.sendBroadcastMessageClanCreatedBy(clanImpl.getName(), clanImpl.getTagColored(), clanPlayer.getName());
                 }
             } else {
-                Messages.sendWarningMessage(commandSource, Messages.CLANTAG_EXISTS_ALREADY);
+                Messages.sendWarningMessage(commandSource, Messages.CLAN_TAG_EXISTS_ALREADY);
             }
         } else {
             Messages.sendWarningMessage(commandSource, Messages.YOU_ARE_ALREADY_IN_A_CLAN);
