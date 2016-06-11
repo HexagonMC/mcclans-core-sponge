@@ -377,7 +377,7 @@ public class CommandManager {
                             ParameterParser<?> parser = parameterValidatorMap.get(listType);
                             List<Object> parameterList = new ArrayList<>();
                             for (int pIndex = index; pIndex < args.length; pIndex++) {
-                                ParseResult<?> result = parser.parseValue(args[pIndex], normalFilledParameter);
+                                ParseResult<?> result = parser.parseValue(commandSource, args[pIndex], normalFilledParameter);
                                 if (result.isSuccess()) {
                                     parameterList.add(result.getItem());
                                 } else {
@@ -389,7 +389,7 @@ public class CommandManager {
                         }
                     } else {
                         ParameterParser<?> parser = parameterValidatorMap.get(type);
-                        ParseResult<?> parseResult = parser.parseValue(args[index], normalFilledParameter);
+                        ParseResult<?> parseResult = parser.parseValue(commandSource, args[index], normalFilledParameter);
                         if (parseResult.isSuccess()) {
                             objects[j] = isOptional ? Optional.of(parseResult.getItem()) : parseResult.getItem();
                         } else {

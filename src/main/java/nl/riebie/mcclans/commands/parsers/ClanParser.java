@@ -26,13 +26,14 @@ import nl.riebie.mcclans.ClansImpl;
 import nl.riebie.mcclans.clan.ClanImpl;
 import nl.riebie.mcclans.commands.filledparameters.NormalFilledParameter;
 import nl.riebie.mcclans.messages.Messages;
+import org.spongepowered.api.command.CommandSource;
 
 /**
  * Created by riebie on 28/02/2016.
  */
 public class ClanParser implements ParameterParser<ClanImpl> {
     @Override
-    public ParseResult<ClanImpl> parseValue(String value, NormalFilledParameter parameter) {
+    public ParseResult<ClanImpl> parseValue(CommandSource commandSource, String value, NormalFilledParameter parameter) {
         ClansImpl clansImpl = ClansImpl.getInstance();
         ClanImpl clan = clansImpl.getClan(value);
         if (clan == null) {

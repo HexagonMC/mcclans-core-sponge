@@ -156,25 +156,15 @@ public class ClanAdminCommands {
     }
 
     @Command(name = "invite", description = "Invite a player to a clan", spongePermission = "mcclans.admin.invite")
-    public void adminInviteCommand(CommandSource commandSource, @Parameter(name = "clanTag") ClanImpl clan, @Parameter(name = "playerName") String playerName) {
-        ClansImpl clansImpl = ClansImpl.getInstance();
-        UUID uuid = UUIDUtils.getUUID(playerName);
-        Optional<Player> playerOpt;
-        if (uuid == null) {
-            playerOpt = Optional.empty();
-        } else {
-            playerOpt = Sponge.getServer().getPlayer(uuid);
-        }
+    public void adminInviteCommand(CommandSource commandSource, @Parameter(name = "clanTag") ClanImpl clan, @Parameter(name = "playerName") ClanPlayerImpl invitedClanPlayer) {
+        Optional<Player> playerOpt = Sponge.getServer().getPlayer(invitedClanPlayer.getUUID());
         if (!playerOpt.isPresent()) {
-            Messages.sendPlayerNotOnline(commandSource, playerName);
+            Messages.sendPlayerNotOnline(commandSource, invitedClanPlayer.getName());
             return;
         }
 
         Player player = playerOpt.get();
-        ClanPlayerImpl invitedClanPlayer = clansImpl.getClanPlayer(player.getUniqueId());
-        if (invitedClanPlayer == null) {
-            invitedClanPlayer = clansImpl.createClanPlayer(player.getUniqueId(), player.getName());
-        }
+
         if (invitedClanPlayer.getClan() != null) {
             Messages.sendPlayerAlreadyInClan(commandSource, player.getName());
         } else if (invitedClanPlayer.getClanInvite() != null) {
@@ -189,7 +179,7 @@ public class ClanAdminCommands {
 
     @Command(name = "remove", description = "Remove a player from a clan", spongePermission = "mcclans.admin.remove")
     public void adminRemoveCommand(CommandSource commandSource, @Parameter(name = "clanTag") ClanImpl clan, @Parameter(name = "playerName") ClanPlayerImpl toBeRemovedClanPlayer) {
-        if (toBeRemovedClanPlayer.getClan().equals(clan)) {
+        if (clan.equals(toBeRemovedClanPlayer.getClan())) {
             if (toBeRemovedClanPlayer.getName().equals(commandSource.getName())) {
                 Messages.sendWarningMessage(commandSource, Messages.YOU_CANNOT_REMOVE_YOURSELF_FROM_THE_CLAN);
             } else if (toBeRemovedClanPlayer.getName().equalsIgnoreCase(clan.getOwner().getName())) {

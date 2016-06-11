@@ -24,13 +24,14 @@ package nl.riebie.mcclans.commands.parsers;
 
 import nl.riebie.mcclans.commands.filledparameters.NormalFilledParameter;
 import nl.riebie.mcclans.commands.Toggle;
+import org.spongepowered.api.command.CommandSource;
 
 /**
  * Created by riebie on 26/02/2016.
  */
 public class ToggleParser implements ParameterParser<Toggle> {
     @Override
-    public ParseResult<Toggle> parseValue(String value, NormalFilledParameter parameter) {
+    public ParseResult<Toggle> parseValue(CommandSource commandSource, String value, NormalFilledParameter parameter) {
         Toggle.ToggleType type = Toggle.ToggleType.ofString(value);
         if (type == null) {
             return ParseResult.newErrorResult(String.format("A toggleable parameter should be one of: %s", Toggle.ToggleType.getPossibleParameterString()));

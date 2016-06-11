@@ -23,6 +23,7 @@
 package nl.riebie.mcclans.commands.parsers;
 
 import nl.riebie.mcclans.commands.filledparameters.NormalFilledParameter;
+import org.spongepowered.api.command.CommandSource;
 
 /**
  * Created by riebie on 17/01/2016.
@@ -30,7 +31,7 @@ import nl.riebie.mcclans.commands.filledparameters.NormalFilledParameter;
 public class DoubleParser implements ParameterParser<Double> {
 
     @Override
-    public ParseResult<Double> parseValue(String value, NormalFilledParameter parameter) {
+    public ParseResult<Double> parseValue(CommandSource commandSource,String value, NormalFilledParameter parameter) {
         try {
             double doubleValue = Double.parseDouble(value);
             if (parameter.getMinimalLength() == -1 || doubleValue >= parameter.getMinimalLength()) {

@@ -27,6 +27,7 @@ import nl.riebie.mcclans.ClansImpl;
 import nl.riebie.mcclans.api.permissions.ClanPermission;
 import nl.riebie.mcclans.api.permissions.ClanPermissionManager;
 import nl.riebie.mcclans.commands.filledparameters.NormalFilledParameter;
+import org.spongepowered.api.command.CommandSource;
 
 /**
  * Created by riebie on 17/01/2016.
@@ -34,7 +35,7 @@ import nl.riebie.mcclans.commands.filledparameters.NormalFilledParameter;
 public class PermissionParser implements ParameterParser<ClanPermission> {
 
     @Override
-    public ParseResult<ClanPermission> parseValue(String value, NormalFilledParameter parameter) {
+    public ParseResult<ClanPermission> parseValue(CommandSource commandSource, String value, NormalFilledParameter parameter) {
         ClanPermissionManager clanPermissionManager = ClansImpl.getInstance().getClanPermissionManager();
         if (clanPermissionManager.isActiveClanPermission(value)) {
             return ParseResult.newSuccessResult(clanPermissionManager.getClanPermission(value));
