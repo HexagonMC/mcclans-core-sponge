@@ -280,7 +280,7 @@ public class ClanCommands {
     }
 
     @Command(name = "roster", description = "See the members of a clan", spongePermission = "mcclans.user.roster")
-    public void clanRosterCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer, @OptionalParameter(value = ClanImpl.class, name = "clanTag") Optional<ClanImpl> clanOpt,
+    public void clanRosterCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer, @Parameter(name = "clanTag") Optional<ClanImpl> clanOpt,
                                   @PageParameter int page) {
         ClanImpl clan;
         if (clanOpt.isPresent()) {
@@ -361,7 +361,7 @@ public class ClanCommands {
     }
 
     @Command(name = "info", description = "Get the info of a clan", spongePermission = "mcclans.user.info")
-    public void clanInfoCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer, @OptionalParameter(value = ClanImpl.class, name = "clanTag") Optional<ClanImpl> clanOpt) {
+    public void clanInfoCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer, @Parameter(name = "clanTag") Optional<ClanImpl> clanOpt) {
         if (clanOpt.isPresent()) {
             ClanImpl clan = clanOpt.get();
             printInfo(commandSource, clan);
@@ -454,7 +454,7 @@ public class ClanCommands {
 
     @Command(name = "stats", description = "See the statistics of a clan's members", spongePermission = "mcclans.user.stats")
     public void clanStatsCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer,
-                                 @OptionalParameter(value = ClanImpl.class, name = "clanTag") Optional<ClanImpl> clanOpt, @PageParameter int page) {
+                                 @Parameter(name = "clanTag") Optional<ClanImpl> clanOpt, @PageParameter int page) {
         ClanImpl clan;
         if (clanOpt.isPresent()) {
             clan = clanOpt.get();

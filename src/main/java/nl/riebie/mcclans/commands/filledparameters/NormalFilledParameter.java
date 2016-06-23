@@ -22,21 +22,23 @@
 
 package nl.riebie.mcclans.commands.filledparameters;
 
+import java.lang.reflect.Type;
+
 /**
  * Created by riebie on 16/01/2016.
  */
 public class NormalFilledParameter implements FilledParameter {
 
-    private Class<?> listType;
+    private Type listType;
     private int minimalLength = -1;
     private int maximalLength = -1;
     private boolean multiline = false;
     private String regex = "";
     private Class<?> parameterType;
-    private Class<?> optionalType;
+    private Type optionalType;
     private String name;
 
-    public NormalFilledParameter(String name, Class<?> optional, boolean multiline, Class<?> listType, int minimalLength, int maximalLength, String regex, Class<?> parameterType) {
+    public NormalFilledParameter(String name, Type optional, boolean multiline, Type listType, int minimalLength, int maximalLength, String regex, Class<?> parameterType) {
         this.name = name;
         this.optionalType = optional;
         this.listType = listType;
@@ -55,7 +57,7 @@ public class NormalFilledParameter implements FilledParameter {
         return optionalType != null;
     }
 
-    public Class<?> getOptionalType(){
+    public Type getOptionalType(){
         return optionalType;
     }
 
@@ -79,7 +81,7 @@ public class NormalFilledParameter implements FilledParameter {
         return parameterType;
     }
 
-    public Class<?> getListType() {
+    public Type getListType() {
         return listType;
     }
 

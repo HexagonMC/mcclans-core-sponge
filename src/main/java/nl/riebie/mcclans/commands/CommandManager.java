@@ -38,6 +38,7 @@ import nl.riebie.mcclans.messages.Messages;
 import nl.riebie.mcclans.player.ClanPlayerImpl;
 import nl.riebie.mcclans.table.HorizontalTable;
 import nl.riebie.mcclans.table.TableAdapter;
+import nl.riebie.mcclans.utils.ClassUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.source.ConsoleSource;
@@ -169,10 +170,8 @@ public class CommandManager {
         }
     }
 
-    public boolean hasNoParameterAnnotation(java.lang.reflect.Parameter parameter) {
-        OptionalParameter optionalParameter = parameter.getAnnotation(OptionalParameter.class);
-        Parameter parameterAnnotation = parameter.getAnnotation(Parameter.class);
-        return optionalParameter == null && parameterAnnotation == null;
+    private boolean hasNoParameterAnnotation(java.lang.reflect.Parameter parameter) {
+        return parameter.getAnnotation(Parameter.class) == null;
     }
 
     private void handleAnnotatedParameter(java.lang.reflect.Parameter parameter, FilledCommand filledCommand) {
@@ -185,12 +184,18 @@ public class CommandManager {
                     Parameter parameterValues = (Parameter) annotation;
 
                     Set<Class<?>> validParametersList = parameterValidatorMap.keySet();
+
+                    Type optionalType = null;
+                    if (parameter.getType().equals(Optional.class)) {
+                        optionalType = ClassUtils.getGenericType(parameter.getParameterizedType());
+                    }
+
                     Multiline multilineParameter = parameter.getAnnotation(Multiline.class);
-                    Class<?> listType = null;
-                    boolean multiline = false;
-                    if (multilineParameter != null) {
-                        listType = multilineParameter.listType();
-                        multiline = true;
+                    Type listType = null;
+                    boolean multiline = multilineParameter != null;
+                    if (multiline) {
+                        Type list = optionalType == null ? parameter.getParameterizedType() : optionalType;
+                        listType = ClassUtils.getGenericType(list);
                     }
 
                     if (!validParametersList.contains(parameter.getType()) && !(multiline && (listType != null || parameter.getType() == String.class))) {     //TODO check if listType is a valid parameter
@@ -199,33 +204,10 @@ public class CommandManager {
                     LengthConstraint lengthConstraint = parameterValues.length();
                     RegexConstraint regexConstraint = parameterValues.regex();
 
-                    filledCommand.addParameter(parameterValues.name(), null, multiline, listType, lengthConstraint.getMinimalLength(),
+                    filledCommand.addParameter(parameterValues.name(), optionalType, multiline, listType, lengthConstraint.getMinimalLength(),
                             lengthConstraint.getMaximalLength(), regexConstraint.getRegex(), parameter.getType());
 
 
-                } else if (annotation instanceof OptionalParameter) {
-                    OptionalParameter parameterValues = (OptionalParameter) annotation;
-                    if (parameter.getType() != Optional.class) {
-                        throw new IllegalArgumentException(String.format("Optional parameter '%s' should be of the Optional type", parameter.getName()));
-                    }
-                    Set<Class<?>> validParametersList = parameterValidatorMap.keySet();
-                    Multiline multilineParameter = parameter.getAnnotation(Multiline.class);
-                    Class<?> listType = null;
-                    boolean multiline = false;
-                    if (multilineParameter != null) {
-                        listType = multilineParameter.listType();
-                        multiline = true;
-                    }
-
-                    if (!validParametersList.contains(parameterValues.value()) && !(multiline && (listType != null || parameterValues.value() == String.class))) {
-                        throw new IllegalArgumentException(String.format("The generic type of the Optional parameter '%s' should be of one of the following types: %s", parameter.getName(), getValidParametersString(validParametersList)));
-                    }
-                    LengthConstraint lengthConstraint = parameterValues.length();
-                    RegexConstraint regexConstraint = parameterValues.regex();
-
-
-                    filledCommand.addParameter(parameterValues.name(), parameterValues.value(), multiline, listType, lengthConstraint.getMinimalLength(),
-                            lengthConstraint.getMaximalLength(), regexConstraint.getRegex(), parameter.getType());
                 }
             }
         } else {
@@ -256,7 +238,7 @@ public class CommandManager {
                 throw new IllegalStateException(String.format("Unknown root: %s", root));
             }
         }
-        if(args.length ==0){
+        if (args.length == 0) {
             sendHelp(commandSource, 1);
             return;
         }
@@ -332,7 +314,7 @@ public class CommandManager {
                 } else if (parameter instanceof NormalFilledParameter) {
                     NormalFilledParameter normalFilledParameter = (NormalFilledParameter) parameter;
 
-                    Class<?> type = normalFilledParameter.getParameterType();
+                    Type type = normalFilledParameter.getParameterType();
                     boolean isOptional = normalFilledParameter.isOptional();
                     if (isOptional) {
                         type = normalFilledParameter.getOptionalType();
@@ -347,7 +329,7 @@ public class CommandManager {
                         }
                     }
                     if (normalFilledParameter.isMultiline()) {
-                        Class<?> listType = normalFilledParameter.getListType();
+                        Type listType = normalFilledParameter.getListType();
                         if (listType == Void.class) {
                             StringBuilder stringBuilder = new StringBuilder();
                             for (int pIndex = index; pIndex < args.length; pIndex++) {

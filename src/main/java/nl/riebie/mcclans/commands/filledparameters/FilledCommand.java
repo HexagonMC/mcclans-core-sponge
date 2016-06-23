@@ -27,6 +27,7 @@ import nl.riebie.mcclans.commands.annotations.Command;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -83,8 +84,8 @@ public final class FilledCommand {
         children.add(child);
     }
 
-    public void addParameter(String name, Class<?> optional, boolean isMultiline, Class<?> listType, int minimalLength, int maximalLength, String regex, Class<?> parameterType) {
-        NormalFilledParameter normalFilledParameter = new NormalFilledParameter(name, optional, isMultiline, listType, minimalLength, maximalLength, regex, parameterType);
+    public void addParameter(String name, Type optionalType, boolean isMultiline, Type listType, int minimalLength, int maximalLength, String regex, Class<?> parameterType) {
+        NormalFilledParameter normalFilledParameter = new NormalFilledParameter(name, optionalType, isMultiline, listType, minimalLength, maximalLength, regex, parameterType);
         checkStateAndAddParameter(normalFilledParameter);
         if (normalFilledParameter.isOptional()) {
             hasOptional = true;

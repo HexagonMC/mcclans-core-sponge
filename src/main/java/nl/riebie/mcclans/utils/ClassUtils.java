@@ -20,27 +20,35 @@
  * THE SOFTWARE.
  */
 
-package nl.riebie.mcclans.commands.annotations;
+package nl.riebie.mcclans.utils;
 
-import nl.riebie.mcclans.commands.constraints.length.LengthConstraints;
-import nl.riebie.mcclans.commands.constraints.regex.RegexConstraints;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.lang.reflect.WildcardType;
 
-/**
- * Created by riebie on 21/02/2016.
- */
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.PARAMETER)
-public @interface OptionalParameter {
-    Class<?> value();
+public class ClassUtils {
 
-    String name();
+    public static Type getGenericType(Type returnType) {
+        if (!(returnType instanceof ParameterizedType)) {
+            throw new IllegalArgumentException(
+                    "Call return type must be parameterized as Call<Foo> or Call<? extends Foo>");
+        }
+        return getParameterUpperBound(0, (ParameterizedType) returnType);
+    }
 
-    LengthConstraints length() default LengthConstraints.EMPTY;
+    static Type getParameterUpperBound(int index, ParameterizedType type) {
+        Type[] types = type.getActualTypeArguments();
+        if (index < 0 || index >= types.length) {
+            throw new IllegalArgumentException(
+                    "Index " + index + " not in range [0," + types.length + ") for " + type);
+        }
+        Type paramType = types[index];
+        if (paramType instanceof WildcardType) {
+            return ((WildcardType) paramType).getUpperBounds()[0];
+        }
+        return paramType;
+    }
 
-    RegexConstraints regex() default RegexConstraints.EMPTY;
+
 }
