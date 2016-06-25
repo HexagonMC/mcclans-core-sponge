@@ -31,8 +31,7 @@ public class ClassUtils {
 
     public static Type getGenericType(Type returnType) {
         if (!(returnType instanceof ParameterizedType)) {
-            throw new IllegalArgumentException(
-                    "Call return type must be parameterized as Call<Foo> or Call<? extends Foo>");
+            return Void.class;
         }
         return getParameterUpperBound(0, (ParameterizedType) returnType);
     }
@@ -48,6 +47,13 @@ public class ClassUtils {
             return ((WildcardType) paramType).getUpperBounds()[0];
         }
         return paramType;
+    }
+
+    public static Type getRawType(Type returnType) {
+        if ((returnType instanceof ParameterizedType)) {
+            return ((ParameterizedType) returnType).getRawType();
+        }
+        return returnType;
     }
 
 

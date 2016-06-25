@@ -48,7 +48,7 @@ public class ClanRankPermissionCommands {
 
     @Command(name = "add", description = "Adds the given permissions to a rank", isPlayerOnly = true, isClanOnly = true, clanPermission = "rank", spongePermission = "mcclans.user.rank.permission.add")
     public void clanRankPermissionAddCommand(CommandSource sender, ClanPlayerImpl clanPlayer, @Parameter(name = "rankName") String rankName,
-                                             @Multiline @Parameter(name = "permissions") List<ClanPermission> permissions) {
+                                             @Parameter(name = "permissions") List<ClanPermission> permissions) {
 
         ClanImpl clan = clanPlayer.getClan();
         if (clan == null) {
@@ -84,7 +84,7 @@ public class ClanRankPermissionCommands {
 
     @Command(name = "set", description = "Sets the given permissions to a rank", isPlayerOnly = true, isClanOnly = true, clanPermission = "rank", spongePermission = "mcclans.user.rank.permission.set")
     public void clanRankPermissionSetCommand(CommandSource sender, ClanPlayerImpl clanPlayer, @Parameter(name = "rankName") String rankName,
-                                             @Multiline @Parameter(name = "permissions") List<ClanPermission> permissions) {
+                                             @Parameter(name = "permissions") List<ClanPermission> permissions) {
         ClanImpl clan = clanPlayer.getClan();
         if (clan == null) {
             Messages.sendWarningMessage(sender, Messages.YOU_ARE_NOT_IN_A_CLAN);
@@ -117,7 +117,7 @@ public class ClanRankPermissionCommands {
 
     @Command(name = "remove", description = "Removes the given permissions from a rank", isPlayerOnly = true, isClanOnly = true, clanPermission = "rank", spongePermission = "mcclans.user.rank.permission.remove")
     public void canPermissionRemoveCommand(CommandSource sender, ClanPlayerImpl clanPlayer, @Parameter(name = "rankName") String rankName,
-                                           @Multiline @Parameter(name = "permissions") List<String> permissions) {
+                                           @Parameter(name = "permissions") List<String> permissions) {
         ClanImpl clan = clanPlayer.getClan();
         if (clan == null) {
             Messages.sendWarningMessage(sender, Messages.YOU_ARE_NOT_IN_A_CLAN);

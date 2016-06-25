@@ -50,7 +50,7 @@ public class ClanRankCommands {
 
     @Command(name = "create", description = "Create a rank", isPlayerOnly = true, isClanOnly = true, clanPermission = "rank", spongePermission = "mcclans.user.rank.create")
     public void clanRankCreateCommand(CommandSource sender, ClanPlayerImpl clanPlayer, @Parameter(name = "rankName") String rankName,
-                                      @Multiline @Parameter(name = "permissions") Optional<List<ClanPermission>> permissions) {
+                                      @Parameter(name = "permissions") Optional<List<ClanPermission>> permissions) {
         ClanImpl clan = clanPlayer.getClan();
         if (clan == null) {
             Messages.sendWarningMessage(sender, Messages.YOU_ARE_NOT_IN_A_CLAN);

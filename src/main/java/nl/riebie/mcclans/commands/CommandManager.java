@@ -41,7 +41,6 @@ import nl.riebie.mcclans.table.TableAdapter;
 import nl.riebie.mcclans.utils.ClassUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.source.ConsoleSource;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
@@ -186,25 +185,26 @@ public class CommandManager {
                     Set<Class<?>> validParametersList = parameterValidatorMap.keySet();
 
                     Type optionalType = null;
-                    if (parameter.getType().equals(Optional.class)) {
+                    boolean hasOptionalType = parameter.getType().equals(Optional.class);
+                    if (hasOptionalType) {
                         optionalType = ClassUtils.getGenericType(parameter.getParameterizedType());
                     }
 
                     Multiline multilineParameter = parameter.getAnnotation(Multiline.class);
-                    Type listType = null;
-                    boolean multiline = multilineParameter != null;
+                    Type genericListType = null;
+                    Type parsedType = hasOptionalType ? optionalType : parameter.getParameterizedType();
+                    boolean multiline = multilineParameter != null || ClassUtils.getRawType(parsedType) == List.class;
                     if (multiline) {
-                        Type list = optionalType == null ? parameter.getParameterizedType() : optionalType;
-                        listType = ClassUtils.getGenericType(list);
+                        genericListType = ClassUtils.getGenericType(parsedType);
+                        parsedType = genericListType == Void.class ? parsedType : ClassUtils.getRawType(genericListType);
                     }
-
-                    if (!validParametersList.contains(parameter.getType()) && !(multiline && (listType != null || parameter.getType() == String.class))) {     //TODO check if listType is a valid parameter
+                    if (!validParametersList.contains(ClassUtils.getRawType(parsedType))) {
                         throw new IllegalArgumentException(String.format("Parameter '%s' should be of one of the following types: %s", parameter.getName(), getValidParametersString(validParametersList)));
                     }
                     LengthConstraint lengthConstraint = parameterValues.length();
                     RegexConstraint regexConstraint = parameterValues.regex();
 
-                    filledCommand.addParameter(parameterValues.name(), optionalType, multiline, listType, lengthConstraint.getMinimalLength(),
+                    filledCommand.addParameter(parameterValues.name(), optionalType, multiline, genericListType, lengthConstraint.getMinimalLength(),
                             lengthConstraint.getMaximalLength(), regexConstraint.getRegex(), parameter.getType());
 
 
@@ -218,11 +218,11 @@ public class CommandManager {
     private String getValidParametersString(Set<Class<?>> validParametersList) {
         StringBuilder stringBuilder = new StringBuilder();
         boolean first = true;
-        for (Class<?> validType : validParametersList) {
+        for (Type validType : validParametersList) {
             if (!first) {
                 stringBuilder.append(", ");
             }
-            stringBuilder.append(validType.getSimpleName());
+            stringBuilder.append(validType.getTypeName());
             first = false;
         }
         return stringBuilder.toString();
