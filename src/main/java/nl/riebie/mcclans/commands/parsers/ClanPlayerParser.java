@@ -78,6 +78,11 @@ public class ClanPlayerParser implements ParameterParser<ClanPlayer> {
         }
     }
 
+    @Override
+    public String getDescription() {
+        return "player name";
+    }
+
     /**
      * TODO remove once https://github.com/SpongePowered/SpongeCommon/issues/791 is fixed
      */

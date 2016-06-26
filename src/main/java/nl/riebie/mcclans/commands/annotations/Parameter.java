@@ -22,9 +22,8 @@
 
 package nl.riebie.mcclans.commands.annotations;
 
-import nl.riebie.mcclans.commands.constraints.length.LengthConstraints;
-import nl.riebie.mcclans.commands.constraints.regex.RegexConstraints;
-
+import nl.riebie.mcclans.commands.constraints.ParameterConstraint;
+import nl.riebie.mcclans.commands.constraints.EmptyConstraint;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -38,7 +37,5 @@ import java.lang.annotation.Target;
 public @interface Parameter {
     String name();
 
-    LengthConstraints length() default LengthConstraints.EMPTY;
-
-    RegexConstraints regex() default RegexConstraints.EMPTY;
+    Class<? extends ParameterConstraint> constraint() default EmptyConstraint.class;
 }

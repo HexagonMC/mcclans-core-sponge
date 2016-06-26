@@ -22,6 +22,7 @@
 
 package nl.riebie.mcclans.commands.parsers;
 
+import nl.riebie.mcclans.commands.constraints.ParameterConstraint;
 import nl.riebie.mcclans.commands.filledparameters.NormalFilledParameter;
 import org.spongepowered.api.command.CommandSource;
 
@@ -32,9 +33,11 @@ public class StringParser implements ParameterParser<String> {
 
     @Override
     public ParseResult<String> parseValue(CommandSource commandSource, String value, NormalFilledParameter parameter) {
-        if ("".equals(parameter.getRegex()) || value.matches(parameter.getRegex())) {
-            if (parameter.getMaximalLength() == -1 || value.length() <= parameter.getMaximalLength()) {
-                if (parameter.getMinimalLength() == -1 || value.length() >= parameter.getMinimalLength()) {
+
+        ParameterConstraint constraint = parameter.getConstraint();
+        if ("".equals(constraint.getRegex()) || value.matches(constraint.getRegex())) {
+            if (constraint.getMaximalLength() == -1 || value.length() <= constraint.getMaximalLength()) {
+                if (constraint.getMinimalLength() == -1 || value.length() >= constraint.getMinimalLength()) {
                     return ParseResult.newSuccessResult(value);
                 } else {
                     return ParseResult.newErrorResult("Supplied parameter too small");
@@ -43,8 +46,13 @@ public class StringParser implements ParameterParser<String> {
                 return ParseResult.newErrorResult("Supplied parameter too long");
             }
         } else {
-            return ParseResult.newErrorResult(String.format("Value should (%s)", parameter.getRegex()));
+            return ParseResult.newErrorResult(String.format("Value should (%s)", constraint.getRegex()));
 
         }
+    }
+
+    @Override
+    public String getDescription() {
+        return "word";
     }
 }

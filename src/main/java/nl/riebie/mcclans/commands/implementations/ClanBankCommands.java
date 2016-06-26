@@ -26,7 +26,7 @@ import nl.riebie.mcclans.MCClans;
 import nl.riebie.mcclans.clan.ClanImpl;
 import nl.riebie.mcclans.commands.annotations.Command;
 import nl.riebie.mcclans.commands.annotations.Parameter;
-import nl.riebie.mcclans.commands.constraints.length.LengthConstraints;
+import nl.riebie.mcclans.commands.constraints.PositiveNumberConstraint;
 import nl.riebie.mcclans.config.Config;
 import nl.riebie.mcclans.messages.Messages;
 import nl.riebie.mcclans.player.ClanPlayerImpl;
@@ -62,7 +62,7 @@ public class ClanBankCommands {
     }
 
     @Command(name = "deposit", description = "Deposit currency in the clan bank", isPlayerOnly = true, isClanOnly = true, clanPermission = "deposit", spongePermission = "mcclans.user.bank.deposit")
-    public void clanBankDepositCommand(CommandSource sender, ClanPlayerImpl clanPlayer, @Parameter(name = "amount", length = LengthConstraints.POSITIVE_NUMBER) double amount) {
+    public void clanBankDepositCommand(CommandSource sender, ClanPlayerImpl clanPlayer, @Parameter(name = "amount", constraint = PositiveNumberConstraint.class) double amount) {
         if (Config.getBoolean(Config.USE_ECONOMY)) {
             ClanImpl clan = clanPlayer.getClan();
             boolean success = EconomyUtils.transferToBank(clan.getBankId(), clanPlayer.getUUID(), amount);
@@ -78,7 +78,7 @@ public class ClanBankCommands {
     }
 
     @Command(name = "withdraw", description = "Withdraw currency from the clan bank", isPlayerOnly = true, isClanOnly = true, clanPermission = "withdraw", spongePermission = "mcclans.user.bank.withdraw")
-    public void clanBankWithdrawCommand(CommandSource sender, ClanPlayerImpl clanPlayer, @Parameter(name = "amount", length = LengthConstraints.POSITIVE_NUMBER) double amount) {
+    public void clanBankWithdrawCommand(CommandSource sender, ClanPlayerImpl clanPlayer, @Parameter(name = "amount", constraint = PositiveNumberConstraint.class) double amount) {
         if (Config.getBoolean(Config.USE_ECONOMY)) {
             ClanImpl clan = clanPlayer.getClan();
             boolean success = EconomyUtils.transferFromBank(clan.getBankId(), clanPlayer.getUUID(), amount);

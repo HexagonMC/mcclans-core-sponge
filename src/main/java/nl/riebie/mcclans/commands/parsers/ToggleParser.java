@@ -39,4 +39,9 @@ public class ToggleParser implements ParameterParser<Toggle> {
             return ParseResult.newSuccessResult(new Toggle(type));
         }
     }
+
+    @Override
+    public String getDescription() {
+        return "value (on/off/toggle)";
+    }
 }

@@ -44,4 +44,9 @@ public class PermissionParser implements ParameterParser<ClanPermission> {
         }
 
     }
+
+    @Override
+    public String getDescription() {
+        return "permission";
+    }
 }

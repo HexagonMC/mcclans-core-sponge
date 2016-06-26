@@ -42,4 +42,9 @@ public class ClanParser implements ParameterParser<ClanImpl> {
             return ParseResult.newSuccessResult(clan);
         }
     }
+
+    @Override
+    public String getDescription() {
+        return "clan tag";
+    }
 }

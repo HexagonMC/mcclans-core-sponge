@@ -25,14 +25,13 @@ package nl.riebie.mcclans.commands;
 import nl.riebie.mcclans.ClansImpl;
 import nl.riebie.mcclans.api.Clan;
 import nl.riebie.mcclans.api.ClanPlayer;
+import nl.riebie.mcclans.commands.constraints.ParameterConstraint;
 import nl.riebie.mcclans.player.CommandSender;
 import nl.riebie.mcclans.api.permissions.ClanPermission;
 import nl.riebie.mcclans.clan.ClanImpl;
 import nl.riebie.mcclans.commands.filledparameters.*;
 import nl.riebie.mcclans.commands.annotations.*;
 import nl.riebie.mcclans.commands.parsers.*;
-import nl.riebie.mcclans.commands.constraints.length.LengthConstraint;
-import nl.riebie.mcclans.commands.constraints.regex.RegexConstraint;
 import nl.riebie.mcclans.config.Config;
 import nl.riebie.mcclans.messages.Messages;
 import nl.riebie.mcclans.player.ClanPlayerImpl;
@@ -74,26 +73,24 @@ public class CommandManager {
 
     //parameter validation
     private static final Map<Class<?>, ParameterParser<?>> parameterValidatorMap = new HashMap<>();
-    private static final Map<Class<?>, String> parameterDescriptionMap = new HashMap<>();
 
     static {
-        registerParameterValidator(new StringParser(), "word", String.class);
-        registerParameterValidator(new IntegerParser(), "number", int.class, Integer.class);
-        registerParameterValidator(new DoubleParser(), "decimal number", double.class, Double.class);
-        registerParameterValidator(new FloatParser(), "decimal number", float.class, Float.class);
-        registerParameterValidator(new BooleanParser(), "value (on/off)", boolean.class, Boolean.class);
+        registerParameterValidator(new StringParser(), String.class);
+        registerParameterValidator(new IntegerParser(), int.class, Integer.class);
+        registerParameterValidator(new DoubleParser(), double.class, Double.class);
+        registerParameterValidator(new FloatParser(), float.class, Float.class);
+        registerParameterValidator(new BooleanParser(), boolean.class, Boolean.class);
 
-        registerParameterValidator(new PermissionParser(), "permission", ClanPermission.class);
-        registerParameterValidator(new ToggleParser(), "value (on/off/toggle)", Toggle.class);
-        registerParameterValidator(new ClanParser(), "clan tag", Clan.class, ClanImpl.class);
-        registerParameterValidator(new ClanPlayerParser(), "player name", ClanPlayer.class, ClanPlayerImpl.class);
-        registerParameterValidator(new TextColorParser(), "color", TextColor.class);
+        registerParameterValidator(new PermissionParser(), ClanPermission.class);
+        registerParameterValidator(new ToggleParser(), Toggle.class);
+        registerParameterValidator(new ClanParser(), Clan.class, ClanImpl.class);
+        registerParameterValidator(new ClanPlayerParser(), ClanPlayer.class, ClanPlayerImpl.class);
+        registerParameterValidator(new TextColorParser(), TextColor.class);
     }
 
-    private static void registerParameterValidator(ParameterParser<?> parser, String userFriendlyDescription, Class<?>... classes) {
+    private static void registerParameterValidator(ParameterParser<?> parser, Class<?>... classes) {
         for (Class<?> type : classes) {
             parameterValidatorMap.put(type, parser);
-            parameterDescriptionMap.put(type, userFriendlyDescription);
         }
     }
 
@@ -191,27 +188,35 @@ public class CommandManager {
                     }
 
                     Multiline multilineParameter = parameter.getAnnotation(Multiline.class);
-                    Type genericListType = null;
+                    Type genericListType;
                     Type parsedType = hasOptionalType ? optionalType : parameter.getParameterizedType();
                     boolean multiline = multilineParameter != null || ClassUtils.getRawType(parsedType) == List.class;
+                    boolean isMultilineString = false;
                     if (multiline) {
                         genericListType = ClassUtils.getGenericType(parsedType);
-                        parsedType = genericListType == Void.class ? parsedType : ClassUtils.getRawType(genericListType);
+                        isMultilineString = genericListType == Void.class;
+                        parsedType = isMultilineString ? parsedType : ClassUtils.getRawType(genericListType);
                     }
                     if (!validParametersList.contains(ClassUtils.getRawType(parsedType))) {
                         throw new IllegalArgumentException(String.format("Parameter '%s' should be of one of the following types: %s", parameter.getName(), getValidParametersString(validParametersList)));
                     }
-                    LengthConstraint lengthConstraint = parameterValues.length();
-                    RegexConstraint regexConstraint = parameterValues.regex();
+                    ParameterConstraint constraint = getConstraintFromParameter(parameterValues);
 
-                    filledCommand.addParameter(parameterValues.name(), optionalType, multiline, genericListType, lengthConstraint.getMinimalLength(),
-                            lengthConstraint.getMaximalLength(), regexConstraint.getRegex(), parameter.getType());
+                    filledCommand.addParameter(parameterValues.name(), hasOptionalType, multiline, isMultilineString, constraint, parsedType);
 
 
                 }
             }
         } else {
             filledCommand.addParameter(parameter.getType());
+        }
+    }
+
+    private ParameterConstraint getConstraintFromParameter(Parameter parameter) {
+        try {
+            return parameter.constraint().newInstance();
+        } catch (InstantiationException | IllegalAccessException e) {
+            throw new IllegalStateException("Cannot instatiate ParameterConstrain ", e);
         }
     }
 
@@ -316,9 +321,6 @@ public class CommandManager {
 
                     Type type = normalFilledParameter.getParameterType();
                     boolean isOptional = normalFilledParameter.isOptional();
-                    if (isOptional) {
-                        type = normalFilledParameter.getOptionalType();
-                    }
                     if (index >= args.length) {
                         if (isOptional) {
                             objects[j] = Optional.empty();
@@ -329,14 +331,14 @@ public class CommandManager {
                         }
                     }
                     if (normalFilledParameter.isMultiline()) {
-                        Type listType = normalFilledParameter.getListType();
-                        if (listType == Void.class) {
+                        ParameterConstraint constraint = normalFilledParameter.getConstraint();
+                        if (normalFilledParameter.isMultilineString()) {
                             StringBuilder stringBuilder = new StringBuilder();
                             for (int pIndex = index; pIndex < args.length; pIndex++) {
                                 String value = args[pIndex];
-                                if (!"".equals(normalFilledParameter.getRegex()) && !value.matches(normalFilledParameter.getRegex())) {
+                                if (!"".equals(constraint.getRegex()) && !value.matches(constraint.getRegex())) {
                                     commandSource.sendMessage(Messages.getWarningMessage(
-                                            String.format("Error while parsing %s: Value should (%s)", args[pIndex], normalFilledParameter.getRegex())));
+                                            String.format("Error while parsing %s: Value should (%s)", args[pIndex], constraint.getRegex())));
                                     return;
                                 }
                                 if (pIndex != index) {
@@ -345,18 +347,18 @@ public class CommandManager {
                                 stringBuilder.append(value);
                             }
                             String result = stringBuilder.toString();
-                            if (normalFilledParameter.getMaximalLength() > -1 &&
-                                    result.length() > normalFilledParameter.getMaximalLength()) {
+                            if (constraint.getMaximalLength() > -1 &&
+                                    result.length() > constraint.getMaximalLength()) {
                                 commandSource.sendMessage(Messages.getWarningMessage("Supplied parameter too large"));
                                 return;
-                            } else if (normalFilledParameter.getMinimalLength() > -1 &&
-                                    result.length() < normalFilledParameter.getMinimalLength()) {
+                            } else if (constraint.getMinimalLength() > -1 &&
+                                    result.length() < constraint.getMinimalLength()) {
                                 commandSource.sendMessage(Messages.getWarningMessage("Supplied parameter too small"));
                                 return;
                             }
                             objects[j] = isOptional ? Optional.of(result) : result;
                         } else {
-                            ParameterParser<?> parser = parameterValidatorMap.get(listType);
+                            ParameterParser<?> parser = parameterValidatorMap.get(type);
                             List<Object> parameterList = new ArrayList<>();
                             for (int pIndex = index; pIndex < args.length; pIndex++) {
                                 ParseResult<?> result = parser.parseValue(commandSource, args[pIndex], normalFilledParameter);
@@ -494,22 +496,23 @@ public class CommandManager {
     }
 
     private Text getParameterDescription(NormalFilledParameter parameter) {
+        ParameterConstraint constraint = parameter.getConstraint();
         Type type = parameter.getParameterType();
-        String prefix = String.format("a %s", parameterDescriptionMap.get(type));
+        String description = parameterValidatorMap.get(type).getDescription();
+
+        String prefix = String.format("a %s", description);
         if (parameter.isMultiline()) {
-            if (parameter.getListType() != Void.class) {
-                type = parameter.getListType();
-                prefix = String.format("a %s list", parameterDescriptionMap.get(type));
-            } else {
+            if (parameter.isMultilineString()) {
                 prefix = "multiple words";
+            } else {
+                prefix = String.format("a %s list", description);
             }
 
         } else if (parameter.isOptional()) {
-            type = parameter.getOptionalType();
-            prefix = String.format("a %s", parameterDescriptionMap.get(type));
+            prefix = String.format("a %s", description);
         }
-        int minimalLength = parameter.getMinimalLength();
-        int maximalLength = parameter.getMaximalLength();
+        int minimalLength = constraint.getMinimalLength();
+        int maximalLength = constraint.getMaximalLength();
         if (minimalLength != -1 && maximalLength != -1) {
             prefix += "; " + minimalLength + "-" + maximalLength;
         }

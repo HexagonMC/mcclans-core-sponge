@@ -22,6 +22,8 @@
 
 package nl.riebie.mcclans.commands.filledparameters;
 
+import nl.riebie.mcclans.commands.constraints.ParameterConstraint;
+
 import java.lang.reflect.Type;
 
 /**
@@ -29,63 +31,51 @@ import java.lang.reflect.Type;
  */
 public class NormalFilledParameter implements FilledParameter {
 
-    private Type listType;
-    private int minimalLength = -1;
-    private int maximalLength = -1;
-    private boolean multiline = false;
-    private String regex = "";
-    private Class<?> parameterType;
-    private Type optionalType;
-    private String name;
+    private final ParameterConstraint constraint;
+    private final boolean multiline;
+    private final Type parameterType;
+    private final boolean isOptional;
+    private final boolean multilineString;
+    private final String name;
 
-    public NormalFilledParameter(String name, Type optional, boolean multiline, Type listType, int minimalLength, int maximalLength, String regex, Class<?> parameterType) {
+    public NormalFilledParameter(String name, boolean optional, boolean multiline, boolean multilineString, ParameterConstraint constraint, Type parameterType) {
         this.name = name;
-        this.optionalType = optional;
-        this.listType = listType;
-        this.minimalLength = minimalLength;
-        this.maximalLength = maximalLength;
-        this.multiline = multiline;
-        this.regex = regex;
+        this.isOptional = optional;
+        this.multilineString = multilineString;this.multiline = multiline;
+        this.constraint = constraint;
         this.parameterType = parameterType;
     }
 
     public NormalFilledParameter(Class<?> parameterType) {
         this.parameterType = parameterType;
+        this.name = null;
+        this.isOptional = false;
+        this.multiline = false;
+        this.multilineString = false;
+        this.constraint = null;
     }
 
     public boolean isOptional() {
-        return optionalType != null;
-    }
-
-    public Type getOptionalType(){
-        return optionalType;
+        return isOptional;
     }
 
     public boolean isMultiline() {
         return multiline;
     }
 
-    public int getMinimalLength() {
-        return minimalLength;
+    public ParameterConstraint getConstraint(){
+        return constraint;
     }
 
-    public int getMaximalLength() {
-        return maximalLength;
-    }
-
-    public String getRegex() {
-        return regex;
-    }
-
-    public Class<?> getParameterType() {
+    public Type getParameterType() {
         return parameterType;
-    }
-
-    public Type getListType() {
-        return listType;
     }
 
     public String getName() {
         return name;
+    }
+
+    public boolean isMultilineString() {
+        return multilineString;
     }
 }

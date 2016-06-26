@@ -22,6 +22,7 @@
 
 package nl.riebie.mcclans.commands.parsers;
 
+import nl.riebie.mcclans.commands.constraints.ParameterConstraint;
 import nl.riebie.mcclans.commands.filledparameters.NormalFilledParameter;
 import org.spongepowered.api.command.CommandSource;
 
@@ -31,20 +32,26 @@ import org.spongepowered.api.command.CommandSource;
 public class FloatParser implements ParameterParser<Float> {
 
     @Override
-    public ParseResult<Float> parseValue(CommandSource commandSource,String value, NormalFilledParameter parameter) {
+    public ParseResult<Float> parseValue(CommandSource commandSource, String value, NormalFilledParameter parameter) {
         try {
             float floatValue = Float.parseFloat(value);
-            if (parameter.getMinimalLength() == -1 || floatValue >= parameter.getMinimalLength()) {
-                if (parameter.getMaximalLength() == -1 || floatValue <= parameter.getMaximalLength()) {
+            ParameterConstraint constraint = parameter.getConstraint();
+            if (constraint.getMinimalLength() == -1 || floatValue >= constraint.getMinimalLength()) {
+                if (constraint.getMaximalLength() == -1 || floatValue <= constraint.getMaximalLength()) {
                     return ParseResult.newSuccessResult(floatValue);
                 } else {
-                    return ParseResult.newErrorResult(String.format("number supplied too high (%s/%s)", floatValue, parameter.getMaximalLength()));
+                    return ParseResult.newErrorResult(String.format("number supplied too high (%s/%s)", floatValue, constraint.getMaximalLength()));
                 }
             } else {
-                return ParseResult.newErrorResult(String.format("number supplied too low (%s/%s)", floatValue, parameter.getMinimalLength()));
+                return ParseResult.newErrorResult(String.format("number supplied too low (%s/%s)", floatValue, constraint.getMinimalLength()));
             }
         } catch (NumberFormatException e) {
             return ParseResult.newErrorResult("Supplied parameter is not a Float");
         }
+    }
+
+    @Override
+    public String getDescription() {
+        return "decimal number";
     }
 }
