@@ -27,8 +27,10 @@ import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
 
-import java.util.Arrays;
+import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -43,14 +45,14 @@ public class CommandRoot implements CommandCallable {
     private final CommandManager commandManager;
     private final String root;
 
-    private CommandRoot(String root, CommandManager commandExecutor,String description) {
+    private CommandRoot(String root, CommandManager commandExecutor, String description) {
         this.root = root;
         this.commandManager = commandExecutor;
 
         desc = Optional.of(Text.of(description));
     }
 
-    public static CommandRoot newAllias(String alias, String[] fullCommand, CommandManager commandExecutor){
+    public static CommandRoot newAllias(String alias, String[] fullCommand, CommandManager commandExecutor) {
         return new CommandRoot(alias, commandExecutor, String.format("alias for /clan %s", commandArrayToString(fullCommand)));
     }
 
@@ -79,20 +81,21 @@ public class CommandRoot implements CommandCallable {
         return desc.get();
     }
 
-    public List<String> getSuggestions(CommandSource source, String arguments) throws CommandException {
+    @Override
+    public List<String> getSuggestions(CommandSource source, String arguments, @Nullable Location<World> targetPosition) throws CommandException {
         return Collections.emptyList();
     }
 
-    public String getRoot(){
+    public String getRoot() {
         return root;
     }
 
-    private static String commandArrayToString(String[] array){
+    private static String commandArrayToString(String[] array) {
         int iMax = array.length - 1;
         StringBuilder b = new StringBuilder();
-        for (int i = 0;i<array.length; i++) {
+        for (int i = 0; i < array.length; i++) {
             b.append(String.valueOf(array[i]));
-            if (i != iMax){
+            if (i != iMax) {
                 b.append(" ");
             }
         }
