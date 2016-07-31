@@ -22,6 +22,7 @@
 
 package nl.riebie.mcclans.commands.parsers;
 
+import nl.riebie.mcclans.commands.constraints.ParameterConstraint;
 import nl.riebie.mcclans.commands.filledparameters.NormalFilledParameter;
 import org.spongepowered.api.command.CommandSource;
 
@@ -34,17 +35,23 @@ public class IntegerParser implements ParameterParser<Integer> {
     public ParseResult<Integer> parseValue(CommandSource commandSource, String value, NormalFilledParameter parameter) {
         try {
             int intValue = Integer.parseInt(value);
-            if (parameter.getMinimalLength() == -1 || intValue >= parameter.getMinimalLength()) {
-                if (parameter.getMaximalLength() == -1 || intValue <= parameter.getMaximalLength()) {
+            ParameterConstraint constraint = parameter.getConstraint();
+            if (constraint.getMinimalLength() == -1 || intValue >= constraint.getMinimalLength()) {
+                if (constraint.getMaximalLength() == -1 || intValue <= constraint.getMaximalLength()) {
                     return ParseResult.newSuccessResult(intValue);
                 } else {
-                    return ParseResult.newErrorResult(String.format("number supplied too high (%s/%s)", intValue, parameter.getMaximalLength()));
+                    return ParseResult.newErrorResult(String.format("The supplied parameter is too high (%s/%s)", intValue, constraint.getMaximalLength()));
                 }
             } else {
-                return ParseResult.newErrorResult(String.format("number supplied too low (%s/%s)", intValue, parameter.getMinimalLength()));
+                return ParseResult.newErrorResult(String.format("The supplied parameter is too low (%s/%s)", intValue, constraint.getMinimalLength()));
             }
         } catch (NumberFormatException e) {
-            return ParseResult.newErrorResult("Supplied parameter is not a Integer");
+            return ParseResult.newErrorResult("The supplied parameter is not a number");
         }
+    }
+
+    @Override
+    public String getDescription() {
+        return "number";
     }
 }

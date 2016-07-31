@@ -41,4 +41,9 @@ public class TextColorParser implements ParameterParser<TextColor> {
             return ParseResult.newSuccessResult(textColor);
         }
     }
+
+    @Override
+    public String getDescription() {
+        return "color";
+    }
 }

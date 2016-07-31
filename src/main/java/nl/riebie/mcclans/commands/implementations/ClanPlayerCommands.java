@@ -28,7 +28,6 @@ import nl.riebie.mcclans.clan.ClanImpl;
 import nl.riebie.mcclans.clan.RankFactory;
 import nl.riebie.mcclans.clan.RankImpl;
 import nl.riebie.mcclans.commands.annotations.Command;
-import nl.riebie.mcclans.commands.annotations.OptionalParameter;
 import nl.riebie.mcclans.commands.annotations.Parameter;
 import nl.riebie.mcclans.messages.Messages;
 import nl.riebie.mcclans.player.ClanPlayerImpl;
@@ -48,7 +47,7 @@ import java.util.Optional;
  */
 public class ClanPlayerCommands {
 
-    @Command(name = "setrank", description = "Set the rank of a member of your clan", isPlayerOnly = true, isClanOnly = true, clanPermission = "setrank", spongePermission = "mcclans.user.player.info")
+    @Command(name = "setrank", description = "Set the rank of a member of your clan", isPlayerOnly = true, isClanOnly = true, clanPermission = "setrank", spongePermission = "mcclans.user.player.setrank")
     public void playerSetRankCommand(CommandSource sender, ClanPlayerImpl clanPlayer, @Parameter(name = "playerName") ClanPlayerImpl targetPlayer,
                                      @Parameter(name = "rankName") String rankName) {
 
@@ -77,7 +76,7 @@ public class ClanPlayerCommands {
     }
 
     @Command(name = "info", description = "Get the info of yourself or another player", spongePermission = "mcclans.user.player.info")
-    public void playerInfoCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer, @OptionalParameter(value = ClanPlayerImpl.class, name = "playerName") Optional<ClanPlayerImpl> playerOpt) {
+    public void playerInfoCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer, @Parameter(name = "playerName") Optional<ClanPlayerImpl> playerOpt) {
         if (playerOpt.isPresent()) {
             ClanPlayerImpl targetClanPlayer = playerOpt.get();
 

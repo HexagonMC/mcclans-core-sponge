@@ -27,8 +27,8 @@ import nl.riebie.mcclans.clan.ClanImpl;
 import nl.riebie.mcclans.clan.RankFactory;
 import nl.riebie.mcclans.clan.RankImpl;
 import nl.riebie.mcclans.commands.annotations.*;
-import nl.riebie.mcclans.commands.constraints.length.LengthConstraints;
-import nl.riebie.mcclans.commands.constraints.regex.RegexConstraints;
+import nl.riebie.mcclans.commands.constraints.ClanNameConstraint;
+import nl.riebie.mcclans.commands.constraints.ClanTagConstraint;
 import nl.riebie.mcclans.comparators.MemberComparator;
 import nl.riebie.mcclans.persistence.DatabaseHandler;
 import nl.riebie.mcclans.messages.Messages;
@@ -102,8 +102,8 @@ public class ClanAdminCommands {
     public void adminCreateCommand(
             CommandSource commandSource,
             @Parameter(name = "owner") String owner,
-            @Parameter(name = "clanTag", length = LengthConstraints.CLAN_TAG, regex = RegexConstraints.CLAN_TAG) String clanTag,
-            @Multiline @Parameter(name = "clanName", length = LengthConstraints.CLAN_NAME, regex = RegexConstraints.CLAN_NAME) String clanName
+            @Parameter(name = "clanTag", constraint = ClanTagConstraint.class) String clanTag,
+            @Multiline @Parameter(name = "clanName", constraint = ClanNameConstraint.class) String clanName
     ) {
         ClansImpl clansImpl = ClansImpl.getInstance();
         ClanPlayerImpl targetClanPlayer = clansImpl.getClanPlayer(owner);

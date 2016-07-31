@@ -22,6 +22,7 @@
 
 package nl.riebie.mcclans.commands.parsers;
 
+import nl.riebie.mcclans.commands.constraints.ParameterConstraint;
 import nl.riebie.mcclans.commands.filledparameters.NormalFilledParameter;
 import org.spongepowered.api.command.CommandSource;
 
@@ -34,17 +35,23 @@ public class DoubleParser implements ParameterParser<Double> {
     public ParseResult<Double> parseValue(CommandSource commandSource,String value, NormalFilledParameter parameter) {
         try {
             double doubleValue = Double.parseDouble(value);
-            if (parameter.getMinimalLength() == -1 || doubleValue >= parameter.getMinimalLength()) {
-                if (parameter.getMaximalLength() == -1 || doubleValue <= parameter.getMaximalLength()) {
+            ParameterConstraint constraint = parameter.getConstraint();
+            if (constraint.getMinimalLength() == -1 || doubleValue >= constraint.getMinimalLength()) {
+                if (constraint.getMaximalLength() == -1 || doubleValue <= constraint.getMaximalLength()) {
                     return ParseResult.newSuccessResult(doubleValue);
                 } else {
-                    return ParseResult.newErrorResult(String.format("number supplied too high (%s/%s)", doubleValue, parameter.getMaximalLength()));
+                    return ParseResult.newErrorResult(String.format("The supplied parameter is too high (%s/%s)", doubleValue, constraint.getMaximalLength()));
                 }
             } else {
-                return ParseResult.newErrorResult(String.format("number supplied too low (%s/%s)", doubleValue, parameter.getMinimalLength()));
+                return ParseResult.newErrorResult(String.format("The supplied parameter is too low (%s/%s)", doubleValue, constraint.getMinimalLength()));
             }
         } catch (NumberFormatException e) {
-            return ParseResult.newErrorResult("Supplied parameter is not a Double");
+            return ParseResult.newErrorResult("The supplied parameter is not a decimal number");
         }
+    }
+
+    @Override
+    public String getDescription() {
+        return "decimal number";
     }
 }

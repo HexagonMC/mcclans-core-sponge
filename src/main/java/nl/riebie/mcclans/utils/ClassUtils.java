@@ -20,39 +20,41 @@
  * THE SOFTWARE.
  */
 
-package nl.riebie.mcclans.commands.constraints.length;
+package nl.riebie.mcclans.utils;
 
-import nl.riebie.mcclans.config.Config;
 
-/**
- * Created by riebie on 14/02/2016.
- */
-public enum LengthConstraints implements LengthConstraint {
-    EMPTY(-1, -1),
-    CLAN_NAME(Config.CLAN_NAME_CHARACTERS_MINIMUM, Config.CLAN_NAME_CHARACTERS_MAXIMUM),
-    CLAN_TAG(Config.CLAN_TAG_CHARACTERS_MINIMUM, Config.CLAN_TAG_CHARACTERS_MAXIMUM),
-    POSITIVE_NUMBER(0, -1);
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.lang.reflect.WildcardType;
 
-    private int minimumLength;
-    private int maximumLength;
+public class ClassUtils {
 
-    LengthConstraints(String minimumKey, String maximumKey) {
-        minimumLength = Config.getInteger(minimumKey);
-        maximumLength = Config.getInteger(maximumKey);
+    public static Type getGenericType(Type returnType) {
+        if (!(returnType instanceof ParameterizedType)) {
+            return Void.class;
+        }
+        return getParameterUpperBound(0, (ParameterizedType) returnType);
     }
 
-    LengthConstraints(int minimumLength, int maximumLength) {
-        this.minimumLength = minimumLength;
-        this.maximumLength = maximumLength;
+    static Type getParameterUpperBound(int index, ParameterizedType type) {
+        Type[] types = type.getActualTypeArguments();
+        if (index < 0 || index >= types.length) {
+            throw new IllegalArgumentException(
+                    "Index " + index + " not in range [0," + types.length + ") for " + type);
+        }
+        Type paramType = types[index];
+        if (paramType instanceof WildcardType) {
+            return ((WildcardType) paramType).getUpperBounds()[0];
+        }
+        return paramType;
     }
 
-    @Override
-    public int getMinimalLength() {
-        return minimumLength;
+    public static Type getRawType(Type returnType) {
+        if ((returnType instanceof ParameterizedType)) {
+            return ((ParameterizedType) returnType).getRawType();
+        }
+        return returnType;
     }
 
-    @Override
-    public int getMaximalLength() {
-        return maximumLength;
-    }
+
 }

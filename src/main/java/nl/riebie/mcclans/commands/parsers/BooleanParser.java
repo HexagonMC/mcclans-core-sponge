@@ -37,4 +37,9 @@ public class BooleanParser implements ParameterParser<Boolean> {
 
         return ParseResult.newSuccessResult(booleanValue);
     }
+
+    @Override
+    public String getDescription() {
+        return "value (on/off)";
+    }
 }
