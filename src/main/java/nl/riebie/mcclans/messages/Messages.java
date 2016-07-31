@@ -78,6 +78,10 @@ public class Messages {
     public static final String PLAYER_STATISTICS_SUCCESSFULLY_MODIFIED = "Player statistics successfully modified";
     public static final String ECONOMY_USAGE_IS_CURRENTLY_DISABLED = "Economy usage is currently disabled";
     public static final String NO_ECONOMY_ACCOUNT_FOUND = "No economy account found!";
+    public static final String YOU_ARE_NOW_IGNORING_CLAN_CHAT = "You are now ignoring clan chat";
+    public static final String YOU_HAVE_STOPPED_IGNORING_CLAN_CHAT = "You have stopped ignoring clan chat";
+    public static final String YOU_ARE_NOW_IGNORING_ALLY_CHAT = "You are now ignoring ally chat";
+    public static final String YOU_HAVE_STOPPED_IGNORING_ALLY_CHAT = "You have stopped ignoring ally chat";
 
     public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_USE_THIS_COMMAND = "You do not have permission to use this command";
     public static final String THIS_COMMAND_HAS_NO_INFORMATION_TO_DISPLAY = "This command has no information to display";
@@ -522,6 +526,22 @@ public class Messages {
                 Text.builder("AC").color(TextColors.GOLD).build(),
                 Text.builder("] ").color(TextColors.GRAY).build(),
                 Text.builder("Now talking in ally chat").color(BASIC_CHAT_COLOR).build()
+        );
+        commandSource.sendMessage(message);
+    }
+
+    public static void sendYouNeedToUnignoreClanChatBeforeTalking(CommandSource commandSource) {
+        Text message = Text.join(
+                Text.builder("You need to unignore clan chat before you can talk. Use ").color(WARNING_CHAT_COLOR).build(),
+                Text.builder("/clan chat ignore clan").color(WARNING_HIGHLIGHT).build()
+        );
+        commandSource.sendMessage(message);
+    }
+
+    public static void sendYouNeedToUnignoreAllyChatBeforeTalking(CommandSource commandSource) {
+        Text message = Text.join(
+                Text.builder("You need to unignore ally chat before you can talk. Use ").color(WARNING_CHAT_COLOR).build(),
+                Text.builder("/clan chat ignore ally").color(WARNING_HIGHLIGHT).build()
         );
         commandSource.sendMessage(message);
     }

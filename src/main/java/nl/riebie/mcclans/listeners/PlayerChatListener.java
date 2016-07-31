@@ -97,8 +97,13 @@ public class PlayerChatListener {
                 break;
             case CLAN:
                 if (clanPlayer.getRank().hasPermission("clanchat")) {
-                    event.setMessage(event.getRawMessage());
-                    event.setChannel(ClanMessageChannel.getFor(clanPlayer));
+                    if (clanPlayer.getIgnoreClanChat()) {
+                        event.setCancelled(true);
+                        clanPlayer.setChatState(PlayerChatState.GLOBAL);
+                        Messages.sendYouNeedToUnignoreClanChatBeforeTalking(player);
+                    } else {
+                        event.setMessage(event.getRawMessage());
+                        event.setChannel(ClanMessageChannel.getFor(clanPlayer));
 //                    Text newMessage = Text.join(
 //                            Text.builder("[").color(TextColors.GRAY).build(),
 //                            Text.builder("CC").color(TextColors.YELLOW).build(),
@@ -117,6 +122,7 @@ public class PlayerChatListener {
 //                            channel.addMember(recipientPlayerOpt.get());
 //                        }
 //                    }
+                    }
                 } else {
                     event.setCancelled(true);
                     clanPlayer.setChatState(PlayerChatState.GLOBAL);
@@ -125,8 +131,13 @@ public class PlayerChatListener {
                 break;
             case ALLY:
                 if (clanPlayer.getRank().hasPermission("allychat")) {
-                    event.setMessage(event.getRawMessage());
-                    event.setChannel(AllyMessageChannel.getFor(clanPlayer));
+                    if (clanPlayer.getIgnoreAllyChat()) {
+                        event.setCancelled(true);
+                        clanPlayer.setChatState(PlayerChatState.GLOBAL);
+                        Messages.sendYouNeedToUnignoreAllyChatBeforeTalking(player);
+                    } else {
+                        event.setMessage(event.getRawMessage());
+                        event.setChannel(AllyMessageChannel.getFor(clanPlayer));
 //                    Text newMessage = Text.join(
 //                            Text.builder("[").color(TextColors.GRAY).build(),
 //                            Text.builder("AC").color(TextColors.GOLD).build(),
@@ -153,6 +164,7 @@ public class PlayerChatListener {
 //                            }
 //                        }
 //                    }
+                    }
                 } else {
                     event.setCancelled(true);
                     clanPlayer.setChatState(PlayerChatState.GLOBAL);

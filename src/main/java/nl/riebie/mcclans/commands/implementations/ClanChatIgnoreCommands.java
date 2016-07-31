@@ -25,6 +25,7 @@ package nl.riebie.mcclans.commands.implementations;
 import nl.riebie.mcclans.commands.Toggle;
 import nl.riebie.mcclans.commands.annotations.Command;
 import nl.riebie.mcclans.commands.annotations.Parameter;
+import nl.riebie.mcclans.messages.Messages;
 import nl.riebie.mcclans.player.ClanPlayerImpl;
 import org.spongepowered.api.command.CommandSource;
 
@@ -35,11 +36,23 @@ public class ClanChatIgnoreCommands {
 
     @Command(name = "clan", description = "Ignore clan chat", isPlayerOnly = true, isClanOnly = true, spongePermission = "mcclans.user.chat.ignore.clan")
     public void clanChatCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer, @Parameter(name = "toggle") Toggle toggle) {
-        clanPlayer.setIgnoreClanChat(toggle.getBoolean(clanPlayer.getIgnoreClanChat()));
+        boolean ignore = toggle.getBoolean(clanPlayer.getIgnoreClanChat());
+        clanPlayer.setIgnoreClanChat(ignore);
+        if (ignore) {
+            Messages.sendBasicMessage(commandSource, Messages.YOU_ARE_NOW_IGNORING_CLAN_CHAT);
+        } else {
+            Messages.sendBasicMessage(commandSource, Messages.YOU_HAVE_STOPPED_IGNORING_CLAN_CHAT);
+        }
     }
 
     @Command(name = "ally", description = "Ignore ally chat", isPlayerOnly = true, isClanOnly = true, spongePermission = "mcclans.user.chat.ignore.ally")
     public void allyChatCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer, @Parameter(name = "toggle") Toggle toggle) {
-        clanPlayer.setIgnoreAllyChat(toggle.getBoolean(clanPlayer.getIgnoreAllyChat()));
+        boolean ignore = toggle.getBoolean(clanPlayer.getIgnoreAllyChat());
+        clanPlayer.setIgnoreAllyChat(ignore);
+        if (ignore) {
+            Messages.sendBasicMessage(commandSource, Messages.YOU_ARE_NOW_IGNORING_ALLY_CHAT);
+        } else {
+            Messages.sendBasicMessage(commandSource, Messages.YOU_HAVE_STOPPED_IGNORING_ALLY_CHAT);
+        }
     }
 }
