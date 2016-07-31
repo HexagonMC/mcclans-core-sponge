@@ -116,7 +116,7 @@ public class CommandManager {
         return roots;
     }
 
-    public void registerCommandStructure(Class<?> commandStructure, FilledCommand parent) {
+    private void registerCommandStructure(Class<?> commandStructure, FilledCommand parent) {
         try {
             Object commandStructureInstance = commandStructure.newInstance();
             for (Method method : commandStructure.getMethods()) {
@@ -216,7 +216,7 @@ public class CommandManager {
         try {
             return parameter.constraint().newInstance();
         } catch (InstantiationException | IllegalAccessException e) {
-            throw new IllegalStateException("Cannot instatiate ParameterConstrain ", e);
+            throw new IllegalStateException(String.format("Cannot instantiate %s", parameter.constraint().getName()), e);
         }
     }
 

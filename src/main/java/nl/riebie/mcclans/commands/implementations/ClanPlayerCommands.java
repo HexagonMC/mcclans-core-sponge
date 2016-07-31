@@ -47,7 +47,7 @@ import java.util.Optional;
  */
 public class ClanPlayerCommands {
 
-    @Command(name = "setrank", description = "Set the rank of a member of your clan", isPlayerOnly = true, isClanOnly = true, clanPermission = "setrank", spongePermission = "mcclans.user.player.info")
+    @Command(name = "setrank", description = "Set the rank of a member of your clan", isPlayerOnly = true, isClanOnly = true, clanPermission = "setrank", spongePermission = "mcclans.user.player.setrank")
     public void playerSetRankCommand(CommandSource sender, ClanPlayerImpl clanPlayer, @Parameter(name = "playerName") ClanPlayerImpl targetPlayer,
                                      @Parameter(name = "rankName") String rankName) {
 
