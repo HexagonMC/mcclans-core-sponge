@@ -40,13 +40,13 @@ public class FloatParser implements ParameterParser<Float> {
                 if (constraint.getMaximalLength() == -1 || floatValue <= constraint.getMaximalLength()) {
                     return ParseResult.newSuccessResult(floatValue);
                 } else {
-                    return ParseResult.newErrorResult(String.format("number supplied too high (%s/%s)", floatValue, constraint.getMaximalLength()));
+                    return ParseResult.newErrorResult(String.format("The supplied parameter is too high (%s/%s)", floatValue, constraint.getMaximalLength()));
                 }
             } else {
-                return ParseResult.newErrorResult(String.format("number supplied too low (%s/%s)", floatValue, constraint.getMinimalLength()));
+                return ParseResult.newErrorResult(String.format("The supplied parameter is too low (%s/%s)", floatValue, constraint.getMinimalLength()));
             }
         } catch (NumberFormatException e) {
-            return ParseResult.newErrorResult("Supplied parameter is not a Float");
+            return ParseResult.newErrorResult("The supplied parameter is not a decimal number");
         }
     }
 

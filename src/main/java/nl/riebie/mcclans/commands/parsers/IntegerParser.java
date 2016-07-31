@@ -40,13 +40,13 @@ public class IntegerParser implements ParameterParser<Integer> {
                 if (constraint.getMaximalLength() == -1 || intValue <= constraint.getMaximalLength()) {
                     return ParseResult.newSuccessResult(intValue);
                 } else {
-                    return ParseResult.newErrorResult(String.format("number supplied too high (%s/%s)", intValue, constraint.getMaximalLength()));
+                    return ParseResult.newErrorResult(String.format("The supplied parameter is too high (%s/%s)", intValue, constraint.getMaximalLength()));
                 }
             } else {
-                return ParseResult.newErrorResult(String.format("number supplied too low (%s/%s)", intValue, constraint.getMinimalLength()));
+                return ParseResult.newErrorResult(String.format("The supplied parameter is too low (%s/%s)", intValue, constraint.getMinimalLength()));
             }
         } catch (NumberFormatException e) {
-            return ParseResult.newErrorResult("Supplied parameter is not a Integer");
+            return ParseResult.newErrorResult("The supplied parameter is not a number");
         }
     }
 

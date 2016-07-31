@@ -40,13 +40,13 @@ public class StringParser implements ParameterParser<String> {
                 if (constraint.getMinimalLength() == -1 || value.length() >= constraint.getMinimalLength()) {
                     return ParseResult.newSuccessResult(value);
                 } else {
-                    return ParseResult.newErrorResult("Supplied parameter too small");
+                    return ParseResult.newErrorResult("The supplied parameter is too small");
                 }
             } else {
-                return ParseResult.newErrorResult("Supplied parameter too long");
+                return ParseResult.newErrorResult("The supplied parameter is too long");
             }
         } else {
-            return ParseResult.newErrorResult(String.format("Value should (%s)", constraint.getRegex()));
+            return ParseResult.newErrorResult(String.format("Value should match regex \'%s\'", constraint.getRegex()));
 
         }
     }

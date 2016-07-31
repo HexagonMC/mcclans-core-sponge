@@ -40,13 +40,13 @@ public class DoubleParser implements ParameterParser<Double> {
                 if (constraint.getMaximalLength() == -1 || doubleValue <= constraint.getMaximalLength()) {
                     return ParseResult.newSuccessResult(doubleValue);
                 } else {
-                    return ParseResult.newErrorResult(String.format("number supplied too high (%s/%s)", doubleValue, constraint.getMaximalLength()));
+                    return ParseResult.newErrorResult(String.format("The supplied parameter is too high (%s/%s)", doubleValue, constraint.getMaximalLength()));
                 }
             } else {
-                return ParseResult.newErrorResult(String.format("number supplied too low (%s/%s)", doubleValue, constraint.getMinimalLength()));
+                return ParseResult.newErrorResult(String.format("The supplied parameter is too low (%s/%s)", doubleValue, constraint.getMinimalLength()));
             }
         } catch (NumberFormatException e) {
-            return ParseResult.newErrorResult("Supplied parameter is not a Double");
+            return ParseResult.newErrorResult("The supplied parameter is not a decimal number");
         }
     }
 

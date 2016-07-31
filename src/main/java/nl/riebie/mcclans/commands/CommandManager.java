@@ -45,6 +45,7 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.util.CollectionUtils;
 
 
 import java.lang.annotation.Annotation;
@@ -338,7 +339,7 @@ public class CommandManager {
                                 String value = args[pIndex];
                                 if (!"".equals(constraint.getRegex()) && !value.matches(constraint.getRegex())) {
                                     commandSource.sendMessage(Messages.getWarningMessage(
-                                            String.format("Error while parsing %s: Value should (%s)", args[pIndex], constraint.getRegex())));
+                                            String.format("Error while executing command: Value should match regex \'%s\'", constraint.getRegex())));
                                     return;
                                 }
                                 if (pIndex != index) {
@@ -349,11 +350,11 @@ public class CommandManager {
                             String result = stringBuilder.toString();
                             if (constraint.getMaximalLength() > -1 &&
                                     result.length() > constraint.getMaximalLength()) {
-                                commandSource.sendMessage(Messages.getWarningMessage("Supplied parameter too large"));
+                                commandSource.sendMessage(Messages.getWarningMessage("Supplied parameter is too large"));
                                 return;
                             } else if (constraint.getMinimalLength() > -1 &&
                                     result.length() < constraint.getMinimalLength()) {
-                                commandSource.sendMessage(Messages.getWarningMessage("Supplied parameter too small"));
+                                commandSource.sendMessage(Messages.getWarningMessage("The supplied parameter is too small"));
                                 return;
                             }
                             objects[j] = isOptional ? Optional.of(result) : result;
@@ -365,7 +366,7 @@ public class CommandManager {
                                 if (result.isSuccess()) {
                                     parameterList.add(result.getItem());
                                 } else {
-                                    commandSource.sendMessage(Messages.getWarningMessage(String.format("Error while parsing %s: (%s)", args[pIndex], result.getErrorMessage())));
+                                    commandSource.sendMessage(Messages.getWarningMessage(String.format("Error while executing command: %s", result.getErrorMessage())));
                                     return;
                                 }
                             }
@@ -397,7 +398,22 @@ public class CommandManager {
     private void sendHelp(CommandSource commandSource, int page) {
         List<FilledCommand> commands = new ArrayList<>();
 
-        this.filledCommandMap.values().stream().filter(
+        List<FilledCommand> filledCommands = new ArrayList<>(filledCommandMap.values());
+        Collections.sort(filledCommands, (o1, o2) -> {
+            boolean adminCommand1 = o1.getSpongePermission().startsWith("mcclans.admin");
+            boolean adminCommand2 = o2.getSpongePermission().startsWith("mcclans.admin");
+
+            if (adminCommand1 && adminCommand2) {
+                return 0;
+            } else if (adminCommand1) {
+                return 1;
+            } else if (adminCommand2) {
+                return -1;
+            }
+
+            return o1.getName().compareTo(o2.getName());
+        });
+        filledCommands.stream().filter(
                 filledCommand -> !(Config.getBoolean(Config.USE_PERMISSIONS) || filledCommand.getSpongePermission().startsWith("mcclans.admin"))
                         || commandSource.hasPermission(filledCommand.getSpongePermission())).forEach(filledCommand -> {
             commands.add(filledCommand);
