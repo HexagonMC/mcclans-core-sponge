@@ -82,7 +82,8 @@ public class Messages {
     public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_USE_THIS_COMMAND = "You do not have permission to use this command";
     public static final String THIS_COMMAND_HAS_NO_INFORMATION_TO_DISPLAY = "This command has no information to display";
     public static final String PAGE_DOES_NOT_EXIST = "Page does not exist";
-    public static final String YOU_NEED_TO_BE_A_PLAYER_TO_PERFORM_THIS_COMMAND = "You need to be a player to perform this command";
+    public static final String YOU_NEED_TO_BE_A_PLAYER_TO_PERFORM_THIS_COMMAND = "You need to be a player to use this command";
+    public static final String YOU_NEED_TO_BE_A_MEMBER_OF_A_CLAN_TO_PERFORM_THIS_COMMAND = "You need to be a member of a clan to use this command";
     public static final String CONFIGURATION_RELOADED = "Configuration reloaded";
     public static final String SYSTEM_BACKUP_INITIATED = "System backup initiated";
 

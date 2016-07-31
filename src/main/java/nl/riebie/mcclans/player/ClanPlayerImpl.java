@@ -62,6 +62,8 @@ public class ClanPlayerImpl implements ClanPlayer, Cloneable, CommandSender {
     private Location<World> lastTeleportInitiationLocation;
     private LastPlayerDamage lastPlayerDamage;
     private boolean ffProtection;
+    private boolean ignoreClanChat;
+    private boolean ignoreAllyChat;
 
     private ClanPlayerImpl(Builder builder) {
         this.clanPlayerID = builder.clanPlayerID;
@@ -123,7 +125,7 @@ public class ClanPlayerImpl implements ClanPlayer, Cloneable, CommandSender {
 
     @Override
     public KillDeath getKillDeath() {
-      return killDeath;
+        return killDeath;
     }
 
     @Override
@@ -253,6 +255,22 @@ public class ClanPlayerImpl implements ClanPlayer, Cloneable, CommandSender {
     public void setFfProtection(boolean ffProtection) {
         this.ffProtection = ffProtection;
         TaskForwarder.sendUpdateClanPlayer(this);
+    }
+
+    public boolean getIgnoreClanChat() {
+        return ignoreClanChat;
+    }
+
+    public void setIgnoreClanChat(boolean ignoreClanChat) {
+        this.ignoreClanChat = ignoreClanChat;
+    }
+
+    public boolean getIgnoreAllyChat() {
+        return ignoreAllyChat;
+    }
+
+    public void setIgnoreAllyChat(boolean ignoreAllyChat) {
+        this.ignoreAllyChat = ignoreAllyChat;
     }
 
     @Override

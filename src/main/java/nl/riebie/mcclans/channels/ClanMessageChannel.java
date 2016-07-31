@@ -22,7 +22,6 @@
 
 package nl.riebie.mcclans.channels;
 
-import nl.riebie.mcclans.api.ClanPlayer;
 import nl.riebie.mcclans.api.Rank;
 import nl.riebie.mcclans.clan.ClanImpl;
 import nl.riebie.mcclans.player.ClanPlayerImpl;
@@ -32,9 +31,7 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.channel.AbstractMutableMessageChannel;
 import org.spongepowered.api.text.channel.MessageReceiver;
 import org.spongepowered.api.text.chat.ChatType;
-import org.spongepowered.api.text.chat.ChatTypes;
 import org.spongepowered.api.text.format.TextColors;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -65,9 +62,9 @@ public class ClanMessageChannel extends AbstractMutableMessageChannel {
         }
 
         Set<MessageReceiver> receivers = new HashSet<>();
-        for (ClanPlayer clanMember : clan.getMembers()) {
+        for (ClanPlayerImpl clanMember : clan.getMembersImpl()) {
             Optional<Player> playerOpt = Sponge.getServer().getPlayer(clanMember.getUUID());
-            if (playerOpt.isPresent()) {
+            if (playerOpt.isPresent() && !clanMember.getIgnoreClanChat()) {
                 Player player = playerOpt.get();
                 if (player.isOnline()) {
                     receivers.add(player);

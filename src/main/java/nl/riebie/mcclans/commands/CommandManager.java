@@ -25,16 +25,16 @@ package nl.riebie.mcclans.commands;
 import nl.riebie.mcclans.ClansImpl;
 import nl.riebie.mcclans.api.Clan;
 import nl.riebie.mcclans.api.ClanPlayer;
-import nl.riebie.mcclans.commands.constraints.ParameterConstraint;
-import nl.riebie.mcclans.player.CommandSender;
 import nl.riebie.mcclans.api.permissions.ClanPermission;
 import nl.riebie.mcclans.clan.ClanImpl;
-import nl.riebie.mcclans.commands.filledparameters.*;
 import nl.riebie.mcclans.commands.annotations.*;
+import nl.riebie.mcclans.commands.constraints.ParameterConstraint;
+import nl.riebie.mcclans.commands.filledparameters.*;
 import nl.riebie.mcclans.commands.parsers.*;
 import nl.riebie.mcclans.config.Config;
 import nl.riebie.mcclans.messages.Messages;
 import nl.riebie.mcclans.player.ClanPlayerImpl;
+import nl.riebie.mcclans.player.CommandSender;
 import nl.riebie.mcclans.table.HorizontalTable;
 import nl.riebie.mcclans.table.TableAdapter;
 import nl.riebie.mcclans.utils.ClassUtils;
@@ -45,8 +45,6 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.format.TextColors;
-import org.spongepowered.api.util.CollectionUtils;
-
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -284,15 +282,15 @@ public class CommandManager {
 
             if ((Config.getBoolean(Config.USE_PERMISSIONS) || filledCommand.getSpongePermission().startsWith("mcclans.admin"))
                     && !commandSource.hasPermission(filledCommand.getSpongePermission())) {
-                commandSource.sendMessage(Text.of("You do not have permission to use this command"));
+                Messages.sendWarningMessage(commandSource, Messages.YOU_DO_NOT_HAVE_PERMISSION_TO_USE_THIS_COMMAND);
                 return;
             }
             if (filledCommand.isPlayerOnly() && !(commandSource instanceof Player)) {
-                commandSource.sendMessage(Text.of("You need to be a player to use this command"));
+                Messages.sendWarningMessage(commandSource, Messages.YOU_NEED_TO_BE_A_PLAYER_TO_PERFORM_THIS_COMMAND);
                 return;
             }
             if (filledCommand.isClanOnly() && (!(commandSender instanceof ClanPlayerImpl) || !((ClanPlayerImpl) commandSender).isMemberOfAClan())) {
-                commandSource.sendMessage(Text.of("You need to be a member of a clan to use this command"));
+                Messages.sendWarningMessage(commandSource, Messages.YOU_NEED_TO_BE_A_MEMBER_OF_A_CLAN_TO_PERFORM_THIS_COMMAND);
                 return;
             }
             String permission = filledCommand.getClanPermission();
