@@ -30,4 +30,6 @@ import org.spongepowered.api.command.CommandSource;
  */
 public interface ParameterParser<T> {
     ParseResult<T> parseValue(CommandSource commandSource, String value, NormalFilledParameter parameter);
+
+    String getDescription();
 }

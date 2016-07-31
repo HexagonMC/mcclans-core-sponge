@@ -24,9 +24,11 @@ package nl.riebie.mcclans.commands.filledparameters;
 
 
 import nl.riebie.mcclans.commands.annotations.Command;
+import nl.riebie.mcclans.commands.constraints.ParameterConstraint;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -83,8 +85,8 @@ public final class FilledCommand {
         children.add(child);
     }
 
-    public void addParameter(String name, Class<?> optional, boolean isMultiline, Class<?> listType, int minimalLength, int maximalLength, String regex, Class<?> parameterType) {
-        NormalFilledParameter normalFilledParameter = new NormalFilledParameter(name, optional, isMultiline, listType, minimalLength, maximalLength, regex, parameterType);
+    public void addParameter(String name, boolean isOptional, boolean isMultiline, boolean multilineString, ParameterConstraint constraint, Type parameterType) {
+        NormalFilledParameter normalFilledParameter = new NormalFilledParameter(name, isOptional, isMultiline, multilineString, constraint, parameterType);
         checkStateAndAddParameter(normalFilledParameter);
         if (normalFilledParameter.isOptional()) {
             hasOptional = true;
@@ -131,9 +133,7 @@ public final class FilledCommand {
     public void execute(Object object, Object... objects) {
         try {
             method.invoke(object, objects);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
+        } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
     }

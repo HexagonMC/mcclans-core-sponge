@@ -50,7 +50,7 @@ public class ClanRankCommands {
 
     @Command(name = "create", description = "Create a rank", isPlayerOnly = true, isClanOnly = true, clanPermission = "rank", spongePermission = "mcclans.user.rank.create")
     public void clanRankCreateCommand(CommandSource sender, ClanPlayerImpl clanPlayer, @Parameter(name = "rankName") String rankName,
-                                      @Multiline(listType = ClanPermission.class) @OptionalParameter(value = List.class, name = "permissions") Optional<List<ClanPermission>> permissions) {
+                                      @Parameter(name = "permissions") Optional<List<ClanPermission>> permissions) {
         ClanImpl clan = clanPlayer.getClan();
         if (clan == null) {
             Messages.sendWarningMessage(sender, Messages.YOU_ARE_NOT_IN_A_CLAN);
@@ -120,7 +120,7 @@ public class ClanRankCommands {
 
     @Command(name = "view", description = "View the properties of the rank or all ranks", isPlayerOnly = true, isClanOnly = true, clanPermission = "rank", spongePermission = "mcclans.user.rank.view")
     public void clanRankViewCommand(CommandSource sender, ClanPlayerImpl clanPlayer,
-                                    @OptionalParameter(value = String.class, name = "rankName") Optional<String> rankName, @PageParameter int page) {
+                                    @Parameter(name = "rankName") Optional<String> rankName, @PageParameter int page) {
         if (rankName.isPresent()) {
             RankImpl rank = clanPlayer.getClan().getRank(rankName.get());
             if (rank == null) {

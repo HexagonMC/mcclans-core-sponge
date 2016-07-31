@@ -30,8 +30,8 @@ import nl.riebie.mcclans.clan.ClanImpl;
 import nl.riebie.mcclans.clan.RankFactory;
 import nl.riebie.mcclans.clan.RankImpl;
 import nl.riebie.mcclans.commands.annotations.*;
-import nl.riebie.mcclans.commands.constraints.length.LengthConstraints;
-import nl.riebie.mcclans.commands.constraints.regex.RegexConstraints;
+import nl.riebie.mcclans.commands.constraints.ClanNameConstraint;
+import nl.riebie.mcclans.commands.constraints.ClanTagConstraint;
 import nl.riebie.mcclans.comparators.ClanKdrComparator;
 import nl.riebie.mcclans.comparators.ClanPlayerKdrComparator;
 import nl.riebie.mcclans.comparators.MemberComparator;
@@ -120,8 +120,8 @@ public class ClanCommands {
     public void clanCreateCommand(
             CommandSource commandSource,
             ClanPlayerImpl clanPlayer,
-            @Parameter(name = "clanTag", length = LengthConstraints.CLAN_TAG, regex = RegexConstraints.CLAN_TAG) String clanTag,
-            @Multiline @Parameter(name = "clanName", length = LengthConstraints.CLAN_NAME, regex = RegexConstraints.CLAN_NAME) String clanName) {
+            @Parameter(name = "clanTag", constraint = ClanTagConstraint.class) String clanTag,
+            @Multiline @Parameter(name = "clanName", constraint = ClanNameConstraint.class) String clanName) {
         if (Utils.isClanTagOrNameBlocked(clanTag)) {
             Messages.sendWarningMessage(commandSource, Messages.CLAN_TAG_BLOCKED);
             return;
@@ -280,7 +280,7 @@ public class ClanCommands {
     }
 
     @Command(name = "roster", description = "See the members of a clan", spongePermission = "mcclans.user.roster")
-    public void clanRosterCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer, @OptionalParameter(value = ClanImpl.class, name = "clanTag") Optional<ClanImpl> clanOpt,
+    public void clanRosterCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer, @Parameter(name = "clanTag") Optional<ClanImpl> clanOpt,
                                   @PageParameter int page) {
         ClanImpl clan;
         if (clanOpt.isPresent()) {
@@ -361,7 +361,7 @@ public class ClanCommands {
     }
 
     @Command(name = "info", description = "Get the info of a clan", spongePermission = "mcclans.user.info")
-    public void clanInfoCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer, @OptionalParameter(value = ClanImpl.class, name = "clanTag") Optional<ClanImpl> clanOpt) {
+    public void clanInfoCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer, @Parameter(name = "clanTag") Optional<ClanImpl> clanOpt) {
         if (clanOpt.isPresent()) {
             ClanImpl clan = clanOpt.get();
             printInfo(commandSource, clan);
@@ -454,7 +454,7 @@ public class ClanCommands {
 
     @Command(name = "stats", description = "See the statistics of a clan's members", spongePermission = "mcclans.user.stats")
     public void clanStatsCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer,
-                                 @OptionalParameter(value = ClanImpl.class, name = "clanTag") Optional<ClanImpl> clanOpt, @PageParameter int page) {
+                                 @Parameter(name = "clanTag") Optional<ClanImpl> clanOpt, @PageParameter int page) {
         ClanImpl clan;
         if (clanOpt.isPresent()) {
             clan = clanOpt.get();

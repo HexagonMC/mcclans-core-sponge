@@ -71,4 +71,9 @@ public class ClanPlayerParser implements ParameterParser<ClanPlayer> {
             }
         }
     }
+
+    @Override
+    public String getDescription() {
+        return "player name";
+    }
 }
