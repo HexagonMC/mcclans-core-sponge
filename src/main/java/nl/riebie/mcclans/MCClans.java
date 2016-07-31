@@ -59,7 +59,7 @@ import java.util.*;
 /**
  * Created by Kippers on 8-12-2015.
  */
-@Plugin(id = "nl.riebie.mcclans", name = "MCClans", version = "1.3", description = "Player grouping by forming clans")
+@Plugin(id = "nl.riebie.mcclans", name = "MCClans", version = "1.3-API5", description = "Player grouping by forming clans")
 public class MCClans {
 
     private static MCClans plugin;

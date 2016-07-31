@@ -7,7 +7,7 @@ apply plugin: 'java'
 sourceCompatibility = 1.8
 
 group = 'nl.riebie'
-version = '1.3'
+version = '1.3-API5'
 description = 'MCClans allows players to group together by forming clans'
 
 jar.enabled = false
@@ -47,7 +47,7 @@ shadowJar {
     } else if (relBuild) {
         archiveName = rootProject.name + '-' + project.version + '.jar'
     } else {
-        archiveName = rootProject.name + '-' + project.version + '-' + 'LOCAL' + '.jar'
+        archiveName = rootProject.name + '-' + project.version + '-LOCAL' + '.jar'
     }
 }
 
