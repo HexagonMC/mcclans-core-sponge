@@ -54,9 +54,13 @@ public class ClanChatCommands {
         if (messageOpt.isPresent()) {
             String message = messageOpt.get();
             if (clanPlayer.getTempChatState() == null) {
-                clanPlayer.setTempChatState(PlayerChatState.CLAN);
-                ClanMessageChannel.getFor(clanPlayer).send(commandSource, Text.of(message));
-                clanPlayer.setTempChatState(null);
+                if (clanPlayer.getIgnoreClanChat()) {
+                    Messages.sendYouNeedToUnignoreClanChatBeforeTalking(commandSource);
+                } else {
+                    clanPlayer.setTempChatState(PlayerChatState.CLAN);
+                    ClanMessageChannel.getFor(clanPlayer).send(commandSource, Text.of(message));
+                    clanPlayer.setTempChatState(null);
+                }
             }
         } else {
             PlayerChatState chatState = clanPlayer.getChatState();
@@ -75,9 +79,13 @@ public class ClanChatCommands {
         if (optionalMessage.isPresent()) {
             String message = optionalMessage.get();
             if (clanPlayer.getTempChatState() == null) {
-                clanPlayer.setTempChatState(PlayerChatState.ALLY);
-                AllyMessageChannel.getFor(clanPlayer).send(commandSource, Text.of(message));
-                clanPlayer.setTempChatState(null);
+                if (clanPlayer.getIgnoreAllyChat()) {
+                    Messages.sendYouNeedToUnignoreAllyChatBeforeTalking(commandSource);
+                } else {
+                    clanPlayer.setTempChatState(PlayerChatState.ALLY);
+                    AllyMessageChannel.getFor(clanPlayer).send(commandSource, Text.of(message));
+                    clanPlayer.setTempChatState(null);
+                }
             }
         } else {
             PlayerChatState chatState = clanPlayer.getChatState();
