@@ -24,6 +24,7 @@ package nl.riebie.mcclans.commands.implementations;
 
 import nl.riebie.mcclans.channels.AllyMessageChannel;
 import nl.riebie.mcclans.channels.ClanMessageChannel;
+import nl.riebie.mcclans.commands.annotations.ChildGroup;
 import nl.riebie.mcclans.commands.annotations.Command;
 import nl.riebie.mcclans.commands.annotations.Multiline;
 import nl.riebie.mcclans.commands.annotations.Parameter;
@@ -42,14 +43,24 @@ import java.util.Optional;
  */
 public class ClanChatCommands {
 
+    @ChildGroup(ClanChatIgnoreCommands.class)
+    @Command(name = "ignore", description = "Top command for all chat ignore commands", spongePermission = "mcclans.user.chat.ignore.helppage")
+    public void clanChatIgnoreRootCommand(CommandSource commandSource) {
+        commandSource.sendMessage(Text.of("TODO"));
+    }
+
     @Command(name = "clan", description = "Talk in clan chat", isPlayerOnly = true, isClanOnly = true, clanPermission = "clanchat", spongePermission = "mcclans.user.chat.clan")
     public void clanChatCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer, @Multiline @Parameter(name = "message") Optional<String> messageOpt) {
         if (messageOpt.isPresent()) {
             String message = messageOpt.get();
             if (clanPlayer.getTempChatState() == null) {
-                clanPlayer.setTempChatState(PlayerChatState.CLAN);
-                ClanMessageChannel.getFor(clanPlayer).send(commandSource, Text.of(message));
-                clanPlayer.setTempChatState(null);
+                if (clanPlayer.getIgnoreClanChat()) {
+                    Messages.sendYouNeedToUnignoreClanChatBeforeTalking(commandSource);
+                } else {
+                    clanPlayer.setTempChatState(PlayerChatState.CLAN);
+                    ClanMessageChannel.getFor(clanPlayer).send(commandSource, Text.of(message));
+                    clanPlayer.setTempChatState(null);
+                }
             }
         } else {
             PlayerChatState chatState = clanPlayer.getChatState();
@@ -68,9 +79,13 @@ public class ClanChatCommands {
         if (optionalMessage.isPresent()) {
             String message = optionalMessage.get();
             if (clanPlayer.getTempChatState() == null) {
-                clanPlayer.setTempChatState(PlayerChatState.ALLY);
-                AllyMessageChannel.getFor(clanPlayer).send(commandSource, Text.of(message));
-                clanPlayer.setTempChatState(null);
+                if (clanPlayer.getIgnoreAllyChat()) {
+                    Messages.sendYouNeedToUnignoreAllyChatBeforeTalking(commandSource);
+                } else {
+                    clanPlayer.setTempChatState(PlayerChatState.ALLY);
+                    AllyMessageChannel.getFor(clanPlayer).send(commandSource, Text.of(message));
+                    clanPlayer.setTempChatState(null);
+                }
             }
         } else {
             PlayerChatState chatState = clanPlayer.getChatState();
