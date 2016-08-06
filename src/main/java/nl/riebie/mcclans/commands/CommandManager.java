@@ -250,6 +250,10 @@ public class CommandManager {
         FilledCommand filledCommand = filledCommandMap.get(firstParam);
         if (firstParam.equals("page")) {
             filledCommand = lastExecutedPageCommand.get(commandSender);
+            if(filledCommand == null){
+                Messages.sendWarningMessage(commandSource, Messages.NO_TABLE_TO_BROWSE);
+                return;
+            }
             int page = Integer.valueOf(args[1]);
 
             if (filledCommand.hasChildren()) {

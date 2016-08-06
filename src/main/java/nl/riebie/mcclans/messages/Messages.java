@@ -66,7 +66,7 @@ public class Messages {
     public static final String YOUR_CLAN_NOW_ACCEPTS_ALLY_INVITES = "Your clan now accepts ally invites";
     public static final String CLAN_HOME_LOCATION_SET = "Clan home location set";
     public static final String CLAN_HOME_LOCATION_IS_NOT_SET = "Clan home location is not set";
-    public static final String NO_TABLE_TO_BROWSE = "There is no table to browse";
+    public static final String NO_TABLE_TO_BROWSE ="You must execute a pageable command first";
     public static final String TELEPORT_CANCELLED = "Teleport cancelled";
     public static final String YOU_NEED_TO_MOVE_BEFORE_ATTEMPTING_ANOTHER_TELEPORT = "You need to move before attempting another teleport";
     public static final String PLAYER_PROPERTIES_REMOVED = "Player properties removed";
