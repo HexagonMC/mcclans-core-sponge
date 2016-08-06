@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Created by riebie on 10/04/2016.
@@ -64,6 +65,6 @@ public class ClanPermissionManagerImpl implements ClanPermissionManager {
 
     @Override
     public List<ClanPermission> getClanPermissions() {
-        return new ArrayList<>(clanPermissionList.values());
+        return new ArrayList<>(clanPermissionList.values().stream().filter(c -> !c.getName().equals("none")).collect(Collectors.toList()));
     }
 }
