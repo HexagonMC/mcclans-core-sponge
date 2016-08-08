@@ -110,9 +110,8 @@ public class HorizontalTable<T> {
                 Row rowObject = rows.get(i);
                 for (Column column : this.columns) {
                     Text value = rows.get(i).getValue(column.key);
-
                     if (column.trim) {
-                        value = trimValue(value, column.spacing);
+                        value = new TextTrimmer(value, column.spacing).trim();
                     }
                     double numberOfSpaces = column.spacing - getSpaces(value);
                     Text spaces = getSpacesString(numberOfSpaces);
@@ -148,7 +147,7 @@ public class HorizontalTable<T> {
         double totalCount = 0;
         Text.Builder row = Text.builder();
         for (Column column : this.columns) {
-            Text header = Text.builder(column.key+ ":").color(TextColors.DARK_GREEN).build();
+            Text header = Text.builder(column.key + ":").color(TextColors.DARK_GREEN).build();
             double numberOfSpaces = column.spacing - getSpaces(header);
             Text spaces = getSpacesString(numberOfSpaces);
             row.color(TextColors.DARK_GREEN).append(Text.of(header)).color(TextColors.RESET).append(Text.of(spaces));
@@ -158,23 +157,6 @@ public class HorizontalTable<T> {
         headerSpaceLength = totalCount;
         largestColumn = totalCount;
         headerMessage = row.build();
-    }
-
-    private Text trimValue(Text value, float trimSpaces) {
-        double totalSpaces = 0;
-        String returnValue = "";
-        final int len = value.toPlain().length();
-        for (int i = 0; i < len; i++) {
-            char c = value.toPlain().charAt(i);
-
-            //TODO fix spacing when there are not enough spaces
-            totalSpaces += getSpacesForChar(c);
-            if (totalSpaces > trimSpaces - 1.5f) {
-                return Text.of(returnValue, "..");
-            }
-            returnValue += c;
-        }
-        return value;
     }
 
     private Text getSpacesString(double numberOfSpaces) {
