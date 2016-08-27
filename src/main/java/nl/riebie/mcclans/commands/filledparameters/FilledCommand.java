@@ -142,7 +142,7 @@ public final class FilledCommand {
         return children;
     }
 
-    public boolean isHasPageParameter() {
+    public boolean hasPageParameter() {
         return hasPageParameter;
     }
 

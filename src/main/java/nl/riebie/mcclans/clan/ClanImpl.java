@@ -54,11 +54,11 @@ public class ClanImpl implements Clan, Cloneable {
     private long homeLastSetTimeStamp = -1;
     private TextColor tagColor = Config.getColor(Config.CLAN_TAG_DEFAULT_COLOR);
     private String tag;
-    private HashMap<String, RankImpl> ranks = new HashMap<String, RankImpl>();
-    private List<ClanPlayerImpl> members = new ArrayList<ClanPlayerImpl>();
-    private List<ClanPlayerImpl> invitedMembers = new ArrayList<ClanPlayerImpl>();
-    private List<ClanImpl> allies = new ArrayList<ClanImpl>();
-    private List<ClanImpl> invitedAllies = new ArrayList<ClanImpl>();
+    private HashMap<String, RankImpl> ranks = new HashMap<>();
+    private List<ClanPlayerImpl> members = new ArrayList<>();
+    private List<ClanPlayerImpl> invitedMembers = new ArrayList<>();
+    private List<ClanImpl> allies = new ArrayList<>();
+    private List<ClanImpl> invitedAllies = new ArrayList<>();
     private ClanImpl invitingAlly;
     private boolean allowAllyInvites = true;
     private Date creationDate;
@@ -597,9 +597,7 @@ public class ClanImpl implements Clan, Cloneable {
         RankImpl recruit = RankFactory.getInstance().createRecruit();
         ranks.put(recruit.getName().toLowerCase(), recruit);
         ranks.put(owner.getName().toLowerCase(), owner);
-        for (RankImpl rank : RankFactory.getInstance().createDefaultRanks()) {
-            addRank(rank);
-        }
+        RankFactory.getInstance().createDefaultRanks().forEach(this::addRank);
     }
 
     @Override

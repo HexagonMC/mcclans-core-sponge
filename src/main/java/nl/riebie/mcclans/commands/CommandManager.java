@@ -40,7 +40,9 @@ import nl.riebie.mcclans.table.TableAdapter;
 import nl.riebie.mcclans.utils.ClassUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColor;
@@ -250,11 +252,12 @@ public class CommandManager {
         FilledCommand filledCommand = filledCommandMap.get(firstParam);
         if (firstParam.equals("page")) {
             filledCommand = lastExecutedPageCommand.get(commandSender);
-            if(filledCommand == null){
+            if (filledCommand == null) {
                 Messages.sendWarningMessage(commandSource, Messages.NO_TABLE_TO_BROWSE);
                 return;
             }
-            int page = Integer.valueOf(args[1]);
+            ParameterParser parameterParser = parameterValidatorMap.get(Integer.class);
+            int page = args.length > 1 ? Integer.valueOf(args[1]) : 1;
 
             if (filledCommand.hasChildren()) {
                 sendContextHelp(commandSender, commandSource, filledCommand, page);
@@ -418,7 +421,6 @@ public class CommandManager {
         filledCommands.stream().filter(
                 filledCommand -> !(Config.getBoolean(Config.USE_PERMISSIONS) || filledCommand.getSpongePermission().startsWith("mcclans.admin"))
                         || commandSource.hasPermission(filledCommand.getSpongePermission())).forEach(filledCommand -> {
-            commands.add(filledCommand);
             commands.addAll(getSubCommands(filledCommand));
         });
 
@@ -433,8 +435,11 @@ public class CommandManager {
     private List<FilledCommand> getSubCommands(FilledCommand filledCommand) {
         List<FilledCommand> commands = new ArrayList<>();
         for (FilledCommand subCommand : filledCommand.getChildren()) {
-            commands.add(subCommand);
-            commands.addAll(getSubCommands(subCommand));
+            if (subCommand.hasChildren()) {
+                commands.addAll(getSubCommands(subCommand));
+            } else {
+                commands.add(subCommand);
+            }
         }
         return commands;
     }
@@ -592,17 +597,15 @@ public class CommandManager {
         List<FilledParameter> requiredParameters = filledCommand.getParameters();
         List<NormalFilledParameter> normalParameters = new ArrayList<>();
 
-        for (FilledParameter parameter : requiredParameters) {
-            if (parameter instanceof NormalFilledParameter) {
-                NormalFilledParameter normalFilledParameter = (NormalFilledParameter) parameter;
-                normalParameters.add(normalFilledParameter);
-                if (normalFilledParameter.isOptional()) {
-                    fullCommandString.append(Text.builder(" {" + normalFilledParameter.getName() + "}").color(TextColors.GREEN).build());
-                } else {
-                    fullCommandString.append(Text.builder(" <" + normalFilledParameter.getName() + ">").color(TextColors.GREEN).build());
-                }
+        requiredParameters.stream().filter(parameter -> parameter instanceof NormalFilledParameter).forEach(parameter -> {
+            NormalFilledParameter normalFilledParameter = (NormalFilledParameter) parameter;
+            normalParameters.add(normalFilledParameter);
+            if (normalFilledParameter.isOptional()) {
+                fullCommandString.append(Text.builder(" {" + normalFilledParameter.getName() + "}").color(TextColors.GREEN).build());
+            } else {
+                fullCommandString.append(Text.builder(" <" + normalFilledParameter.getName() + ">").color(TextColors.GREEN).build());
             }
-        }
+        });
 
         table.setMessage(fullCommandString.build());
 
