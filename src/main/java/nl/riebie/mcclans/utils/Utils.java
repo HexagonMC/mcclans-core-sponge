@@ -229,4 +229,8 @@ public final class Utils {
     public static String getDateTimeString() {
         return new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(System.currentTimeMillis());
     }
+
+    public static String getTimeString() {
+        return new SimpleDateFormat("HH:mm:ss").format(System.currentTimeMillis());
+    }
 }

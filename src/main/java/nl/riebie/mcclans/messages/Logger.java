@@ -82,14 +82,11 @@ public class Logger {
         }
 
         if (useLocalLogging) {
-            executor.submit(new Runnable() {
-                @Override
-                public void run() {
-                    write(Utils.getDateTimeString() + " " + level + " " + value + FileUtils.getLineSeparator());
-                    for (Throwable throwable : throwables) {
-                        for (StackTraceElement element : throwable.getStackTrace()) {
-                            write(Utils.getDateTimeString() + " " + level + " " + element.toString() + FileUtils.getLineSeparator());
-                        }
+            executor.submit((Runnable) () -> {
+                write(Utils.getTimeString() + " " + level + " " + value + FileUtils.getLineSeparator());
+                for (Throwable throwable : throwables) {
+                    for (StackTraceElement element : throwable.getStackTrace()) {
+                        write(Utils.getTimeString() + " " + level + " " + element.toString() + FileUtils.getLineSeparator());
                     }
                 }
             });
@@ -137,5 +134,12 @@ public class Logger {
             spongeLogger.info(message, t);
         }
         writeLocalLogger("[e]", message, t);
+    }
+
+    /**
+     * This message is only logged locally.
+     */
+    public void local(String message) {
+        writeLocalLogger("[l]", message);
     }
 }
