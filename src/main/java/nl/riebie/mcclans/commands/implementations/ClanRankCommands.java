@@ -84,7 +84,9 @@ public class ClanRankCommands {
     public void clanRankRenameCommand(CommandSource sender, ClanPlayerImpl clanPlayer, @Parameter(name = "oldRankName") String rankName,
                                       @Parameter(name = "newRankName") String newRankName) {
         ClanImpl clan = clanPlayer.getClan();
-        if (clan.containsRank(rankName)) {
+        if (clan.containsRank(newRankName)) {
+            Messages.sendRankExistsAlready(sender, newRankName);
+        } else if (clan.containsRank(rankName)) {
             RankImpl rank = clan.getRank(rankName);
             if (rank.isChangeable()) {
                 clan.renameRank(rankName, newRankName);
