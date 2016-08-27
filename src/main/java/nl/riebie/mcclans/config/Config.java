@@ -47,6 +47,7 @@ public class Config {
     private static final String SECTION_GENERAL = "general";
 
     public static final String DEBUGGING = "debugging";
+    public static final String LOGGING = "logging";
     public static final String USE_PERMISSIONS = "use-permissions";
     public static final String TELEPORT_DELAY_SECONDS = "teleport-delay-seconds";
     public static final String TELEPORT_COOLDOWN_SECONDS = "teleport-cooldown-seconds";
@@ -111,6 +112,7 @@ public class Config {
 
         ConfigSection generalConfigSection = ConfigSection.builder(SECTION_GENERAL).setConfigOptions(
                 ConfigOption.builder(DEBUGGING, false).build(),
+                ConfigOption.builder(LOGGING, true).build(),
                 ConfigOption.builder(USE_PERMISSIONS, false).build(),
                 ConfigOption.builder(TELEPORT_DELAY_SECONDS, 5).addMinimumNumberConstraint(0).build(),
                 ConfigOption.builder(TELEPORT_COOLDOWN_SECONDS, 120).addMinimumNumberConstraint(0).build(),
@@ -237,12 +239,12 @@ public class Config {
                 if (isOfType.bool) {
                     MessageBoolean meetsConstraints = configOption.meetsConstraints(value);
                     if (!meetsConstraints.bool) {
-                        MCClans.getPlugin().getLogger().warn("Could not load config option " + configOption.key + " (" + value + "): " + meetsConstraints.message);
+                        MCClans.getPlugin().getLogger().warn("Could not load config option " + configOption.key + " (" + value + "): " + meetsConstraints.message, true);
                         // Only change runtime value
                         value = configOption.valueIfConstraintFailed;
                     }
                 } else {
-                    MCClans.getPlugin().getLogger().warn("Could not load config option " + configOption.key + " (" + value + "): needs to be a " + isOfType.message);
+                    MCClans.getPlugin().getLogger().warn("Could not load config option " + configOption.key + " (" + value + "): needs to be a " + isOfType.message, true);
                     // Change runtime and config file value to the default
                     value = configOption.value;
                     subNode.setValue(configOption.value);
