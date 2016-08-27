@@ -23,11 +23,43 @@
 package nl.riebie.mcclans.utils;
 
 import java.io.*;
+import java.util.zip.Adler32;
+import java.util.zip.CheckedOutputStream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 /**
  * Created by Kippers on 19-1-2016.
  */
 public class FileUtils {
+
+    static final int BUFFER = 2048;
+
+    public static void toZip(File file) {
+        try {
+            File zipFile = new File(file.getParentFile(), stripExtension(file.getName()) + ".zip");
+
+            FileOutputStream dest = new FileOutputStream(zipFile);
+            CheckedOutputStream checksum = new CheckedOutputStream(dest, new Adler32());
+            ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(checksum));
+
+            byte data[] = new byte[BUFFER];
+            FileInputStream fi = new FileInputStream(file);
+            BufferedInputStream origin = new BufferedInputStream(fi, BUFFER);
+            ZipEntry entry = new ZipEntry(file.getName());
+            out.putNextEntry(entry);
+            int count;
+            while ((count = origin.read(data, 0, BUFFER)) != -1) {
+                out.write(data, 0, count);
+            }
+            out.closeEntry();
+            origin.close();
+
+            out.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     public static void copyFile(File source, File dest) throws IOException {
         if (!source.exists()) {
@@ -82,5 +114,28 @@ public class FileUtils {
             }
 
         return lastModifiedFile;
+    }
+
+    public static String getLineSeparator() {
+        return System.getProperty("line.separator");
+    }
+
+    // from http://stackoverflow.com/a/924506
+    public static String stripExtension(String str) {
+        // Handle null case specially.
+
+        if (str == null) return null;
+
+        // Get position of last '.'.
+
+        int pos = str.lastIndexOf(".");
+
+        // If there wasn't any '.' just return the string as is.
+
+        if (pos == -1) return str;
+
+        // Otherwise return the string, up to the dot.
+
+        return str.substring(0, pos);
     }
 }

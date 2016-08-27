@@ -66,7 +66,7 @@ public class MCClans {
     private ServiceHelper serviceHelper = new ServiceHelper();
 
     @Inject
-    private Logger logger;
+    private Logger spongeLogger;
 
     @Inject
     @ConfigDir(sharedRoot = false)
@@ -92,23 +92,35 @@ public class MCClans {
     public void onServerStart(GameStartedServerEvent event) {
         plugin = this;
 
+        getLogger().init(spongeLogger);
+        // If an error occurs during config loading, make sure it gets logged (not enabled by default as the config has
+        // not been checked yet if local logging is enabled. But we want to make sure any config loading error is
+        // logged regardless)
+        getLogger().enableLocalLoggingTrigger(true);
+
         // Init config
         if (!Config.load(configDir)) {
-            getLogger().error("Config failed to load!");
+            getLogger().error("Config failed to load!", true);
             // todo stop plugin?
             return;
         }
+
+        getLogger().enableLocalLoggingTrigger(false);
+        if (Config.getBoolean(Config.LOGGING)) {
+            getLogger().enableLocalLogging(configDir);
+        }
+
         // TODO SPONGE reloadSettings stuff?
         //reloadSettings();
 
         // Init services
         if (!serviceHelper.initUserStorageService()) {
-            MCClans.getPlugin().getLogger().warn("Could not find UserStorageService during initialization!");
+            MCClans.getPlugin().getLogger().warn("Could not find UserStorageService during initialization!", true);
             // todo stop plugin?
         }
         if (Config.getBoolean(Config.USE_ECONOMY) && !serviceHelper.initEconomyService()) {
             // todo what if config option 'use economy' is changed and reload is called, economy service not available?
-            MCClans.getPlugin().getLogger().warn("Could not find EconomyService during initialization! Deactivating economy usage for MCClans");
+            MCClans.getPlugin().getLogger().warn("Could not find EconomyService during initialization! Deactivating economy usage for MCClans", true);
             Config.setValue(Config.USE_ECONOMY, false);
         }
 
@@ -129,7 +141,7 @@ public class MCClans {
                 DatabaseHandler.getInstance().load();
             } catch (Exception e) {
                 loadError = true;
-                getLogger().error("MCClans: Fatal error during data load: " + e.getMessage());
+                getLogger().error("MCClans: Fatal error during data load: " + e.getMessage(), true);
                 Sponge.getServer().shutdown(Text.of("MCClans: Fatal error during data load!"));
                 throw e;
             }
@@ -152,7 +164,7 @@ public class MCClans {
                 }
             } catch (Exception e) {
                 loadError = true;
-                getLogger().error("MCClans: Fatal error during data load: " + e.getMessage());
+                getLogger().error("MCClans: Fatal error during data load: " + e.getMessage(), true);
                 Sponge.getServer().shutdown(Text.of("MCClans: Fatal error during data load!"));
                 throw e;
             }
@@ -290,8 +302,8 @@ public class MCClans {
         return new File(configDir, "data");
     }
 
-    public Logger getLogger() {
-        return logger;
+    public nl.riebie.mcclans.messages.Logger getLogger() {
+        return nl.riebie.mcclans.messages.Logger.get();
     }
 
     public ServiceHelper getServiceHelper() {
@@ -330,7 +342,7 @@ public class MCClans {
                     }
                     if (currency == null) {
                         currency = economyService.getDefaultCurrency();
-                        getPlugin().getLogger().warn("Currency " + currencyName + " not found, falling back to default currency");
+                        getPlugin().getLogger().warn("Currency " + currencyName + " not found, falling back to default currency", false);
                     }
                 }
                 return true;
