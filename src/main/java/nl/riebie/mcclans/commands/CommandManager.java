@@ -40,9 +40,7 @@ import nl.riebie.mcclans.table.TableAdapter;
 import nl.riebie.mcclans.utils.ClassUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColor;
@@ -421,7 +419,11 @@ public class CommandManager {
         filledCommands.stream().filter(
                 filledCommand -> !(Config.getBoolean(Config.USE_PERMISSIONS) || filledCommand.getSpongePermission().startsWith("mcclans.admin"))
                         || commandSource.hasPermission(filledCommand.getSpongePermission())).forEach(filledCommand -> {
-            commands.addAll(getSubCommands(filledCommand));
+            if (filledCommand.hasChildren()) {
+                commands.addAll(getSubCommands(filledCommand));
+            } else {
+                commands.add(filledCommand);
+            }
         });
 
         sendHelpPage(commands, commandSource, page, "help");
