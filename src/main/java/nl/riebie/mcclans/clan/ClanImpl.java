@@ -187,7 +187,7 @@ public class ClanImpl implements Clan, Cloneable {
 
     @Override
     public void setHome(Location<World> location) {
-        home = new Location<>(home.getExtent(), home.getPosition());
+        home = new Location<>(location.getExtent(), location.getPosition());
         TaskForwarder.sendUpdateClan(this);
     }
 
