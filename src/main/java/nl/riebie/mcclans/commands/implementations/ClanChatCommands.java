@@ -22,8 +22,8 @@
 
 package nl.riebie.mcclans.commands.implementations;
 
-import nl.riebie.mcclans.channels.AllyMessageChannel;
-import nl.riebie.mcclans.channels.ClanMessageChannel;
+import nl.riebie.mcclans.channels.AllyMessageChannelImpl;
+import nl.riebie.mcclans.channels.ClanMessageChannelImpl;
 import nl.riebie.mcclans.commands.annotations.ChildGroup;
 import nl.riebie.mcclans.commands.annotations.Command;
 import nl.riebie.mcclans.commands.annotations.Multiline;
@@ -58,7 +58,7 @@ public class ClanChatCommands {
                     Messages.sendYouNeedToUnignoreClanChatBeforeTalking(commandSource);
                 } else {
                     clanPlayer.setTempChatState(PlayerChatState.CLAN);
-                    ClanMessageChannel.getFor(clanPlayer).send(commandSource, Text.of(message));
+                    ClanMessageChannelImpl.getFor(clanPlayer).send(commandSource, Text.of(message));
                     clanPlayer.setTempChatState(null);
                 }
             }
@@ -83,7 +83,7 @@ public class ClanChatCommands {
                     Messages.sendYouNeedToUnignoreAllyChatBeforeTalking(commandSource);
                 } else {
                     clanPlayer.setTempChatState(PlayerChatState.ALLY);
-                    AllyMessageChannel.getFor(clanPlayer).send(commandSource, Text.of(message));
+                    AllyMessageChannelImpl.getFor(clanPlayer).send(commandSource, Text.of(message));
                     clanPlayer.setTempChatState(null);
                 }
             }

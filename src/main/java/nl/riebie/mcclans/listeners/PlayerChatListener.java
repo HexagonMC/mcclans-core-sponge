@@ -23,8 +23,8 @@
 package nl.riebie.mcclans.listeners;
 
 import nl.riebie.mcclans.ClansImpl;
-import nl.riebie.mcclans.channels.AllyMessageChannel;
-import nl.riebie.mcclans.channels.ClanMessageChannel;
+import nl.riebie.mcclans.channels.AllyMessageChannelImpl;
+import nl.riebie.mcclans.channels.ClanMessageChannelImpl;
 import nl.riebie.mcclans.clan.ClanImpl;
 import nl.riebie.mcclans.config.Config;
 import nl.riebie.mcclans.enums.PlayerChatState;
@@ -103,7 +103,7 @@ public class PlayerChatListener {
                         Messages.sendYouNeedToUnignoreClanChatBeforeTalking(player);
                     } else {
                         event.setMessage(event.getRawMessage());
-                        event.setChannel(ClanMessageChannel.getFor(clanPlayer));
+                        event.setChannel(ClanMessageChannelImpl.getFor(clanPlayer));
 //                    Text newMessage = Text.join(
 //                            Text.builder("[").color(TextColors.GRAY).build(),
 //                            Text.builder("CC").color(TextColors.YELLOW).build(),
@@ -137,7 +137,7 @@ public class PlayerChatListener {
                         Messages.sendYouNeedToUnignoreAllyChatBeforeTalking(player);
                     } else {
                         event.setMessage(event.getRawMessage());
-                        event.setChannel(AllyMessageChannel.getFor(clanPlayer));
+                        event.setChannel(AllyMessageChannelImpl.getFor(clanPlayer));
 //                    Text newMessage = Text.join(
 //                            Text.builder("[").color(TextColors.GRAY).build(),
 //                            Text.builder("AC").color(TextColors.GOLD).build(),

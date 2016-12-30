@@ -22,7 +22,8 @@
 
 package nl.riebie.mcclans.channels;
 
-import nl.riebie.mcclans.api.Rank;
+import nl.riebie.mcclans.api.Clan;
+import nl.riebie.mcclans.api.channels.AllyMessageChannel;
 import nl.riebie.mcclans.clan.ClanImpl;
 import nl.riebie.mcclans.player.ClanPlayerImpl;
 import org.spongepowered.api.Sponge;
@@ -35,67 +36,81 @@ import org.spongepowered.api.text.format.TextColors;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by Kippers on 14/02/2016.
  */
-public class ClanMessageChannel extends AbstractMutableMessageChannel {
+public class AllyMessageChannelImpl extends AbstractMutableMessageChannel implements AllyMessageChannel {
 
     private ClanPlayerImpl clanPlayer;
 
-    protected ClanMessageChannel(@Nonnull ClanPlayerImpl clanPlayer) {
+    protected AllyMessageChannelImpl(@Nonnull ClanPlayerImpl clanPlayer) {
         this(new HashSet<>(), clanPlayer);
     }
 
-    protected ClanMessageChannel(Set<MessageReceiver> receivers, @Nonnull ClanPlayerImpl clanPlayer) {
+    protected AllyMessageChannelImpl(Set<MessageReceiver> receivers, @Nonnull ClanPlayerImpl clanPlayer) {
         super(receivers);
         this.clanPlayer = clanPlayer;
     }
 
-    public static ClanMessageChannel getFor(@Nonnull ClanPlayerImpl clanPlayer) {
+    public static AllyMessageChannelImpl getFor(@Nonnull ClanPlayerImpl clanPlayer) {
         ClanImpl clan = clanPlayer.getClan();
         if (clan == null) {
-            return new ClanMessageChannel(clanPlayer);
+            return new AllyMessageChannelImpl(clanPlayer);
         }
 
         Set<MessageReceiver> receivers = new HashSet<>();
         for (ClanPlayerImpl clanMember : clan.getMembersImpl()) {
             Optional<Player> playerOpt = Sponge.getServer().getPlayer(clanMember.getUUID());
-            if (playerOpt.isPresent() && !clanMember.getIgnoreClanChat()) {
-                Player player = playerOpt.get();
-                if (player.isOnline()) {
-                    receivers.add(player);
+            if (playerOpt.isPresent() && playerOpt.get().isOnline() && !clanMember.getIgnoreAllyChat()) {
+                receivers.add(playerOpt.get());
+            }
+        }
+        for (ClanImpl ally : clan.getAlliesImpl()) {
+            for (ClanPlayerImpl allyMember : ally.getMembersImpl()) {
+                Optional<Player> playerOpt = Sponge.getServer().getPlayer(allyMember.getUUID());
+                if (playerOpt.isPresent() && playerOpt.get().isOnline() && !allyMember.getIgnoreAllyChat()) {
+                    receivers.add(playerOpt.get());
                 }
             }
         }
-
-        return new ClanMessageChannel(receivers, clanPlayer);
+        return new AllyMessageChannelImpl(receivers, clanPlayer);
     }
 
     @Override
     public Optional<Text> transformMessage(@Nullable Object sender, MessageReceiver recipient, Text original, ChatType type) {
-        Rank rank = clanPlayer.getRank();
-        Text rankText = null;
-        if (rank != null) {
-            rankText = Text.join(
-                    Text.builder("[").color(TextColors.GRAY).build(),
-                    Text.builder(rank.getName()).color(TextColors.BLUE).build(),
-                    Text.builder("] ").color(TextColors.GRAY).build()
+        Clan clan = clanPlayer.getClan();
+        Text clanTagText = null;
+        if (clan != null) {
+            clanTagText = Text.join(
+                    clan.getTagColored(),
+                    Text.of(" ")
             );
         }
 
         Text newMessage = Text.join(
                 Text.builder("[").color(TextColors.GRAY).build(),
-                Text.builder("CC").color(TextColors.YELLOW).build(),
+                Text.builder("AC").color(TextColors.GOLD).build(),
                 Text.builder("] ").color(TextColors.GRAY).build(),
-                (rankText == null) ? Text.of("") : rankText,
+                (clanTagText == null) ? Text.of("") : clanTagText,
                 Text.of(clanPlayer.getName() + ": "),
-                original.toBuilder().color(TextColors.YELLOW).build()
+                original.toBuilder().color(TextColors.GOLD).build()
         );
 
         return Optional.of(newMessage);
+    }
+
+    @Override
+    public List<Clan> getClans() {
+        List<Clan> clans = new ArrayList<>();
+        Clan clan = clanPlayer.getClan();
+        if (clan == null) {
+            return clans;
+        }
+
+        clans.add(clan);
+        clans.addAll(clan.getAllies());
+        return clans;
     }
 }
