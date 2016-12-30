@@ -49,7 +49,7 @@ public class ClanImpl implements Clan, Cloneable {
     private int clanID;
     private String name;
     private ClanPlayerImpl owner;
-    private Location home;
+    private Location<World> home;
     private int homeSetTimes = 0;
     private long homeLastSetTimeStamp = -1;
     private TextColor tagColor = Config.getColor(Config.CLAN_TAG_DEFAULT_COLOR);
@@ -187,17 +187,13 @@ public class ClanImpl implements Clan, Cloneable {
 
     @Override
     public void setHome(Location<World> location) {
-        // TODO SPONGE: clone has protected access in Object.. is copy & cast good enough?
-//        home = location.clone();
-        home = (Location) location.copy();
+        home = new Location<>(home.getExtent(), home.getPosition());
         TaskForwarder.sendUpdateClan(this);
     }
 
     @Override
     public Location<World> getHome() {
         if (home != null) {
-            // TODO SPONGE: clone has protected access in Object.. why we clonin anyway?
-//            return home.clone();
             return home;
         } else {
             return null;
@@ -641,7 +637,7 @@ public class ClanImpl implements Clan, Cloneable {
         private int clanID;
         private String name;
         private ClanPlayerImpl owner;
-        private Location home;
+        private Location<World> home;
         private int homeSetTimes = 0;
         private long homeLastSetTimeStamp = -1;
         private TextColor tagColor = Config.getColor(Config.CLAN_TAG_DEFAULT_COLOR);
@@ -667,7 +663,7 @@ public class ClanImpl implements Clan, Cloneable {
             return this;
         }
 
-        public Builder home(Location home) {
+        public Builder home(Location<World> home) {
             this.home = home;
             return this;
         }
