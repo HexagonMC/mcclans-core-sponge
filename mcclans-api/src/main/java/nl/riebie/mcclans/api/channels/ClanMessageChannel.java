@@ -31,6 +31,8 @@ public interface ClanMessageChannel {
 
     /**
      * Get the clan that will receive the messages sent in this channel.
+     *
+     * @return The clan that will receive the messages sent in this channel
      */
     Clan getClan();
 }

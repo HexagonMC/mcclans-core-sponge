@@ -33,6 +33,8 @@ public interface AllyMessageChannel {
 
     /**
      * Get the clans that will receive the messages sent in this channel.
+     *
+     * @return The clans that will receive the messages sent in this channel
      */
     List<Clan> getClans();
 }
