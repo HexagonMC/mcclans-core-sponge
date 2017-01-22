@@ -92,7 +92,7 @@ public class MCClans {
     public void onServerStart(GameStartedServerEvent event) {
         plugin = this;
 
-        getLogger().init(spongeLogger);
+        getLogger().init(this, spongeLogger);
         // If an error occurs during config loading, make sure it gets logged (not enabled by default as the config has
         // not been checked yet if local logging is enabled. But we want to make sure any config loading error is
         // logged regardless)
