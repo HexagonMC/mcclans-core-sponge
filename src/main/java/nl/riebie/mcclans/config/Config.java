@@ -141,7 +141,7 @@ public class Config {
 
         ConfigSection databaseConfigSection = ConfigSection.builder(SECTION_DATABASE).setConfigOptions(
                 ConfigOption.builder(USE_DATABASE, false).build(),
-                ConfigOption.builder(DBMS_TYPE, "mysql").addOneOfStringConstraint(true, "mysql", "sqlite").setValueIfConstraintFailed("unrecognised").build(),
+                ConfigOption.builder(DBMS_TYPE, "mysql").addOneOfStringConstraint(true, "mysql", "h2").setValueIfConstraintFailed("unrecognised").build(),
                 ConfigOption.builder(DATABASE_SERVER_PORT, 3306).addMinimumNumberConstraint(0).build(),
                 ConfigOption.builder(DATABASE_SERVER, "localhost").build(),
                 ConfigOption.builder(DATABASE_NAME, "database_name").build(),

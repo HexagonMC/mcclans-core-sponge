@@ -27,7 +27,7 @@ package nl.riebie.mcclans.enums;
  */
 public enum DBMSType {
 
-    MYSQL("mysql"), SQLITE("sqlite"), UNRECOGNISED("unrecognised");
+    MYSQL("mysql"), SQLITE("sqlite"), H2("h2"), UNRECOGNISED("unrecognised");
 
     private String name;
 
