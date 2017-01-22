@@ -36,14 +36,14 @@ public class Logger {
         return instance;
     }
 
-    public void init(org.slf4j.Logger spongeLogger) {
+    public void init(MCClans plugin, org.slf4j.Logger spongeLogger) {
+        executor = Sponge.getScheduler().createAsyncExecutor(plugin);
         this.useLocalLogging = false;
         this.spongeLogger = spongeLogger;
     }
 
     public void enableLocalLogging(File configDir) {
         useLocalLogging = true;
-        executor = Sponge.getScheduler().createAsyncExecutor(MCClans.getPlugin());
         createDir(configDir);
         zipPreviousFiles();
         createFile();
