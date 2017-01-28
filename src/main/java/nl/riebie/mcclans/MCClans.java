@@ -30,6 +30,7 @@ import nl.riebie.mcclans.commands.implementations.ClanCommands;
 import nl.riebie.mcclans.config.Config;
 import nl.riebie.mcclans.enums.DBMSType;
 import nl.riebie.mcclans.listeners.*;
+import nl.riebie.mcclans.metrics.BStatsMetrics;
 import nl.riebie.mcclans.metrics.MetricsWrapper;
 import nl.riebie.mcclans.persistence.DatabaseConnectionOwner;
 import nl.riebie.mcclans.persistence.DatabaseHandler;
@@ -74,6 +75,8 @@ public class MCClans {
 
     @Inject
     public MetricsWrapper stats;
+    @Inject
+    public BStatsMetrics bStats;
 
     private boolean loadError = false;
 
