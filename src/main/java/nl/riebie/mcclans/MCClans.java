@@ -50,6 +50,7 @@ import org.spongepowered.api.event.game.state.GamePostInitializationEvent;
 import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
 import org.spongepowered.api.event.game.state.GameStartedServerEvent;
 import org.spongepowered.api.event.game.state.GameStoppingServerEvent;
+import org.spongepowered.api.plugin.Dependency;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.scheduler.Task;
@@ -66,7 +67,10 @@ import java.util.*;
 /**
  * Created by Kippers on 8-12-2015.
  */
-@Plugin(id = "mcclans", name = "MCClans", version = "1.4.1", description = "Player grouping by forming clans")
+@Plugin(
+        id = "mcclans", name = "MCClans", version = "1.4.1", description = "Player grouping by forming clans",
+        dependencies = @Dependency(id = "nucleus", optional = true)
+)
 public class MCClans {
 
     private static MCClans plugin;
