@@ -23,6 +23,8 @@
 package nl.riebie.mcclans;
 
 import com.google.inject.Inject;
+import io.github.nucleuspowered.nucleus.api.exceptions.PluginAlreadyRegisteredException;
+import io.github.nucleuspowered.nucleus.api.service.NucleusMessageTokenService;
 import nl.riebie.mcclans.api.ClanService;
 import nl.riebie.mcclans.clan.RankFactory;
 import nl.riebie.mcclans.commands.CommandRoot;
@@ -34,18 +36,22 @@ import nl.riebie.mcclans.metrics.MetricsWrapper;
 import nl.riebie.mcclans.persistence.DatabaseConnectionOwner;
 import nl.riebie.mcclans.persistence.DatabaseHandler;
 import nl.riebie.mcclans.persistence.TaskExecutor;
+import nl.riebie.mcclans.player.ClanPlayerImpl;
 import nl.riebie.mcclans.utils.FileUtils;
 import nl.riebie.mcclans.utils.Pair;
 import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandManager;
+import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.config.ConfigDir;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GamePostInitializationEvent;
 import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
 import org.spongepowered.api.event.game.state.GameStartedServerEvent;
 import org.spongepowered.api.event.game.state.GameStoppingServerEvent;
 import org.spongepowered.api.plugin.Plugin;
+import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.service.ProviderRegistration;
 import org.spongepowered.api.service.economy.Currency;
@@ -53,6 +59,7 @@ import org.spongepowered.api.service.economy.EconomyService;
 import org.spongepowered.api.service.user.UserStorageService;
 import org.spongepowered.api.text.Text;
 
+import javax.annotation.Nonnull;
 import java.io.File;
 import java.util.*;
 
@@ -122,6 +129,9 @@ public class MCClans {
             // todo what if config option 'use economy' is changed and reload is called, economy service not available?
             MCClans.getPlugin().getLogger().warn("Could not find EconomyService during initialization! Deactivating economy usage for MCClans", true);
             Config.setValue(Config.USE_ECONOMY, false);
+        }
+        if (serviceHelper.initNucleusMessageTokenService(Sponge.getPluginManager().getPlugin("mcclans"))) {
+            MCClans.getPlugin().getLogger().info("Registered to Nucleus message token service", false);
         }
 
         // Init database/xml
@@ -315,6 +325,7 @@ public class MCClans {
         public UserStorageService userStorageService;
         public EconomyService economyService;
         public Currency currency;
+        public NucleusMessageTokenService nucleusMessageTokenService;
 
         private boolean initUserStorageService() {
             Optional<ProviderRegistration<UserStorageService>> userStorageOpt = Sponge.getServiceManager().getRegistration(UserStorageService.class);
@@ -345,6 +356,41 @@ public class MCClans {
                         getPlugin().getLogger().warn("Currency " + currencyName + " not found, falling back to default currency", false);
                     }
                 }
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        private boolean initNucleusMessageTokenService(Optional<PluginContainer> pluginContainerOpt) {
+            Optional<ProviderRegistration<NucleusMessageTokenService>> nucleusMessageTokenServiceOpt = Sponge.getServiceManager().getRegistration(NucleusMessageTokenService.class);
+            if (pluginContainerOpt.isPresent() && nucleusMessageTokenServiceOpt.isPresent()) {
+                nucleusMessageTokenService = nucleusMessageTokenServiceOpt.get().getProvider();
+                try {
+                    nucleusMessageTokenService.register(pluginContainerOpt.get(), new NucleusMessageTokenService.TokenParser() {
+                        @Nonnull
+                        @Override
+                        public Optional<Text> parse(String tokenInput, CommandSource source, Map<String, Object> variables) {
+                            if (!"clantag".equals(tokenInput)) {
+                                return Optional.empty();
+                            }
+                            if (!(source instanceof Player)) {
+                                return Optional.empty();
+                            }
+                            Player player = (Player) source;
+                            ClanPlayerImpl clanPlayer = ClansImpl.getInstance().getClanPlayer(player.getUniqueId());
+                            if (clanPlayer == null || clanPlayer.getClan() == null) {
+                                return Optional.empty();
+                            }
+
+                            return Optional.of(clanPlayer.getClan().getTagColored());
+                        }
+                    });
+                } catch (PluginAlreadyRegisteredException e) {
+                    MCClans.getPlugin().getLogger().error("Could not register to Nucleus message token service!", e, false);
+                    return false;
+                }
+
                 return true;
             } else {
                 return false;
