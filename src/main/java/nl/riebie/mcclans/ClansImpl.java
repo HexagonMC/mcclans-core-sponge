@@ -25,6 +25,8 @@ package nl.riebie.mcclans;
 import nl.riebie.mcclans.api.Clan;
 import nl.riebie.mcclans.api.ClanPlayer;
 import nl.riebie.mcclans.api.ClanService;
+import nl.riebie.mcclans.api.Result;
+import nl.riebie.mcclans.api.events.ClanCreateEvent;
 import nl.riebie.mcclans.api.events.ClanMemberJoinEvent;
 import nl.riebie.mcclans.api.events.ClanMemberLeaveEvent;
 import nl.riebie.mcclans.api.exceptions.NotDefaultImplementationException;
@@ -34,6 +36,7 @@ import nl.riebie.mcclans.clan.RankFactory;
 import nl.riebie.mcclans.clan.RankImpl;
 import nl.riebie.mcclans.comparators.ClanKdrComparator;
 import nl.riebie.mcclans.config.Config;
+import nl.riebie.mcclans.messages.Messages;
 import nl.riebie.mcclans.permissions.ClanPermissionManagerImpl;
 import nl.riebie.mcclans.persistence.TaskForwarder;
 import nl.riebie.mcclans.events.ClanPlayerKillEvent;
@@ -42,6 +45,7 @@ import nl.riebie.mcclans.persistence.query.DataType;
 import nl.riebie.mcclans.persistence.query.table.CreateQuery;
 import nl.riebie.mcclans.player.ClanInvite;
 import nl.riebie.mcclans.player.ClanPlayerImpl;
+import nl.riebie.mcclans.utils.ResultImpl;
 import nl.riebie.mcclans.utils.UUIDUtils;
 import org.spongepowered.api.event.Listener;
 
@@ -153,50 +157,36 @@ public class ClansImpl implements ClanService {
         return ++highestUsedRankID;
     }
 
-    public void fillThisDummyDummy() {
-        if (clans.size() < 30) {
-            for (int i = 0; i < 500; i++) {
-                ClanImpl clanImpl = new ClanImpl.Builder(ClansImpl.getInstance().getNextAvailableClanID(), "tc" + i, "test clan" + i).build();
-                clanImpl.setupDefaultRanks();
-                UUID ownerUUID = new UUID(-1, i);
-                ClanPlayerImpl owner = new ClanPlayerImpl.Builder(ClansImpl.getInstance().getNextAvailableClanPlayerID(), ownerUUID, "TCOWNER" + i)
-                        .clan(clanImpl).rank(clanImpl.getRank("Owner")).build();
-                clanImpl.addMember(owner);
-                clanImpl.setLoadedOwner(owner);
-                clans.put(clanImpl.getTag().toLowerCase(), clanImpl);
-                clanPlayers.put(ownerUUID, owner);
-                for (int j = 0; j < 19; j++) {
-                    UUID memberUID = new UUID(i, j);
-                    ClanPlayerImpl member = new ClanPlayerImpl.Builder(ClansImpl.getInstance().getNextAvailableClanPlayerID(), memberUID, "TCMEMBER"
-                            + i + "." + j).clan(clanImpl).rank(clanImpl.getRank("Member")).build();
-                    clanImpl.addMember(member);
-                    clanPlayers.put(memberUID, member);
-                }
-            }
-        }
-    }
-
     @Override
-    public ClanImpl createClan(String tag, String name, ClanPlayer owner) {
+    public Result<Clan> createClan(String tag, String name, ClanPlayer owner) {
         if (owner instanceof ClanPlayerImpl) {
             ClanPlayerImpl ownerImpl = (ClanPlayerImpl) owner;
             if (tagIsFree(tag)) {
-                ClanImpl newClan = new ClanImpl.Builder(getNextAvailableClanID(), tag, name).owner(ownerImpl).build();
-                newClan.setupDefaultRanks();
-                newClan.addMember(ownerImpl);
-
-                ownerImpl.setRank(newClan.getRank(RankFactory.getOwnerIdentifier()));
-                ownerImpl.setClan(newClan);
-                clans.put(tag.toLowerCase(), newClan);
-                EventDispatcher.getInstance().dispatchClanCreateEvent(newClan, owner);
-                TaskForwarder.sendInsertClan(newClan);
-                updateClanTagCache();
-                return newClan;
+                ClanCreateEvent.Plugin clanCreateEvent = EventDispatcher.getInstance().dispatchPluginClanCreateEvent(tag, name, owner);
+                if (clanCreateEvent.isCancelled()) {
+                    return ResultImpl.ofError(clanCreateEvent.getCancelMessage());
+                } else {
+                    Clan clan = createClanInternal(tag, name, ownerImpl);
+                    return ResultImpl.ofResult(clan);
+                }
             }
-            return null;
+            return ResultImpl.ofError("Tag is already taken");
         } else {
             throw new NotDefaultImplementationException(owner.getClass());
         }
+    }
+
+    public ClanImpl createClanInternal(String tag, String name, ClanPlayerImpl owner) {
+        ClanImpl newClan = new ClanImpl.Builder(getNextAvailableClanID(), tag, name).owner(owner).build();
+        newClan.setupDefaultRanks();
+        newClan.addMember(owner);
+
+        owner.setRank(newClan.getRank(RankFactory.getOwnerIdentifier()));
+        owner.setClan(newClan);
+        clans.put(tag.toLowerCase(), newClan);
+        TaskForwarder.sendInsertClan(newClan);
+        updateClanTagCache();
+        return newClan;
     }
 
     @Override

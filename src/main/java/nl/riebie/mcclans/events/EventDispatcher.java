@@ -27,7 +27,10 @@ import nl.riebie.mcclans.api.ClanPlayer;
 import nl.riebie.mcclans.api.events.*;
 import nl.riebie.mcclans.player.ClanPlayerImpl;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.event.Event;
+import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
 
 /**
  * Created by Kippers on 9-2-2016.
@@ -42,8 +45,22 @@ public class EventDispatcher {
         return _instance;
     }
 
-    public void dispatchClanCreateEvent(Clan clan, ClanPlayer owner) {
-        dispatchEvent(new ClanCreateEvent(clan, owner));
+    public ClanCreateEvent.Plugin dispatchPluginClanCreateEvent(String clanTag, String clanName, ClanPlayer owner) {
+        ClanCreateEvent.Plugin event = new ClanCreateEvent.Plugin(clanTag, clanName, owner);
+        dispatchEvent(event);
+        return event;
+    }
+
+    public ClanCreateEvent.User dispatchUserClanCreateEvent(String clanTag, String clanName, ClanPlayer owner) {
+        ClanCreateEvent.User event = new ClanCreateEvent.User(clanTag, clanName, owner);
+        dispatchEvent(event);
+        return event;
+    }
+
+    public ClanCreateEvent.Admin dispatchAdminClanCreateEvent(String clanTag, String clanName, ClanPlayer owner) {
+        ClanCreateEvent.Admin event = new ClanCreateEvent.Admin(clanTag, clanName, owner);
+        dispatchEvent(event);
+        return event;
     }
 
     public void dispatchClanDisbandEvent(Clan clan) {
@@ -64,6 +81,18 @@ public class EventDispatcher {
 
     public void dispatchClanPlayerKillEvent(ClanPlayerImpl killer, ClanPlayerImpl victim) {
         dispatchEvent(new ClanPlayerKillEvent(killer, victim));
+    }
+
+    public ClanSetHomeEvent.Admin dispatchClanSetHomeAdmin(Location<World> location, CommandSource commandSource) {
+        ClanSetHomeEvent.Admin event = new ClanSetHomeEvent.Admin(commandSource, location);
+        dispatchEvent(event);
+        return event;
+}
+
+    public ClanSetHomeEvent.User dispatchClanSetHomeUser(ClanPlayerImpl player, Location<World> location) {
+        ClanSetHomeEvent.User event = new ClanSetHomeEvent.User(player, location);
+        dispatchEvent(event);
+        return event;
     }
 
     private void dispatchEvent(Event event) {

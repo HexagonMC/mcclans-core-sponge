@@ -24,8 +24,11 @@ package nl.riebie.mcclans.commands.implementations;
 
 import nl.riebie.mcclans.ClansImpl;
 import nl.riebie.mcclans.MCClans;
+import nl.riebie.mcclans.api.ClanPlayer;
 import nl.riebie.mcclans.api.KillDeath;
 import nl.riebie.mcclans.api.enums.KillDeathFactor;
+import nl.riebie.mcclans.api.events.ClanCreateEvent;
+import nl.riebie.mcclans.api.events.ClanSetHomeEvent;
 import nl.riebie.mcclans.clan.ClanImpl;
 import nl.riebie.mcclans.clan.RankFactory;
 import nl.riebie.mcclans.clan.RankImpl;
@@ -36,6 +39,7 @@ import nl.riebie.mcclans.comparators.ClanKdrComparator;
 import nl.riebie.mcclans.comparators.ClanPlayerKdrComparator;
 import nl.riebie.mcclans.comparators.MemberComparator;
 import nl.riebie.mcclans.config.Config;
+import nl.riebie.mcclans.events.EventDispatcher;
 import nl.riebie.mcclans.messages.Messages;
 import nl.riebie.mcclans.player.ClanHomeTeleportTask;
 import nl.riebie.mcclans.player.ClanInvite;
@@ -130,25 +134,25 @@ public class ClanCommands {
             return;
         }
 
-        ClansImpl clansImpl = ClansImpl.getInstance();
         if (clanPlayer.getClan() == null) {
-            if (clansImpl.tagIsFree(clanTag)) {
-                if (Config.getBoolean(Config.USE_ECONOMY)) {
-                    double clanCreationCost = Config.getDouble(Config.CLAN_CREATION_COST);
-                    boolean success = EconomyUtils.withdraw(clanPlayer.getUUID(), clanCreationCost);
-                    String currencyName = MCClans.getPlugin().getServiceHelper().currency.getDisplayName().toPlain();
-                    if (success) {
-                        if (clanCreationCost != 0) {
-                            Messages.sendYouWereChargedCurrency(commandSource, clanCreationCost, currencyName);
-                        }
-
-                        ClanImpl clanImpl = clansImpl.createClan(clanTag, clanName, clanPlayer);
-                        Messages.sendBroadcastMessageClanCreatedBy(clanImpl.getName(), clanImpl.getTagColored(), clanPlayer.getName());
-                    } else {
-                        Messages.sendYouDoNotHaveEnoughCurrency(commandSource, clanCreationCost, currencyName);
-                    }
+            if (ClansImpl.getInstance().tagIsFree(clanTag)) {
+                ClanCreateEvent.User event = EventDispatcher.getInstance().dispatchUserClanCreateEvent(clanTag, clanName, clanPlayer);
+                if (event.isCancelled()) {
+                    clanPlayer.sendMessage(Messages.getWarningMessage(event.getWarningMessage()));
                 } else {
-                    ClanImpl clanImpl = clansImpl.createClan(clanTag, clanName, clanPlayer);
+                    if (Config.getBoolean(Config.USE_ECONOMY)) {
+                        double clanCreationCost = Config.getDouble(Config.CLAN_CREATION_COST);
+                        boolean success = EconomyUtils.withdraw(clanPlayer.getUUID(), clanCreationCost);
+                        String currencyName = MCClans.getPlugin().getServiceHelper().currency.getDisplayName().toPlain();
+
+                        if (!success) {
+                            Messages.sendYouDoNotHaveEnoughCurrency(commandSource, clanCreationCost, currencyName);
+                            return;
+                        }
+                        Messages.sendYouWereChargedCurrency(commandSource, clanCreationCost, currencyName);
+                    }
+
+                    ClanImpl clanImpl = ClansImpl.getInstance().createClanInternal(clanTag, clanName, clanPlayer);
                     Messages.sendBroadcastMessageClanCreatedBy(clanImpl.getName(), clanImpl.getTagColored(), clanPlayer.getName());
                 }
             } else {
@@ -540,14 +544,9 @@ public class ClanCommands {
 
                 int homeSetTimes = clan.getHomeSetTimes();
                 double setClanhomeCost = setClanhomeBaseCost + (homeSetTimes * reSetClanhomeCostIncrease);
-
-                boolean success = EconomyUtils.withdraw(clanPlayer.getUUID(), setClanhomeCost);
                 String currencyName = MCClans.getPlugin().getServiceHelper().currency.getDisplayName().toPlain();
-                if (success) {
-                    setHome(player, clanPlayer, setClanhomeCost, currencyName);
-                } else {
-                    Messages.sendYouDoNotHaveEnoughCurrency(player, setClanhomeCost, currencyName);
-                }
+
+                setHome(player, clanPlayer, setClanhomeCost, currencyName);
             } else {
                 setHome(player, clanPlayer, 0, "");
             }
@@ -557,13 +556,25 @@ public class ClanCommands {
     }
 
     private void setHome(Player player, ClanPlayerImpl clanPlayer, double setClanhomeCost, String currencyName) {
-        Location<World> location = player.getLocation();
-        clanPlayer.getClan().setHome(location);
-        clanPlayer.getClan().increaseHomeSetTimes();
-        clanPlayer.getClan().setHomeSetTimeStamp(System.currentTimeMillis());
-        Messages.sendBasicMessage(player, Messages.CLAN_HOME_LOCATION_SET);
-        if (setClanhomeCost != 0) {
-            Messages.sendYouWereChargedCurrency(player, setClanhomeCost, currencyName);
+        ClanSetHomeEvent.User event = EventDispatcher.getInstance().dispatchClanSetHomeUser(clanPlayer, player.getLocation());
+        if (event.isCancelled()) {
+            clanPlayer.sendMessage(Messages.getWarningMessage(event.getErrorMessage()));
+        } else {
+            if (setClanhomeCost > 0) {
+                boolean success = EconomyUtils.withdraw(clanPlayer.getUUID(), setClanhomeCost);
+                if (!success) {
+                    Messages.sendYouDoNotHaveEnoughCurrency(player, setClanhomeCost, currencyName);
+                    return;
+                }
+            }
+            Location<World> location = player.getLocation();
+            clanPlayer.getClan().setHome(location);
+            clanPlayer.getClan().increaseHomeSetTimes();
+            clanPlayer.getClan().setHomeSetTimeStamp(System.currentTimeMillis());
+            Messages.sendBasicMessage(player, Messages.CLAN_HOME_LOCATION_SET);
+            if (setClanhomeCost != 0) {
+                Messages.sendYouWereChargedCurrency(player, setClanhomeCost, currencyName);
+            }
         }
     }
 

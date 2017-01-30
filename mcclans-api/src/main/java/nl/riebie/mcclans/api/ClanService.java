@@ -41,7 +41,7 @@ public interface ClanService {
      * @return the new Clan
      * @throws NotDefaultImplementationException if owner is not created by MCClans
      */
-    Clan createClan(String tag, String name, ClanPlayer owner);
+    Result<Clan> createClan(String tag, String name, ClanPlayer owner);
 
     /**
      * Disband a clan

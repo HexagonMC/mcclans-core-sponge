@@ -23,6 +23,7 @@
 package nl.riebie.mcclans.commands.implementations;
 
 import nl.riebie.mcclans.ClansImpl;
+import nl.riebie.mcclans.api.events.ClanSetHomeEvent;
 import nl.riebie.mcclans.clan.ClanImpl;
 import nl.riebie.mcclans.clan.RankFactory;
 import nl.riebie.mcclans.clan.RankImpl;
@@ -30,6 +31,7 @@ import nl.riebie.mcclans.commands.annotations.*;
 import nl.riebie.mcclans.commands.constraints.ClanNameConstraint;
 import nl.riebie.mcclans.commands.constraints.ClanTagConstraint;
 import nl.riebie.mcclans.comparators.MemberComparator;
+import nl.riebie.mcclans.events.EventDispatcher;
 import nl.riebie.mcclans.persistence.DatabaseHandler;
 import nl.riebie.mcclans.messages.Messages;
 import nl.riebie.mcclans.player.ClanPlayerImpl;
@@ -198,6 +200,7 @@ public class ClanAdminCommands {
     public void adminSetHomeCommand(CommandSource commandSource, @Parameter(name = "clanTag") ClanImpl clan) {
         Player player = (Player) commandSource;
         Location<World> location = player.getLocation();
+        EventDispatcher.getInstance().dispatchClanSetHomeAdmin(location, commandSource);
         clan.setHome(location);
         Messages.sendBasicMessage(commandSource, Messages.CLAN_HOME_LOCATION_SET);
     }

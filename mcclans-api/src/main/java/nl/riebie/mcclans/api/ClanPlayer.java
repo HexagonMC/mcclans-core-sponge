@@ -23,6 +23,7 @@
 package nl.riebie.mcclans.api;
 
 import nl.riebie.mcclans.api.exceptions.NotDefaultImplementationException;
+import org.spongepowered.api.text.Text;
 
 import java.util.UUID;
 
@@ -103,4 +104,10 @@ public interface ClanPlayer {
      */
     void setFfProtection(boolean ffProtection);
 
+    /**
+     * Send a message to the ClanPlayer
+     *
+     * @param message the message for the ClanPlayer
+     */
+    void sendMessage(Text... message);
 }
