@@ -22,6 +22,7 @@
 
 package nl.riebie.mcclans.channels;
 
+import nl.riebie.mcclans.ClansImpl;
 import nl.riebie.mcclans.api.Clan;
 import nl.riebie.mcclans.api.Rank;
 import nl.riebie.mcclans.api.channels.ClanMessageChannel;
@@ -31,9 +32,11 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.channel.AbstractMutableMessageChannel;
+import org.spongepowered.api.text.channel.MessageChannel;
 import org.spongepowered.api.text.channel.MessageReceiver;
 import org.spongepowered.api.text.chat.ChatType;
 import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.text.format.TextStyles;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -47,34 +50,47 @@ import java.util.Set;
 public class ClanMessageChannelImpl extends AbstractMutableMessageChannel implements ClanMessageChannel {
 
     private ClanPlayerImpl clanPlayer;
+    private boolean spy;
 
-    protected ClanMessageChannelImpl(@Nonnull ClanPlayerImpl clanPlayer) {
-        this(new HashSet<>(), clanPlayer);
+    private ClanMessageChannelImpl(@Nonnull ClanPlayerImpl clanPlayer, boolean spy) {
+        this(new HashSet<>(), clanPlayer, spy);
     }
 
-    protected ClanMessageChannelImpl(Set<MessageReceiver> receivers, @Nonnull ClanPlayerImpl clanPlayer) {
+    private ClanMessageChannelImpl(Set<MessageReceiver> receivers, @Nonnull ClanPlayerImpl clanPlayer, boolean spy) {
         super(receivers);
         this.clanPlayer = clanPlayer;
+        this.spy = spy;
     }
 
-    public static ClanMessageChannelImpl getFor(@Nonnull ClanPlayerImpl clanPlayer) {
+    public static MessageChannel getFor(@Nonnull ClanPlayerImpl clanPlayer) {
         ClanImpl clan = clanPlayer.getClan();
         if (clan == null) {
-            return new ClanMessageChannelImpl(clanPlayer);
+            return new ClanMessageChannelImpl(clanPlayer, false);
         }
 
-        Set<MessageReceiver> receivers = new HashSet<>();
+        Set<MessageReceiver> spyReceivers = new HashSet<>();
+        for (Player player : Sponge.getServer().getOnlinePlayers()) {
+            ClanPlayerImpl clanPlayerSpy = ClansImpl.getInstance().getClanPlayer(player.getUniqueId());
+            if (clanPlayerSpy.isSpy()) {
+                spyReceivers.add(player);
+            }
+        }
+
+        Set<MessageReceiver> normalReceivers = new HashSet<>();
         for (ClanPlayerImpl clanMember : clan.getMembersImpl()) {
             Optional<Player> playerOpt = Sponge.getServer().getPlayer(clanMember.getUUID());
             if (playerOpt.isPresent() && !clanMember.getIgnoreClanChat()) {
                 Player player = playerOpt.get();
                 if (player.isOnline()) {
-                    receivers.add(player);
+                    normalReceivers.add(player);
                 }
             }
         }
 
-        return new ClanMessageChannelImpl(receivers, clanPlayer);
+        return MessageChannel.combined(
+                new ClanMessageChannelImpl(spyReceivers, clanPlayer, true),
+                new ClanMessageChannelImpl(normalReceivers, clanPlayer, false)
+        );
     }
 
     @Override
@@ -97,6 +113,10 @@ public class ClanMessageChannelImpl extends AbstractMutableMessageChannel implem
                 Text.of(clanPlayer.getName() + ": "),
                 original.toBuilder().color(TextColors.YELLOW).build()
         );
+
+        if (spy) {
+            newMessage = newMessage.toBuilder().style(TextStyles.ITALIC).build();
+        }
 
         return Optional.of(newMessage);
     }

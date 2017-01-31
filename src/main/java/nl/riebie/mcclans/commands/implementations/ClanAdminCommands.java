@@ -26,6 +26,7 @@ import nl.riebie.mcclans.ClansImpl;
 import nl.riebie.mcclans.clan.ClanImpl;
 import nl.riebie.mcclans.clan.RankFactory;
 import nl.riebie.mcclans.clan.RankImpl;
+import nl.riebie.mcclans.commands.Toggle;
 import nl.riebie.mcclans.commands.annotations.*;
 import nl.riebie.mcclans.commands.constraints.ClanNameConstraint;
 import nl.riebie.mcclans.commands.constraints.ClanTagConstraint;
@@ -216,6 +217,17 @@ public class ClanAdminCommands {
             clan.setOwner(targetClanPlayer);
             targetClanPlayer.setRank(rank);
             Messages.sendRankOfPlayerSuccessfullyChangedToRank(commandSource, targetClanPlayer.getName(), rank.getName());
+        }
+    }
+
+    @Command(name = "spy", description = "Spy on all the clan chats", isPlayerOnly = true, spongePermission = "mcclans.admin.spy")
+    public void adminSpyCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer, @Parameter(name = "toggle") Toggle toggle) {
+        if (toggle.getBoolean(clanPlayer.isSpy())) {
+            Messages.sendBasicMessage(commandSource, "You are now spying on all clan chats");
+            clanPlayer.setSpy(true);
+        } else {
+            Messages.sendBasicMessage(commandSource, "You have stopped spying on all clan chats");
+            clanPlayer.setSpy(false);
         }
     }
 }

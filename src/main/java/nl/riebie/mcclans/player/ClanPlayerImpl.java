@@ -64,6 +64,7 @@ public class ClanPlayerImpl implements ClanPlayer, Cloneable, CommandSender {
     private boolean ffProtection;
     private boolean ignoreClanChat;
     private boolean ignoreAllyChat;
+    private boolean spy;
 
     private ClanPlayerImpl(Builder builder) {
         this.clanPlayerID = builder.clanPlayerID;
@@ -271,6 +272,14 @@ public class ClanPlayerImpl implements ClanPlayer, Cloneable, CommandSender {
 
     public void setIgnoreAllyChat(boolean ignoreAllyChat) {
         this.ignoreAllyChat = ignoreAllyChat;
+    }
+
+    public boolean isSpy() {
+        return spy;
+    }
+
+    public void setSpy(boolean spy) {
+        this.spy = spy;
     }
 
     @Override
