@@ -26,22 +26,13 @@ repositories {
         name = 'nucleus'
         url = 'http://repo.drnaylor.co.uk/artifactory/list/minecraft'
     }
-    maven {
-        name 'drnaylor'
-        url 'http://repo.drnaylor.co.uk/artifactory/list/quickstart'
-    }
 }
 
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.11'
     compile 'org.spongepowered:spongeapi:5.0.0'
     compile 'net.minecrell.mcstats:statslite-sponge:0.2.2'
-    compile('io.github.nucleuspowered:Nucleus:0.20.0-5.0') {
-        exclude module: 'EssentialCmds'
-        exclude module: 'mixin'
-        exclude module: 'launchwrapper'
-        exclude module: 'guava'
-    }
+    compile 'io.github.nucleuspowered:nucleus-api:0.21.1-S5.1'
     compile project(':mcclans-api')
 }
 
