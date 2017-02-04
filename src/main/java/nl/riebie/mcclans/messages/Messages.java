@@ -66,7 +66,7 @@ public class Messages {
     public static final String YOUR_CLAN_NOW_ACCEPTS_ALLY_INVITES = "Your clan now accepts ally invites";
     public static final String CLAN_HOME_LOCATION_SET = "Clan home location set";
     public static final String CLAN_HOME_LOCATION_IS_NOT_SET = "Clan home location is not set";
-    public static final String NO_TABLE_TO_BROWSE ="You must execute a pageable command first";
+    public static final String NO_TABLE_TO_BROWSE = "You must execute a pageable command first";
     public static final String TELEPORT_CANCELLED = "Teleport cancelled";
     public static final String YOU_NEED_TO_MOVE_BEFORE_ATTEMPTING_ANOTHER_TELEPORT = "You need to move before attempting another teleport";
     public static final String PLAYER_PROPERTIES_REMOVED = "Player properties removed";
@@ -82,6 +82,8 @@ public class Messages {
     public static final String YOU_HAVE_STOPPED_IGNORING_CLAN_CHAT = "You have stopped ignoring clan chat";
     public static final String YOU_ARE_NOW_IGNORING_ALLY_CHAT = "You are now ignoring ally chat";
     public static final String YOU_HAVE_STOPPED_IGNORING_ALLY_CHAT = "You have stopped ignoring ally chat";
+    public static final String YOU_ARE_NOW_SPYING_ON_ALL_CLAN_CHATS = "You are now spying on all clan chats";
+    public static final String YOU_HAVE_STOPPED_SPYING_ON_ALL_CLAN_CHATS = "You have stopped spying on all clan chats";
 
     public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_USE_THIS_COMMAND = "You do not have permission to use this command";
     public static final String THIS_COMMAND_HAS_NO_INFORMATION_TO_DISPLAY = "This command has no information to display";
