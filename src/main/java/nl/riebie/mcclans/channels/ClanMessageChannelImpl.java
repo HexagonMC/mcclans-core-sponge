@@ -40,9 +40,7 @@ import org.spongepowered.api.text.format.TextStyles;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by Kippers on 14/02/2016.
@@ -50,54 +48,60 @@ import java.util.Set;
 public class ClanMessageChannelImpl extends AbstractMutableMessageChannel implements ClanMessageChannel {
 
     private ClanPlayerImpl clanPlayer;
-    private boolean spy;
+    private List<UUID> spies;
 
-    private ClanMessageChannelImpl(@Nonnull ClanPlayerImpl clanPlayer, boolean spy) {
-        this(new HashSet<>(), clanPlayer, spy);
+    private ClanMessageChannelImpl(@Nonnull ClanPlayerImpl clanPlayer) {
+        this(new HashSet<>(), new ArrayList<>(), clanPlayer);
     }
 
-    private ClanMessageChannelImpl(Set<MessageReceiver> receivers, @Nonnull ClanPlayerImpl clanPlayer, boolean spy) {
+    private ClanMessageChannelImpl(Set<MessageReceiver> receivers, List<UUID> spies, @Nonnull ClanPlayerImpl clanPlayer) {
         super(receivers);
         this.clanPlayer = clanPlayer;
-        this.spy = spy;
+        this.spies = spies;
     }
 
     public static MessageChannel getFor(@Nonnull ClanPlayerImpl clanPlayer) {
         ClanImpl clan = clanPlayer.getClan();
         if (clan == null) {
-            return new ClanMessageChannelImpl(clanPlayer, false);
+            return new ClanMessageChannelImpl(clanPlayer);
         }
 
-        Set<MessageReceiver> spyReceivers = new HashSet<>();
-        for (Player player : Sponge.getServer().getOnlinePlayers()) {
-            ClanPlayerImpl clanPlayerSpy = ClansImpl.getInstance().getClanPlayer(player.getUniqueId());
-            if (clanPlayerSpy.isSpy()) {
-                spyReceivers.add(player);
-            }
-        }
-
-        Set<MessageReceiver> normalReceivers = new HashSet<>();
+        Set<MessageReceiver> receivers = new HashSet<>();
         for (ClanPlayerImpl clanMember : clan.getMembersImpl()) {
             Optional<Player> playerOpt = Sponge.getServer().getPlayer(clanMember.getUUID());
             if (playerOpt.isPresent() && !clanMember.getIgnoreClanChat()) {
                 Player player = playerOpt.get();
                 if (player.isOnline()) {
-                    normalReceivers.add(player);
+                    receivers.add(player);
                 }
             }
         }
 
-        return MessageChannel.combined(
-                new ClanMessageChannelImpl(spyReceivers, clanPlayer, true),
-                new ClanMessageChannelImpl(normalReceivers, clanPlayer, false)
-        );
+        List<UUID> spies = new ArrayList<>();
+        for (Player player : Sponge.getServer().getOnlinePlayers()) {
+            ClanPlayerImpl clanPlayerSpy = ClansImpl.getInstance().getClanPlayer(player.getUniqueId());
+            if (clanPlayerSpy.isSpy() && !receivers.contains(player)) {
+                spies.add(player.getUniqueId());
+                receivers.add(player);
+            }
+        }
+
+        return new ClanMessageChannelImpl(receivers, spies, clanPlayer);
     }
 
     @Override
     public Optional<Text> transformMessage(@Nullable Object sender, MessageReceiver recipient, Text original, ChatType type) {
+        boolean spy = recipient instanceof Player && spies.contains(((Player) recipient).getUniqueId());
+
+        Clan clan = clanPlayer.getClan();
         Rank rank = clanPlayer.getRank();
         Text rankText = null;
-        if (rank != null) {
+        if (spy && clan != null) {
+            rankText = Text.join(
+                    clan.getTagColored(),
+                    Text.of(" ")
+            );
+        } else if (rank != null) {
             rankText = Text.join(
                     Text.builder("[").color(TextColors.GRAY).build(),
                     Text.builder(rank.getName()).color(TextColors.BLUE).build(),

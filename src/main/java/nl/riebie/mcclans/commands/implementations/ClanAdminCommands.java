@@ -223,10 +223,10 @@ public class ClanAdminCommands {
     @Command(name = "spy", description = "Spy on all the clan chats", isPlayerOnly = true, spongePermission = "mcclans.admin.spy")
     public void adminSpyCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer, @Parameter(name = "toggle") Toggle toggle) {
         if (toggle.getBoolean(clanPlayer.isSpy())) {
-            Messages.sendBasicMessage(commandSource, "You are now spying on all clan chats");
+            Messages.sendBasicMessage(commandSource, Messages.YOU_ARE_NOW_SPYING_ON_ALL_CLAN_CHATS);
             clanPlayer.setSpy(true);
         } else {
-            Messages.sendBasicMessage(commandSource, "You have stopped spying on all clan chats");
+            Messages.sendBasicMessage(commandSource, Messages.YOU_HAVE_STOPPED_SPYING_ON_ALL_CLAN_CHATS);
             clanPlayer.setSpy(false);
         }
     }
