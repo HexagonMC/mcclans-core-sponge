@@ -204,10 +204,6 @@ public class ClanCommands {
             ClanPlayerImpl invitedClanPlayer = clansInstance.getClanPlayer(uuid);
 
             if (invitedClanPlayer == null) {
-                if (invitedPlayer == null) {
-                    Messages.sendPlayerNotOnline(invitedPlayer, playerName);
-                    return;
-                }
                 invitedClanPlayer = clansInstance.createClanPlayer(invitedPlayer.getUniqueId(), invitedPlayer.getName());
             }
             String invitedClanPlayerName = invitedClanPlayer.getName();
