@@ -11,15 +11,18 @@ public class ResultImpl<T> implements Result<T> {
 
     private final String errorMessage;
     private final T item;
+    private final boolean success;
 
     private ResultImpl(T item) {
         this.item = item;
-        errorMessage = null;
+        this.errorMessage = null;
+        this.success = true;
     }
 
     private ResultImpl(boolean success, String errorMessage) {
-        item = null;
+        this.item = null;
         this.errorMessage = errorMessage;
+        this.success = success;
     }
 
     public static <T> Result<T> ofResult(T item) {
@@ -45,6 +48,6 @@ public class ResultImpl<T> implements Result<T> {
 
     @Override
     public boolean isSuccessful() {
-        return item != null;
+        return success;
     }
 }
