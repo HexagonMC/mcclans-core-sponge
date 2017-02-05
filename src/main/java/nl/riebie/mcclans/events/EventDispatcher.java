@@ -25,6 +25,7 @@ package nl.riebie.mcclans.events;
 import nl.riebie.mcclans.api.Clan;
 import nl.riebie.mcclans.api.ClanPlayer;
 import nl.riebie.mcclans.api.events.*;
+import nl.riebie.mcclans.clan.ClanImpl;
 import nl.riebie.mcclans.player.ClanPlayerImpl;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
@@ -87,10 +88,22 @@ public class EventDispatcher {
         ClanSetHomeEvent.Admin event = new ClanSetHomeEvent.Admin(commandSource, location);
         dispatchEvent(event);
         return event;
-}
+    }
 
     public ClanSetHomeEvent.User dispatchClanSetHomeUser(ClanPlayerImpl player, Location<World> location) {
         ClanSetHomeEvent.User event = new ClanSetHomeEvent.User(player, location);
+        dispatchEvent(event);
+        return event;
+    }
+
+    public ClanHomeTeleportEvent.User dispatchUserClanHomeTeleportEvent(ClanPlayerImpl player, ClanImpl clan) {
+        ClanHomeTeleportEvent.User event = new ClanHomeTeleportEvent.User(clan, player);
+        dispatchEvent(event);
+        return event;
+    }
+
+    public ClanHomeTeleportEvent.Admin dispatchAdminClanHomeTeleportEvent(ClanPlayerImpl player, ClanImpl clan) {
+        ClanHomeTeleportEvent.Admin event = new ClanHomeTeleportEvent.Admin(clan, player);
         dispatchEvent(event);
         return event;
     }

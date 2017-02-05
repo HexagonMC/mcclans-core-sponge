@@ -24,10 +24,10 @@ package nl.riebie.mcclans.commands.implementations;
 
 import nl.riebie.mcclans.ClansImpl;
 import nl.riebie.mcclans.MCClans;
-import nl.riebie.mcclans.api.ClanPlayer;
 import nl.riebie.mcclans.api.KillDeath;
 import nl.riebie.mcclans.api.enums.KillDeathFactor;
 import nl.riebie.mcclans.api.events.ClanCreateEvent;
+import nl.riebie.mcclans.api.events.ClanHomeTeleportEvent;
 import nl.riebie.mcclans.api.events.ClanSetHomeEvent;
 import nl.riebie.mcclans.clan.ClanImpl;
 import nl.riebie.mcclans.clan.RankFactory;
@@ -501,26 +501,32 @@ public class ClanCommands {
     }
 
     @Command(name = "home", description = "Teleport to your clan home", isPlayerOnly = true, isClanOnly = true, clanPermission = "home", spongePermission = "mcclans.user.home")
-    public void clanHomeCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer) {
-        Player player = (Player) commandSource;
-        Location<World> teleportLocation = clanPlayer.getClan().getHome();
+    public void clanHomeCommand(Player player, ClanPlayerImpl clanPlayer) {
+        ClanImpl clan = clanPlayer.getClan();
+        Location<World> teleportLocation = clan.getHome();
         if (teleportLocation == null) {
-            Messages.sendWarningMessage(commandSource, Messages.CLAN_HOME_LOCATION_IS_NOT_SET);
-        } else if (player != null) {
-            LastClanHomeTeleport lastClanHomeTeleport = clanPlayer.getLastClanHomeTeleport();
-            if (lastClanHomeTeleport == null || lastClanHomeTeleport.canPlayerTeleport()) {
-                Location<World> currentPlayerLocation = player.getLocation();
-                Location<World> lastTeleportInitiationLocation = clanPlayer.getLastTeleportInitiationLocation();
-                if (lastTeleportInitiationLocation == null
-                        || !lastTeleportInitiationLocation.getExtent().getName().equalsIgnoreCase(currentPlayerLocation.getExtent().getName())
-                        || lastTeleportInitiationLocation.getPosition().distance(currentPlayerLocation.getPosition()) != 0) {
-                    startTeleportTask(player, clanPlayer, teleportLocation, currentPlayerLocation);
+            Messages.sendWarningMessage(player, Messages.CLAN_HOME_LOCATION_IS_NOT_SET);
+            return;
+        }
+
+        LastClanHomeTeleport lastClanHomeTeleport = clanPlayer.getLastClanHomeTeleport();
+        if (lastClanHomeTeleport == null || lastClanHomeTeleport.canPlayerTeleport()) {
+            Location<World> currentPlayerLocation = player.getLocation();
+            Location<World> lastTeleportInitiationLocation = clanPlayer.getLastTeleportInitiationLocation();
+            if (lastTeleportInitiationLocation == null
+                    || !lastTeleportInitiationLocation.getExtent().getName().equalsIgnoreCase(currentPlayerLocation.getExtent().getName())
+                    || lastTeleportInitiationLocation.getPosition().distance(currentPlayerLocation.getPosition()) != 0) {
+                ClanHomeTeleportEvent.User event = EventDispatcher.getInstance().dispatchUserClanHomeTeleportEvent(clanPlayer, clan);
+                if (event.isCancelled()) {
+                    Messages.sendWarningMessage(player, event.getCancelMessage());
                 } else {
-                    Messages.sendWarningMessage(commandSource, Messages.YOU_NEED_TO_MOVE_BEFORE_ATTEMPTING_ANOTHER_TELEPORT);
+                    startTeleportTask(player, clanPlayer, teleportLocation, currentPlayerLocation);
                 }
             } else {
-                Messages.sendYouCanTeleportInXSeconds(commandSource, lastClanHomeTeleport.secondsBeforePlayerCanTeleport());
+                Messages.sendWarningMessage(player, Messages.YOU_NEED_TO_MOVE_BEFORE_ATTEMPTING_ANOTHER_TELEPORT);
             }
+        } else {
+            Messages.sendYouCanTeleportInXSeconds(player, lastClanHomeTeleport.secondsBeforePlayerCanTeleport());
         }
     }
 

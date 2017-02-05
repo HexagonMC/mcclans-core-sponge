@@ -23,14 +23,12 @@
 package nl.riebie.mcclans.listeners;
 
 import nl.riebie.mcclans.ClansImpl;
-import nl.riebie.mcclans.api.events.ClanSetHomeEvent;
 import nl.riebie.mcclans.channels.AllyMessageChannelImpl;
 import nl.riebie.mcclans.channels.ClanMessageChannelImpl;
 import nl.riebie.mcclans.config.Config;
 import nl.riebie.mcclans.enums.PlayerChatState;
 import nl.riebie.mcclans.messages.Messages;
 import nl.riebie.mcclans.player.ClanPlayerImpl;
-import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
