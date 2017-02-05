@@ -65,7 +65,11 @@ public class ClanPlayerCommands {
         } else if (targetPlayer.getRank().getName().toLowerCase().equals(RankFactory.getOwnerIdentifier().toLowerCase())) {
             Messages.sendWarningMessage(sender, Messages.YOU_CANNOT_OVERWRITE_THE_OWNER_RANK);
         } else {
-            if (RankFactory.getOwnerIdentifier().toLowerCase().equals(rankName.toLowerCase())) {
+            if (RankFactory.getOwnerIdentifier().toLowerCase().equals(rank.getName().toLowerCase())) {
+                if(!clan.getOwner().equals(clanPlayer)){
+                    Messages.sendWarningMessage(sender, Messages.ONLY_THE_OWNER_CAN_CHANGE_OWNER);
+                    return;
+                }
                 ClanOwnerChangeEvent.User clanOwnerChangeEvent = EventDispatcher.getInstance().dispatchUserClanOwnerChangeEvent(clan, clan.getOwner(), targetPlayer);
                 if (clanOwnerChangeEvent.isCancelled()) {
                     Messages.sendWarningMessage(sender, clanOwnerChangeEvent.getCancelMessage());

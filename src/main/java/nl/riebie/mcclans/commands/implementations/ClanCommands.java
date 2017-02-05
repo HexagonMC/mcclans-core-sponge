@@ -189,20 +189,20 @@ public class ClanCommands {
     }
 
     @Command(name = "invite", description = "Invite a player to your clan", isPlayerOnly = true, isClanOnly = true, clanPermission = "invite", spongePermission = "mcclans.user.invite")
-    public void clanInviteCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer, @Parameter(name = "playerName") String playerName) {
+    public void clanInviteCommand(Player player, ClanPlayerImpl clanPlayer, @Parameter(name = "playerName") String playerName) {
         // TODO SPONGE: Check if command is properly and fully implemented
         ClanImpl clan = clanPlayer.getClan();
-        Player player = (Player) commandSource;       // TODO SPONGE add check if it is a player
         if (clan != null) {
             UUID uuid = UUIDUtils.getUUID(playerName);
-            if (uuid == null) {
+            Optional<Player> invitedPlayerOpt = uuid == null ? Optional.empty() : Sponge.getServer().getPlayer(uuid);
+            if (!invitedPlayerOpt.isPresent()) {
                 Messages.sendPlayerNotOnline(player, playerName);
                 return;
             }
-
+            Player invitedPlayer = invitedPlayerOpt.get();
             ClansImpl clansInstance = ClansImpl.getInstance();
             ClanPlayerImpl invitedClanPlayer = clansInstance.getClanPlayer(uuid);
-            Player invitedPlayer = Sponge.getServer().getPlayer(uuid).get();  // TODO SPONGE handle optional :)
+
             if (invitedClanPlayer == null) {
                 if (invitedPlayer == null) {
                     Messages.sendPlayerNotOnline(invitedPlayer, playerName);
