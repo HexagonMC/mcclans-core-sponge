@@ -38,7 +38,7 @@ public class ClanCreateEvent extends CancellableClanEvent {
     private final ClanPlayer owner;
 
     public ClanCreateEvent(String clanTag, String clanName, ClanPlayer owner) {
-        super(Cause.of(NamedCause.owner(owner)));
+        super("Clan creation cancelled by an external plugin", Cause.of(NamedCause.owner(owner)));
 
         this.clanTag = clanTag;
         this.clanName = clanName;

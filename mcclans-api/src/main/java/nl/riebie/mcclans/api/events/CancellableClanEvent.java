@@ -27,15 +27,18 @@ import org.spongepowered.api.event.cause.Cause;
 
 /**
  * Created by Kippers on 19-1-2016.
- *
+ * <p>
  * A clan event that is cancellable
  */
 public abstract class CancellableClanEvent extends ClanEvent implements Cancellable {
+
+    private final String defaultCancelMessage;
     private boolean cancelled;
     private String cancelMessage;
 
-    public CancellableClanEvent(Cause cause) {
+    public CancellableClanEvent(String defaultCancelMessage, Cause cause) {
         super(cause);
+        this.defaultCancelMessage = defaultCancelMessage;
     }
 
     @Override
@@ -53,7 +56,12 @@ public abstract class CancellableClanEvent extends ClanEvent implements Cancella
         cancelMessage = reasonMessage;
     }
 
+    /**
+     * Get the reason why this event was cancelled
+     *
+     * @return the reason why this event was cancelled, returns null when the event isn't cancelled
+     */
     public String getCancelMessage() {
-        return cancelMessage;
+        return cancelled && cancelMessage == null ? defaultCancelMessage : cancelMessage;
     }
 }

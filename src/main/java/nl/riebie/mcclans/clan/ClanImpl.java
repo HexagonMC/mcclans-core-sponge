@@ -26,6 +26,7 @@ import nl.riebie.mcclans.ClansImpl;
 import nl.riebie.mcclans.api.Clan;
 import nl.riebie.mcclans.api.ClanPlayer;
 import nl.riebie.mcclans.api.Rank;
+import nl.riebie.mcclans.api.Result;
 import nl.riebie.mcclans.api.enums.KillDeathFactor;
 import nl.riebie.mcclans.api.events.ClanOwnerChangeEvent;
 import nl.riebie.mcclans.api.exceptions.NotDefaultImplementationException;
@@ -34,6 +35,7 @@ import nl.riebie.mcclans.messages.Messages;
 import nl.riebie.mcclans.persistence.TaskForwarder;
 import nl.riebie.mcclans.events.EventDispatcher;
 import nl.riebie.mcclans.player.ClanPlayerImpl;
+import nl.riebie.mcclans.utils.ResultImpl;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.format.TextColors;
@@ -285,13 +287,14 @@ public class ClanImpl implements Clan, Cloneable {
     }
 
     @Override
-    public void setOwner(ClanPlayer clanPlayer) {
+    public Result<Void> setOwner(ClanPlayer clanPlayer) {
         if (clanPlayer instanceof ClanPlayerImpl) {
             ClanOwnerChangeEvent event = EventDispatcher.getInstance().dispatchPluginClanOwnerChangeEvent(this, owner, clanPlayer);
             if (event.isCancelled()) {
-                clanPlayer.sendMessage(Messages.getWarningMessage(event.getCancelMessage()));
+                return ResultImpl.ofError(event.getCancelMessage());
             } else {
                 setOwnerInternal((ClanPlayerImpl) clanPlayer);
+                return ResultImpl.ofResult(null);
             }
         } else {
             throw new NotDefaultImplementationException(clanPlayer.getClass());

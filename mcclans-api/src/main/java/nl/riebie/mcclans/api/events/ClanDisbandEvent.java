@@ -29,13 +29,15 @@ import org.spongepowered.api.event.cause.NamedCause;
 
 /**
  * Created by Kippers on 19-1-2016.
+ *
+ * Event fired when a clan is disbanded
  */
 public class ClanDisbandEvent extends CancellableClanEvent {
 
     private Clan clan;
 
     private ClanDisbandEvent(Clan clan) {
-        super(Cause.of(NamedCause.owner(clan.getOwner())));
+        super("Clan disband cancelled by an external plugin", Cause.of(NamedCause.owner(clan.getOwner())));
         this.clan = clan;
     }
 
