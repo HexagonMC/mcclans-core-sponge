@@ -16,7 +16,7 @@ public class ClanHomeTeleportEvent extends CancellableClanEvent {
     private ClanPlayer clanPlayer;
 
     public ClanHomeTeleportEvent(Clan clan, ClanPlayer clanPlayer) {
-        super(Cause.of(NamedCause.owner(clanPlayer)));
+        super("Clan home teleport cancelled by an external plugin", Cause.of(NamedCause.owner(clanPlayer)));
         this.clan = clan;
         this.clanPlayer = clanPlayer;
     }

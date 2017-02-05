@@ -10,13 +10,15 @@ import org.spongepowered.api.world.World;
 
 /**
  * Created by riebie on 29/01/2017.
+ *
+ * An event which is fired when a clan home is set
  */
 public class ClanSetHomeEvent extends CancellableClanEvent {
 
     private final Location<World> location;
 
     private ClanSetHomeEvent(Cause cause, Location<World> location) {
-        super(cause);
+        super("Clan set home cancelled by an external plugin", cause);
         this.location = location;
     }
 
