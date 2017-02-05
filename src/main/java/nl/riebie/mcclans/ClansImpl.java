@@ -27,6 +27,7 @@ import nl.riebie.mcclans.api.ClanPlayer;
 import nl.riebie.mcclans.api.ClanService;
 import nl.riebie.mcclans.api.Result;
 import nl.riebie.mcclans.api.events.ClanCreateEvent;
+import nl.riebie.mcclans.api.events.ClanDisbandEvent;
 import nl.riebie.mcclans.api.events.ClanMemberJoinEvent;
 import nl.riebie.mcclans.api.events.ClanMemberLeaveEvent;
 import nl.riebie.mcclans.api.exceptions.NotDefaultImplementationException;
@@ -48,6 +49,9 @@ import nl.riebie.mcclans.player.ClanPlayerImpl;
 import nl.riebie.mcclans.utils.ResultImpl;
 import nl.riebie.mcclans.utils.UUIDUtils;
 import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.Order;
+import org.spongepowered.api.event.filter.IsCancelled;
+import org.spongepowered.api.util.Tristate;
 
 import java.util.*;
 
@@ -78,17 +82,20 @@ public class ClansImpl implements ClanService {
         return instance;
     }
 
-    @Listener
+    @IsCancelled(Tristate.FALSE)
+    @Listener(order = Order.POST)
     public void onClanPlayerKill(ClanPlayerKillEvent event) {
         updateClanTagCache();
     }
 
-    @Listener
+    @IsCancelled(Tristate.FALSE)
+    @Listener(order = Order.POST)
     public void onMemberJoin(ClanMemberJoinEvent event) {
         updateClanTagCache();
     }
 
-    @Listener
+    @IsCancelled(Tristate.FALSE)
+    @Listener(order = Order.POST)
     public void onMemberLeave(ClanMemberLeaveEvent event) {
         updateClanTagCache();
     }
@@ -192,34 +199,43 @@ public class ClansImpl implements ClanService {
     @Override
     public void disbandClan(Clan disbandedClan) {
         if (disbandedClan instanceof ClanImpl) {
-            ClanImpl clan = (ClanImpl) disbandedClan;
-            for (ClanPlayerImpl clanPlayer : clan.getMembersImpl()) {
-                clanPlayer.setClan(null);
-                clanPlayer.setRank(null);
+            ClanDisbandEvent.Plugin event = EventDispatcher.getInstance().dispatchPluginClanDisbandEvent(disbandedClan);
+            if (event.isCancelled()) {
+                disbandedClan.getOwner().sendMessage(Messages.getWarningMessage(event.getCancelMessage()));
+            } else {
+                disbandClanInternal((ClanImpl) disbandedClan);
             }
-            List<RankImpl> ranks = clan.getRankImpls();
-            for (RankImpl rank : ranks) {
-                clan.removeRank(rank.getName());
-            }
-            for (ClanPlayerImpl invitedPlayer : clan.getInvitedPlayersImpl()) {
-                invitedPlayer.resetClanInvite();
-            }
-            for (ClanImpl ally : clan.getAlliesImpl()) {
-                ally.removeAlly(clan);
-            }
-            for (ClanImpl invitedAlly : clan.getInvitedAlliesImpl()) {
-                invitedAlly.resetInvitingAlly();
-            }
-
-            clans.remove(clan.getTag().toLowerCase());
-
-            EventDispatcher.getInstance().dispatchClanDisbandEvent(clan);
-            TaskForwarder.sendDeleteClan(clan.getID());
-            updateClanTagCache();
         } else {
             throw new NotDefaultImplementationException(disbandedClan.getClass());
         }
     }
+
+    public void disbandClanInternal(ClanImpl clan) {
+        for (ClanPlayerImpl clanPlayer : clan.getMembersImpl()) {
+            clanPlayer.setClan(null);
+            clanPlayer.setRank(null);
+        }
+        List<RankImpl> ranks = clan.getRankImpls();
+        for (RankImpl rank : ranks) {
+            clan.removeRank(rank.getName());
+        }
+        for (ClanPlayerImpl invitedPlayer : clan.getInvitedPlayersImpl()) {
+            invitedPlayer.resetClanInvite();
+        }
+        for (ClanImpl ally : clan.getAlliesImpl()) {
+            ally.removeAlly(clan);
+        }
+        for (ClanImpl invitedAlly : clan.getInvitedAlliesImpl()) {
+            invitedAlly.resetInvitingAlly();
+        }
+
+        clans.remove(clan.getTag().toLowerCase());
+
+        TaskForwarder.sendDeleteClan(clan.getID());
+        updateClanTagCache();
+    }
+
+
 
     @Override
     public ClanImpl getClan(String tag) {

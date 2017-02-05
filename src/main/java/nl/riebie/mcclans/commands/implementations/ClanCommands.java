@@ -26,9 +26,7 @@ import nl.riebie.mcclans.ClansImpl;
 import nl.riebie.mcclans.MCClans;
 import nl.riebie.mcclans.api.KillDeath;
 import nl.riebie.mcclans.api.enums.KillDeathFactor;
-import nl.riebie.mcclans.api.events.ClanCreateEvent;
-import nl.riebie.mcclans.api.events.ClanHomeTeleportEvent;
-import nl.riebie.mcclans.api.events.ClanSetHomeEvent;
+import nl.riebie.mcclans.api.events.*;
 import nl.riebie.mcclans.clan.ClanImpl;
 import nl.riebie.mcclans.clan.RankFactory;
 import nl.riebie.mcclans.clan.RankImpl;
@@ -233,10 +231,15 @@ public class ClanCommands {
 
     @Command(name = "disband", description = "Disband a clan", isPlayerOnly = true, isClanOnly = true, clanPermission = "disband", spongePermission = "mcclans.user.disband")
     public void clanDisbandCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer) {
-        ClansImpl clansImpl = ClansImpl.getInstance();
         ClanImpl clan = clanPlayer.getClan();
-        Messages.sendBroadcastMessageClanDisbandedBy(clan.getName(), clan.getTagColored(), commandSource.getName());
-        clansImpl.disbandClan(clan);
+        ClanDisbandEvent.User event = EventDispatcher.getInstance().dispatchUserClanDisbandEvent(clan);
+        if (event.isCancelled()) {
+            Messages.sendWarningMessage(commandSource, event.getCancelMessage());
+        } else {
+            ClansImpl clansImpl = ClansImpl.getInstance();
+            Messages.sendBroadcastMessageClanDisbandedBy(clan.getName(), clan.getTagColored(), commandSource.getName());
+            clansImpl.disbandClan(clan);
+        }
     }
 
     @Command(name = "remove", description = "Remove a player from your clan", isPlayerOnly = true, isClanOnly = true, clanPermission = "remove", spongePermission = "mcclans.user.remove")
@@ -249,9 +252,14 @@ public class ClanCommands {
                 } else if (toBeRemovedClanPlayer == clan.getOwner()) {
                     Messages.sendWarningMessage(commandSource, Messages.YOU_CANNOT_REMOVE_THE_OWNER_FROM_THE_CLAN);
                 } else {
-                    clan.removeMember(toBeRemovedClanPlayer.getName());
-                    Messages.sendClanBroadcastMessagePlayerRemovedFromTheClanBy(clan, toBeRemovedClanPlayer.getName(), clanPlayer.getName());
-                    Messages.sendYouHaveBeenRemovedFromClan(toBeRemovedClanPlayer, clan.getName());
+                    ClanMemberLeaveEvent.User clanMemberLeaveEvent = EventDispatcher.getInstance().dispatchUserClanMemberLeaveEvent(clan, toBeRemovedClanPlayer);
+                    if (clanMemberLeaveEvent.isCancelled()) {
+                        Messages.sendWarningMessage(commandSource, clanMemberLeaveEvent.getCancelMessage());
+                    } else {
+                        clan.removeMember(toBeRemovedClanPlayer.getName());
+                        Messages.sendClanBroadcastMessagePlayerRemovedFromTheClanBy(clan, toBeRemovedClanPlayer.getName(), clanPlayer.getName());
+                        Messages.sendYouHaveBeenRemovedFromClan(toBeRemovedClanPlayer, clan.getName());
+                    }
                 }
             } else {
                 Messages.sendPlayerNotAMemberOfThisClan(commandSource, toBeRemovedClanPlayer.getName());
@@ -423,9 +431,14 @@ public class ClanCommands {
         if (rank.getName().equals(RankFactory.getOwnerIdentifier())) {
             Messages.sendWarningMessage(commandSource, Messages.YOU_CANNOT_RESIGN_FROM_THE_CLAN_AS_THE_OWNER);
         } else {
-            clan.removeMember(clanPlayer.getName());
-            Messages.sendSuccessfullyResignedFromClan(commandSource, clan.getName());
-            Messages.sendClanBroadcastMessagePlayerResignedFromTheClan(clan, clanPlayer.getName());
+            ClanMemberLeaveEvent.User clanMemberLeaveEvent = EventDispatcher.getInstance().dispatchUserClanMemberLeaveEvent(clan, clanPlayer);
+            if (clanMemberLeaveEvent.isCancelled()) {
+                Messages.sendWarningMessage(commandSource, clanMemberLeaveEvent.getCancelMessage());
+            } else {
+                clan.removeMember(clanPlayer.getName());
+                Messages.sendSuccessfullyResignedFromClan(commandSource, clan.getName());
+                Messages.sendClanBroadcastMessagePlayerResignedFromTheClan(clan, clanPlayer.getName());
+            }
         }
     }
 

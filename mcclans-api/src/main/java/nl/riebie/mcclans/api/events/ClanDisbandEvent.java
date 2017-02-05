@@ -23,22 +23,41 @@
 package nl.riebie.mcclans.api.events;
 
 import nl.riebie.mcclans.api.Clan;
+import nl.riebie.mcclans.api.ClanPlayer;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.NamedCause;
 
 /**
  * Created by Kippers on 19-1-2016.
  */
-public class ClanDisbandEvent extends ClanEvent {
+public class ClanDisbandEvent extends CancellableClanEvent {
 
     private Clan clan;
 
-    public ClanDisbandEvent(Clan clan) {
+    private ClanDisbandEvent(Clan clan) {
         super(Cause.of(NamedCause.owner(clan.getOwner())));
         this.clan = clan;
     }
 
     public Clan getClan() {
         return clan;
+    }
+
+    public static class Admin extends ClanDisbandEvent {
+        public Admin(Clan clan) {
+            super(clan);
+        }
+    }
+
+    public static class User extends ClanDisbandEvent {
+        public User(Clan clan) {
+            super(clan);
+        }
+    }
+
+    public static class Plugin extends ClanDisbandEvent {
+        public Plugin(Clan clan) {
+            super(clan);
+        }
     }
 }

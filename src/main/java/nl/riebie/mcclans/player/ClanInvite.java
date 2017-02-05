@@ -22,8 +22,10 @@
 
 package nl.riebie.mcclans.player;
 
+import nl.riebie.mcclans.api.events.ClanMemberJoinEvent;
 import nl.riebie.mcclans.clan.ClanImpl;
 import nl.riebie.mcclans.clan.RankFactory;
+import nl.riebie.mcclans.events.EventDispatcher;
 import nl.riebie.mcclans.messages.Messages;
 
 /**
@@ -39,12 +41,17 @@ public class ClanInvite {
     }
 
     public void accept() {
-        Messages.sendClanBroadcastMessagePlayerJoinedTheClan(clan, clanPlayer.getName());
-        clanPlayer.setRank(clan.getRank(RankFactory.getRecruitIdentifier()));
-        clan.addMember(clanPlayer);
-        clanPlayer.setClan(clan);
-        clan.removeInvitedPlayer(clanPlayer.getName());
-        clanPlayer.resetClanInvite();
+        ClanMemberJoinEvent event = EventDispatcher.getInstance().dispatchClanMemberJoinEvent(clan, clanPlayer);
+        if (event.isCancelled()) {
+            clanPlayer.sendMessage(Messages.getWarningMessage(event.getCancelMessage()));
+        } else {
+            Messages.sendClanBroadcastMessagePlayerJoinedTheClan(clan, clanPlayer.getName());
+            clanPlayer.setRank(clan.getRank(RankFactory.getRecruitIdentifier()));
+            clan.addMember(clanPlayer);
+            clanPlayer.setClan(clan);
+            clan.removeInvitedPlayer(clanPlayer.getName());
+            clanPlayer.resetClanInvite();
+        }
     }
 
     public void decline() {

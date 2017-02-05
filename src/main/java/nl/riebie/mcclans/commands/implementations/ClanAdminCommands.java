@@ -23,9 +23,7 @@
 package nl.riebie.mcclans.commands.implementations;
 
 import nl.riebie.mcclans.ClansImpl;
-import nl.riebie.mcclans.api.events.ClanCreateEvent;
-import nl.riebie.mcclans.api.events.ClanHomeTeleportEvent;
-import nl.riebie.mcclans.api.events.ClanSetHomeEvent;
+import nl.riebie.mcclans.api.events.*;
 import nl.riebie.mcclans.clan.ClanImpl;
 import nl.riebie.mcclans.clan.RankFactory;
 import nl.riebie.mcclans.clan.RankImpl;
@@ -149,10 +147,15 @@ public class ClanAdminCommands {
 
     @Command(name = "disband", description = "Disband a clan", spongePermission = "mcclans.admin.disband")
     public void adminDisbandCommand(CommandSource commandSource, @Parameter(name = "clanTag") ClanImpl clan) {
-        ClansImpl clansImpl = ClansImpl.getInstance();
+        ClanDisbandEvent.Admin event = EventDispatcher.getInstance().dispatchAdminClanDisbandEvent(clan);
+        if (event.isCancelled()) {
+            Messages.sendWarningMessage(commandSource, event.getCancelMessage());
+        } else {
+            ClansImpl clansImpl = ClansImpl.getInstance();
 
-        Messages.sendBroadcastMessageClanDisbandedBy(clan.getName(), clan.getTagColored(), commandSource.getName());
-        clansImpl.disbandClan(clan);
+            Messages.sendBroadcastMessageClanDisbandedBy(clan.getName(), clan.getTagColored(), commandSource.getName());
+            clansImpl.disbandClanInternal(clan);
+        }
     }
 
     @Command(name = "home", description = "Teleport to a clan home", isPlayerOnly = true, spongePermission = "mcclans.admin.home")
@@ -201,9 +204,14 @@ public class ClanAdminCommands {
             } else if (toBeRemovedClanPlayer.getName().equalsIgnoreCase(clan.getOwner().getName())) {
                 Messages.sendWarningMessage(commandSource, Messages.YOU_CANNOT_REMOVE_THE_OWNER_FROM_THE_CLAN);
             } else {
-                clan.removeMember(toBeRemovedClanPlayer.getName());
-                Messages.sendClanBroadcastMessagePlayerRemovedFromTheClanBy(clan, toBeRemovedClanPlayer.getName(), commandSource.getName());
-                Messages.sendYouHaveBeenRemovedFromClan(toBeRemovedClanPlayer, clan.getName());
+                ClanMemberLeaveEvent.Admin clanMemberLeaveEvent = EventDispatcher.getInstance().dispatchAdminClanMemberLeaveEvent(clan, toBeRemovedClanPlayer);
+                if (clanMemberLeaveEvent.isCancelled()) {
+                    Messages.sendWarningMessage(commandSource, clanMemberLeaveEvent.getCancelMessage());
+                } else {
+                    clan.removeMember(toBeRemovedClanPlayer.getName());
+                    Messages.sendClanBroadcastMessagePlayerRemovedFromTheClanBy(clan, toBeRemovedClanPlayer.getName(), commandSource.getName());
+                    Messages.sendYouHaveBeenRemovedFromClan(toBeRemovedClanPlayer, clan.getName());
+                }
             }
         } else {
             Messages.sendPlayerNotAMemberOfThisClan(commandSource, toBeRemovedClanPlayer.getName());
@@ -233,10 +241,13 @@ public class ClanAdminCommands {
         if (targetClanPlayer.getRank().getName().toLowerCase().equals(RankFactory.getOwnerIdentifier().toLowerCase())) {
             Messages.sendWarningMessage(commandSource, Messages.THIS_PLAYER_IS_ALREADY_THE_OWNER);
         } else {
-            clan.getOwner().setRank(clan.getRank(RankFactory.getRecruitIdentifier()));
-            clan.setOwner(targetClanPlayer);
-            targetClanPlayer.setRank(rank);
-            Messages.sendRankOfPlayerSuccessfullyChangedToRank(commandSource, targetClanPlayer.getName(), rank.getName());
+            ClanOwnerChangeEvent.Admin event = EventDispatcher.getInstance().dispatchAdminClanOwnerChangeEvent(clan, clan.getOwner(), targetClanPlayer);
+            if(event.isCancelled()){
+                Messages.sendWarningMessage(commandSource, event.getCancelMessage());
+            } else {
+                clan.setOwnerInternal(targetClanPlayer);
+                Messages.sendRankOfPlayerSuccessfullyChangedToRank(commandSource, targetClanPlayer.getName(), rank.getName());
+            }
         }
     }
 

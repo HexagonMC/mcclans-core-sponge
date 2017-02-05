@@ -27,8 +27,10 @@ import nl.riebie.mcclans.api.Clan;
 import nl.riebie.mcclans.api.ClanPlayer;
 import nl.riebie.mcclans.api.Rank;
 import nl.riebie.mcclans.api.enums.KillDeathFactor;
+import nl.riebie.mcclans.api.events.ClanOwnerChangeEvent;
 import nl.riebie.mcclans.api.exceptions.NotDefaultImplementationException;
 import nl.riebie.mcclans.config.Config;
+import nl.riebie.mcclans.messages.Messages;
 import nl.riebie.mcclans.persistence.TaskForwarder;
 import nl.riebie.mcclans.events.EventDispatcher;
 import nl.riebie.mcclans.player.ClanPlayerImpl;
@@ -285,14 +287,24 @@ public class ClanImpl implements Clan, Cloneable {
     @Override
     public void setOwner(ClanPlayer clanPlayer) {
         if (clanPlayer instanceof ClanPlayerImpl) {
-            ClanPlayerImpl clanPlayerImpl = (ClanPlayerImpl) clanPlayer;
-            EventDispatcher.getInstance().dispatchClanOwnerChangeEvent(this, owner, clanPlayerImpl);
-            this.owner = clanPlayerImpl;
-            TaskForwarder.sendUpdateClan(this);
+            ClanOwnerChangeEvent event = EventDispatcher.getInstance().dispatchPluginClanOwnerChangeEvent(this, owner, clanPlayer);
+            if (event.isCancelled()) {
+                clanPlayer.sendMessage(Messages.getWarningMessage(event.getCancelMessage()));
+            } else {
+                setOwnerInternal((ClanPlayerImpl) clanPlayer);
+            }
         } else {
             throw new NotDefaultImplementationException(clanPlayer.getClass());
         }
     }
+
+    public void setOwnerInternal(ClanPlayerImpl clanPlayer) {
+        this.owner.setRank(getRank(RankFactory.getRecruitIdentifier()));
+        clanPlayer.setRank(getRank(RankFactory.getOwnerIdentifier()));
+        this.owner = clanPlayer;
+        TaskForwarder.sendUpdateClan(this);
+    }
+
 
     // Use for restoring clan object from database/xml
     public void setLoadedOwner(ClanPlayerImpl clanPlayer) {
@@ -388,7 +400,6 @@ public class ClanImpl implements Clan, Cloneable {
             ClanPlayerImpl clanPlayerImpl = (ClanPlayerImpl) player;
             members.add(clanPlayerImpl);
             TaskForwarder.sendUpdateClanPlayer(clanPlayerImpl);
-            EventDispatcher.getInstance().dispatchClanMemberJoinEvent(this, clanPlayerImpl);
         } else {
             throw new NotDefaultImplementationException(player.getClass());
         }
@@ -402,7 +413,6 @@ public class ClanImpl implements Clan, Cloneable {
             member.setRank(null);
 
             members.remove(member);
-            EventDispatcher.getInstance().dispatchClanMemberLeaveEvent(this, member);
             TaskForwarder.sendUpdateClanPlayer(member);
         }
     }
