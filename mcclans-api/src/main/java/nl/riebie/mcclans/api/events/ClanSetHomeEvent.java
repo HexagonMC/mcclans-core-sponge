@@ -11,7 +11,7 @@ import org.spongepowered.api.world.World;
 /**
  * Created by riebie on 29/01/2017.
  */
-public class ClanSetHomeEvent extends ClanEvent {
+public class ClanSetHomeEvent extends CancellableClanEvent {
 
     private final Location<World> location;
 
@@ -24,11 +24,9 @@ public class ClanSetHomeEvent extends ClanEvent {
         return location;
     }
 
-    public static class User extends ClanSetHomeEvent implements org.spongepowered.api.event.Cancellable {
+    public static class User extends ClanSetHomeEvent {
 
         private final ClanPlayer clanPlayer;
-        private String errorMessage;
-        private boolean isCancelled;
 
         public User(ClanPlayer clanPlayer, Location<World> location) {
             super(Cause.of(NamedCause.source(clanPlayer)), location);
@@ -36,27 +34,8 @@ public class ClanSetHomeEvent extends ClanEvent {
             this.clanPlayer = clanPlayer;
         }
 
-        @Override
-        public boolean isCancelled() {
-            return isCancelled;
-        }
-
-        @Override
-        public void setCancelled(boolean cancel) {
-            isCancelled = cancel;
-        }
-
-        public void cancelWithMessage(String errorMessage) {
-            setCancelled(true);
-            this.errorMessage = errorMessage;
-        }
-
         public ClanPlayer getClanPlayer() {
             return clanPlayer;
-        }
-
-        public String getErrorMessage() {
-            return errorMessage;
         }
     }
 

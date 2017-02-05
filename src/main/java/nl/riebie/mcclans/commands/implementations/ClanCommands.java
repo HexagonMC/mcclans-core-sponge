@@ -138,7 +138,7 @@ public class ClanCommands {
             if (ClansImpl.getInstance().tagIsFree(clanTag)) {
                 ClanCreateEvent.User event = EventDispatcher.getInstance().dispatchUserClanCreateEvent(clanTag, clanName, clanPlayer);
                 if (event.isCancelled()) {
-                    clanPlayer.sendMessage(Messages.getWarningMessage(event.getWarningMessage()));
+                    clanPlayer.sendMessage(Messages.getWarningMessage(event.getCancelMessage()));
                 } else {
                     if (Config.getBoolean(Config.USE_ECONOMY)) {
                         double clanCreationCost = Config.getDouble(Config.CLAN_CREATION_COST);
@@ -544,43 +544,32 @@ public class ClanCommands {
         ClanImpl clan = clanPlayer.getClan();
         long setTimeDifference = (System.currentTimeMillis() - clan.getHomeSetTimeStamp()) / 1000;
         if (clan.getHomeSetTimeStamp() == -1 || setTimeDifference > Config.getInteger(Config.RE_SET_CLANHOME_COOLDOWN_SECONDS)) {
-            if (Config.getBoolean(Config.USE_ECONOMY)) {
-                double setClanhomeBaseCost = Config.getDouble(Config.SET_CLANHOME_COST);
-                double reSetClanhomeCostIncrease = Config.getDouble(Config.RE_SET_CLANHOME_COST_INCREASE);
-
-                int homeSetTimes = clan.getHomeSetTimes();
-                double setClanhomeCost = setClanhomeBaseCost + (homeSetTimes * reSetClanhomeCostIncrease);
-                String currencyName = MCClans.getPlugin().getServiceHelper().currency.getDisplayName().toPlain();
-
-                setHome(player, clanPlayer, setClanhomeCost, currencyName);
+            ClanSetHomeEvent.User event = EventDispatcher.getInstance().dispatchClanSetHomeUser(clanPlayer, player.getLocation());
+            if (event.isCancelled()) {
+                Messages.sendWarningMessage(commandSource, event.getCancelMessage());
             } else {
-                setHome(player, clanPlayer, 0, "");
+                if (Config.getBoolean(Config.USE_ECONOMY)) {
+                    double setClanhomeBaseCost = Config.getDouble(Config.SET_CLANHOME_COST);
+                    double reSetClanhomeCostIncrease = Config.getDouble(Config.RE_SET_CLANHOME_COST_INCREASE);
+
+                    int homeSetTimes = clan.getHomeSetTimes();
+                    double setClanhomeCost = setClanhomeBaseCost + (homeSetTimes * reSetClanhomeCostIncrease);
+                    String currencyName = MCClans.getPlugin().getServiceHelper().currency.getDisplayName().toPlain();
+                    boolean success = EconomyUtils.withdraw(clanPlayer.getUUID(), setClanhomeCost);
+                    if (!success) {
+                        Messages.sendYouDoNotHaveEnoughCurrency(player, setClanhomeCost, currencyName);
+                        return;
+                    }
+                    Messages.sendYouWereChargedCurrency(player, setClanhomeCost, currencyName);
+                }
+                Location<World> location = player.getLocation();
+                clanPlayer.getClan().setHome(location);
+                clanPlayer.getClan().increaseHomeSetTimes();
+                clanPlayer.getClan().setHomeSetTimeStamp(System.currentTimeMillis());
+                Messages.sendBasicMessage(player, Messages.CLAN_HOME_LOCATION_SET);
             }
         } else {
             Messages.sendCannotSetClanhomeForAnotherXTime(commandSource, Config.getInteger(Config.RE_SET_CLANHOME_COOLDOWN_SECONDS) - setTimeDifference);
-        }
-    }
-
-    private void setHome(Player player, ClanPlayerImpl clanPlayer, double setClanhomeCost, String currencyName) {
-        ClanSetHomeEvent.User event = EventDispatcher.getInstance().dispatchClanSetHomeUser(clanPlayer, player.getLocation());
-        if (event.isCancelled()) {
-            clanPlayer.sendMessage(Messages.getWarningMessage(event.getErrorMessage()));
-        } else {
-            if (setClanhomeCost > 0) {
-                boolean success = EconomyUtils.withdraw(clanPlayer.getUUID(), setClanhomeCost);
-                if (!success) {
-                    Messages.sendYouDoNotHaveEnoughCurrency(player, setClanhomeCost, currencyName);
-                    return;
-                }
-            }
-            Location<World> location = player.getLocation();
-            clanPlayer.getClan().setHome(location);
-            clanPlayer.getClan().increaseHomeSetTimes();
-            clanPlayer.getClan().setHomeSetTimeStamp(System.currentTimeMillis());
-            Messages.sendBasicMessage(player, Messages.CLAN_HOME_LOCATION_SET);
-            if (setClanhomeCost != 0) {
-                Messages.sendYouWereChargedCurrency(player, setClanhomeCost, currencyName);
-            }
         }
     }
 

@@ -23,7 +23,9 @@
 package nl.riebie.mcclans.commands.implementations;
 
 import nl.riebie.mcclans.ClansImpl;
+import nl.riebie.mcclans.api.events.ClanCreateEvent;
 import nl.riebie.mcclans.api.events.ClanHomeTeleportEvent;
+import nl.riebie.mcclans.api.events.ClanSetHomeEvent;
 import nl.riebie.mcclans.clan.ClanImpl;
 import nl.riebie.mcclans.clan.RankFactory;
 import nl.riebie.mcclans.clan.RankImpl;
@@ -110,6 +112,12 @@ public class ClanAdminCommands {
     ) {
         ClansImpl clansImpl = ClansImpl.getInstance();
         ClanPlayerImpl targetClanPlayer = clansImpl.getClanPlayer(owner);
+
+        ClanCreateEvent.Admin clanCreateEvent = EventDispatcher.getInstance().dispatchAdminClanCreateEvent(clanTag, clanName, targetClanPlayer);
+        if (clanCreateEvent.isCancelled()) {
+            Messages.sendWarningMessage(commandSource, clanCreateEvent.getCancelMessage());
+            return;
+        }
         if (targetClanPlayer == null) {
             UUID uuid = UUIDUtils.getUUID(owner);
             Optional<Player> playerOpt;
@@ -128,7 +136,7 @@ public class ClanAdminCommands {
         } else {
             if (targetClanPlayer.getClan() == null) {
                 if (clansImpl.tagIsFree(clanTag)) {
-                    ClanImpl clanImpl = clansImpl.createClan(clanTag, clanName, targetClanPlayer);
+                    ClanImpl clanImpl = clansImpl.createClanInternal(clanTag, clanName, targetClanPlayer);
                     Messages.sendBroadcastMessageClanCreatedBy(clanImpl.getName(), clanImpl.getTagColored(), commandSource.getName());
                 } else {
                     Messages.sendWarningMessage(commandSource, Messages.CLAN_TAG_EXISTS_ALREADY);
@@ -206,9 +214,13 @@ public class ClanAdminCommands {
     public void adminSetHomeCommand(CommandSource commandSource, @Parameter(name = "clanTag") ClanImpl clan) {
         Player player = (Player) commandSource;
         Location<World> location = player.getLocation();
-        EventDispatcher.getInstance().dispatchClanSetHomeAdmin(location, commandSource);
-        clan.setHome(location);
-        Messages.sendBasicMessage(commandSource, Messages.CLAN_HOME_LOCATION_SET);
+        ClanSetHomeEvent.Admin clanSetHomeEvent = EventDispatcher.getInstance().dispatchClanSetHomeAdmin(location, commandSource);
+        if (clanSetHomeEvent.isCancelled()) {
+            Messages.sendWarningMessage(commandSource, clanSetHomeEvent.getCancelMessage());
+        } else {
+            clan.setHome(location);
+            Messages.sendBasicMessage(commandSource, Messages.CLAN_HOME_LOCATION_SET);
+        }
     }
 
     @Command(name = "setowner", description = "Set the owner of a clan", spongePermission = "mcclans.admin.setowner")

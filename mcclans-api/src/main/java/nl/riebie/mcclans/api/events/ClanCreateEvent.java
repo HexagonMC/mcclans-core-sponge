@@ -23,7 +23,6 @@
 package nl.riebie.mcclans.api.events;
 
 import nl.riebie.mcclans.api.ClanPlayer;
-import org.spongepowered.api.event.Cancellable;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.NamedCause;
 
@@ -32,7 +31,7 @@ import org.spongepowered.api.event.cause.NamedCause;
  * <p>
  * A clan event which is fired when a clan is created
  */
-public class ClanCreateEvent extends ClanEvent {
+public class ClanCreateEvent extends CancellableClanEvent {
 
     private final String clanTag;
     private final String clanName;
@@ -58,25 +57,10 @@ public class ClanCreateEvent extends ClanEvent {
         return owner;
     }
 
-    public static class User extends ClanCreateEvent implements Cancellable {
-        private String warningMessage;
+    public static class User extends ClanCreateEvent {
 
         public User(String clanTag, String clanName, ClanPlayer owner) {
             super(clanTag, clanName, owner);
-        }
-
-        @Override
-        public boolean isCancelled() {
-            return false;
-        }
-
-        @Override
-        public void setCancelled(boolean cancel) {
-
-        }
-
-        public String getWarningMessage() {
-            return warningMessage;
         }
     }
 
@@ -87,26 +71,10 @@ public class ClanCreateEvent extends ClanEvent {
         }
     }
 
-    public static class Plugin extends ClanCreateEvent implements Cancellable {
-
-        private String cancelMessage;
+    public static class Plugin extends ClanCreateEvent {
 
         public Plugin(String clanTag, String clanName, ClanPlayer owner) {
             super(clanTag, clanName, owner);
-        }
-
-        @Override
-        public boolean isCancelled() {
-            return false;
-        }
-
-        @Override
-        public void setCancelled(boolean cancel) {
-
-        }
-
-        public String getCancelMessage() {
-            return cancelMessage;
         }
     }
 }
