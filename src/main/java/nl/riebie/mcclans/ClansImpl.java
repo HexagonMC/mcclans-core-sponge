@@ -82,7 +82,6 @@ public class ClansImpl implements ClanService {
         return instance;
     }
 
-    @IsCancelled(Tristate.FALSE)
     @Listener(order = Order.POST)
     public void onClanPlayerKill(ClanPlayerKillEvent event) {
         updateClanTagCache();
