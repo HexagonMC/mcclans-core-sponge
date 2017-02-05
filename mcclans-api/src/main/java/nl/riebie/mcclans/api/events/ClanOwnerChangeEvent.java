@@ -29,15 +29,17 @@ import org.spongepowered.api.event.cause.NamedCause;
 
 /**
  * Created by Kippers on 19-1-2016.
+ *
+ * Event fired when an owner of a clan is changed
  */
-public class ClanOwnerChangeEvent extends ClanEvent {
+public class ClanOwnerChangeEvent extends CancellableClanEvent {
 
     private Clan clan;
     private ClanPlayer previousOwner;
     private ClanPlayer newOwner;
 
-    public ClanOwnerChangeEvent(Clan clan, ClanPlayer previousOwner, ClanPlayer newOwner) {
-        super(Cause.of(NamedCause.owner(newOwner)));
+    private ClanOwnerChangeEvent(Clan clan, ClanPlayer previousOwner, ClanPlayer newOwner) {
+        super("Clan owner change cancelled by an external plugin", Cause.of(NamedCause.owner(newOwner)));
         this.clan = clan;
         this.previousOwner = previousOwner;
         this.newOwner = newOwner;
@@ -53,5 +55,23 @@ public class ClanOwnerChangeEvent extends ClanEvent {
 
     public ClanPlayer getNewOwner() {
         return newOwner;
+    }
+
+    public static class Admin extends ClanOwnerChangeEvent {
+        public Admin(Clan clan, ClanPlayer previousOwner, ClanPlayer newOwner) {
+            super(clan, previousOwner, newOwner);
+        }
+    }
+
+    public static class User extends ClanOwnerChangeEvent {
+        public User(Clan clan, ClanPlayer previousOwner, ClanPlayer newOwner) {
+            super(clan, previousOwner, newOwner);
+        }
+    }
+
+    public static class Plugin extends ClanOwnerChangeEvent {
+        public Plugin(Clan clan, ClanPlayer previousOwner, ClanPlayer newOwner) {
+            super(clan, previousOwner, newOwner);
+        }
     }
 }

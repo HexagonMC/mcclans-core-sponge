@@ -26,6 +26,7 @@ import nl.riebie.mcclans.ClansImpl;
 import nl.riebie.mcclans.MCClans;
 import nl.riebie.mcclans.api.KillDeath;
 import nl.riebie.mcclans.api.enums.KillDeathFactor;
+import nl.riebie.mcclans.api.events.*;
 import nl.riebie.mcclans.clan.ClanImpl;
 import nl.riebie.mcclans.clan.RankFactory;
 import nl.riebie.mcclans.clan.RankImpl;
@@ -36,6 +37,7 @@ import nl.riebie.mcclans.comparators.ClanKdrComparator;
 import nl.riebie.mcclans.comparators.ClanPlayerKdrComparator;
 import nl.riebie.mcclans.comparators.MemberComparator;
 import nl.riebie.mcclans.config.Config;
+import nl.riebie.mcclans.events.EventDispatcher;
 import nl.riebie.mcclans.messages.Messages;
 import nl.riebie.mcclans.player.ClanHomeTeleportTask;
 import nl.riebie.mcclans.player.ClanInvite;
@@ -130,25 +132,25 @@ public class ClanCommands {
             return;
         }
 
-        ClansImpl clansImpl = ClansImpl.getInstance();
         if (clanPlayer.getClan() == null) {
-            if (clansImpl.tagIsFree(clanTag)) {
-                if (Config.getBoolean(Config.USE_ECONOMY)) {
-                    double clanCreationCost = Config.getDouble(Config.CLAN_CREATION_COST);
-                    boolean success = EconomyUtils.withdraw(clanPlayer.getUUID(), clanCreationCost);
-                    String currencyName = MCClans.getPlugin().getServiceHelper().currency.getDisplayName().toPlain();
-                    if (success) {
-                        if (clanCreationCost != 0) {
-                            Messages.sendYouWereChargedCurrency(commandSource, clanCreationCost, currencyName);
-                        }
-
-                        ClanImpl clanImpl = clansImpl.createClan(clanTag, clanName, clanPlayer);
-                        Messages.sendBroadcastMessageClanCreatedBy(clanImpl.getName(), clanImpl.getTagColored(), clanPlayer.getName());
-                    } else {
-                        Messages.sendYouDoNotHaveEnoughCurrency(commandSource, clanCreationCost, currencyName);
-                    }
+            if (ClansImpl.getInstance().tagIsFree(clanTag)) {
+                ClanCreateEvent.User event = EventDispatcher.getInstance().dispatchUserClanCreateEvent(clanTag, clanName, clanPlayer);
+                if (event.isCancelled()) {
+                    clanPlayer.sendMessage(Messages.getWarningMessage(event.getCancelMessage()));
                 } else {
-                    ClanImpl clanImpl = clansImpl.createClan(clanTag, clanName, clanPlayer);
+                    if (Config.getBoolean(Config.USE_ECONOMY)) {
+                        double clanCreationCost = Config.getDouble(Config.CLAN_CREATION_COST);
+                        boolean success = EconomyUtils.withdraw(clanPlayer.getUUID(), clanCreationCost);
+                        String currencyName = MCClans.getPlugin().getServiceHelper().currency.getDisplayName().toPlain();
+
+                        if (!success) {
+                            Messages.sendYouDoNotHaveEnoughCurrency(commandSource, clanCreationCost, currencyName);
+                            return;
+                        }
+                        Messages.sendYouWereChargedCurrency(commandSource, clanCreationCost, currencyName);
+                    }
+
+                    ClanImpl clanImpl = ClansImpl.getInstance().createClanInternal(clanTag, clanName, clanPlayer);
                     Messages.sendBroadcastMessageClanCreatedBy(clanImpl.getName(), clanImpl.getTagColored(), clanPlayer.getName());
                 }
             } else {
@@ -187,25 +189,21 @@ public class ClanCommands {
     }
 
     @Command(name = "invite", description = "Invite a player to your clan", isPlayerOnly = true, isClanOnly = true, clanPermission = "invite", spongePermission = "mcclans.user.invite")
-    public void clanInviteCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer, @Parameter(name = "playerName") String playerName) {
+    public void clanInviteCommand(Player player, ClanPlayerImpl clanPlayer, @Parameter(name = "playerName") String playerName) {
         // TODO SPONGE: Check if command is properly and fully implemented
         ClanImpl clan = clanPlayer.getClan();
-        Player player = (Player) commandSource;       // TODO SPONGE add check if it is a player
         if (clan != null) {
             UUID uuid = UUIDUtils.getUUID(playerName);
-            if (uuid == null) {
+            Optional<Player> invitedPlayerOpt = uuid == null ? Optional.empty() : Sponge.getServer().getPlayer(uuid);
+            if (!invitedPlayerOpt.isPresent()) {
                 Messages.sendPlayerNotOnline(player, playerName);
                 return;
             }
-
+            Player invitedPlayer = invitedPlayerOpt.get();
             ClansImpl clansInstance = ClansImpl.getInstance();
             ClanPlayerImpl invitedClanPlayer = clansInstance.getClanPlayer(uuid);
-            Player invitedPlayer = Sponge.getServer().getPlayer(uuid).get();  // TODO SPONGE handle optional :)
+
             if (invitedClanPlayer == null) {
-                if (invitedPlayer == null) {
-                    Messages.sendPlayerNotOnline(invitedPlayer, playerName);
-                    return;
-                }
                 invitedClanPlayer = clansInstance.createClanPlayer(invitedPlayer.getUniqueId(), invitedPlayer.getName());
             }
             String invitedClanPlayerName = invitedClanPlayer.getName();
@@ -229,10 +227,15 @@ public class ClanCommands {
 
     @Command(name = "disband", description = "Disband a clan", isPlayerOnly = true, isClanOnly = true, clanPermission = "disband", spongePermission = "mcclans.user.disband")
     public void clanDisbandCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer) {
-        ClansImpl clansImpl = ClansImpl.getInstance();
         ClanImpl clan = clanPlayer.getClan();
-        Messages.sendBroadcastMessageClanDisbandedBy(clan.getName(), clan.getTagColored(), commandSource.getName());
-        clansImpl.disbandClan(clan);
+        ClanDisbandEvent.User event = EventDispatcher.getInstance().dispatchUserClanDisbandEvent(clan);
+        if (event.isCancelled()) {
+            Messages.sendWarningMessage(commandSource, event.getCancelMessage());
+        } else {
+            ClansImpl clansImpl = ClansImpl.getInstance();
+            Messages.sendBroadcastMessageClanDisbandedBy(clan.getName(), clan.getTagColored(), commandSource.getName());
+            clansImpl.disbandClan(clan);
+        }
     }
 
     @Command(name = "remove", description = "Remove a player from your clan", isPlayerOnly = true, isClanOnly = true, clanPermission = "remove", spongePermission = "mcclans.user.remove")
@@ -245,9 +248,14 @@ public class ClanCommands {
                 } else if (toBeRemovedClanPlayer == clan.getOwner()) {
                     Messages.sendWarningMessage(commandSource, Messages.YOU_CANNOT_REMOVE_THE_OWNER_FROM_THE_CLAN);
                 } else {
-                    clan.removeMember(toBeRemovedClanPlayer.getName());
-                    Messages.sendClanBroadcastMessagePlayerRemovedFromTheClanBy(clan, toBeRemovedClanPlayer.getName(), clanPlayer.getName());
-                    Messages.sendYouHaveBeenRemovedFromClan(toBeRemovedClanPlayer, clan.getName());
+                    ClanMemberLeaveEvent.User clanMemberLeaveEvent = EventDispatcher.getInstance().dispatchUserClanMemberLeaveEvent(clan, toBeRemovedClanPlayer);
+                    if (clanMemberLeaveEvent.isCancelled()) {
+                        Messages.sendWarningMessage(commandSource, clanMemberLeaveEvent.getCancelMessage());
+                    } else {
+                        clan.removeMember(toBeRemovedClanPlayer.getName());
+                        Messages.sendClanBroadcastMessagePlayerRemovedFromTheClanBy(clan, toBeRemovedClanPlayer.getName(), clanPlayer.getName());
+                        Messages.sendYouHaveBeenRemovedFromClan(toBeRemovedClanPlayer, clan.getName());
+                    }
                 }
             } else {
                 Messages.sendPlayerNotAMemberOfThisClan(commandSource, toBeRemovedClanPlayer.getName());
@@ -419,9 +427,14 @@ public class ClanCommands {
         if (rank.getName().equals(RankFactory.getOwnerIdentifier())) {
             Messages.sendWarningMessage(commandSource, Messages.YOU_CANNOT_RESIGN_FROM_THE_CLAN_AS_THE_OWNER);
         } else {
-            clan.removeMember(clanPlayer.getName());
-            Messages.sendSuccessfullyResignedFromClan(commandSource, clan.getName());
-            Messages.sendClanBroadcastMessagePlayerResignedFromTheClan(clan, clanPlayer.getName());
+            ClanMemberLeaveEvent.User clanMemberLeaveEvent = EventDispatcher.getInstance().dispatchUserClanMemberLeaveEvent(clan, clanPlayer);
+            if (clanMemberLeaveEvent.isCancelled()) {
+                Messages.sendWarningMessage(commandSource, clanMemberLeaveEvent.getCancelMessage());
+            } else {
+                clan.removeMember(clanPlayer.getName());
+                Messages.sendSuccessfullyResignedFromClan(commandSource, clan.getName());
+                Messages.sendClanBroadcastMessagePlayerResignedFromTheClan(clan, clanPlayer.getName());
+            }
         }
     }
 
@@ -497,26 +510,32 @@ public class ClanCommands {
     }
 
     @Command(name = "home", description = "Teleport to your clan home", isPlayerOnly = true, isClanOnly = true, clanPermission = "home", spongePermission = "mcclans.user.home")
-    public void clanHomeCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer) {
-        Player player = (Player) commandSource;
-        Location<World> teleportLocation = clanPlayer.getClan().getHome();
+    public void clanHomeCommand(Player player, ClanPlayerImpl clanPlayer) {
+        ClanImpl clan = clanPlayer.getClan();
+        Location<World> teleportLocation = clan.getHome();
         if (teleportLocation == null) {
-            Messages.sendWarningMessage(commandSource, Messages.CLAN_HOME_LOCATION_IS_NOT_SET);
-        } else if (player != null) {
-            LastClanHomeTeleport lastClanHomeTeleport = clanPlayer.getLastClanHomeTeleport();
-            if (lastClanHomeTeleport == null || lastClanHomeTeleport.canPlayerTeleport()) {
-                Location<World> currentPlayerLocation = player.getLocation();
-                Location<World> lastTeleportInitiationLocation = clanPlayer.getLastTeleportInitiationLocation();
-                if (lastTeleportInitiationLocation == null
-                        || !lastTeleportInitiationLocation.getExtent().getName().equalsIgnoreCase(currentPlayerLocation.getExtent().getName())
-                        || lastTeleportInitiationLocation.getPosition().distance(currentPlayerLocation.getPosition()) != 0) {
-                    startTeleportTask(player, clanPlayer, teleportLocation, currentPlayerLocation);
+            Messages.sendWarningMessage(player, Messages.CLAN_HOME_LOCATION_IS_NOT_SET);
+            return;
+        }
+
+        LastClanHomeTeleport lastClanHomeTeleport = clanPlayer.getLastClanHomeTeleport();
+        if (lastClanHomeTeleport == null || lastClanHomeTeleport.canPlayerTeleport()) {
+            Location<World> currentPlayerLocation = player.getLocation();
+            Location<World> lastTeleportInitiationLocation = clanPlayer.getLastTeleportInitiationLocation();
+            if (lastTeleportInitiationLocation == null
+                    || !lastTeleportInitiationLocation.getExtent().getName().equalsIgnoreCase(currentPlayerLocation.getExtent().getName())
+                    || lastTeleportInitiationLocation.getPosition().distance(currentPlayerLocation.getPosition()) != 0) {
+                ClanHomeTeleportEvent.User event = EventDispatcher.getInstance().dispatchUserClanHomeTeleportEvent(clanPlayer, clan);
+                if (event.isCancelled()) {
+                    Messages.sendWarningMessage(player, event.getCancelMessage());
                 } else {
-                    Messages.sendWarningMessage(commandSource, Messages.YOU_NEED_TO_MOVE_BEFORE_ATTEMPTING_ANOTHER_TELEPORT);
+                    startTeleportTask(player, clanPlayer, teleportLocation, currentPlayerLocation);
                 }
             } else {
-                Messages.sendYouCanTeleportInXSeconds(commandSource, lastClanHomeTeleport.secondsBeforePlayerCanTeleport());
+                Messages.sendWarningMessage(player, Messages.YOU_NEED_TO_MOVE_BEFORE_ATTEMPTING_ANOTHER_TELEPORT);
             }
+        } else {
+            Messages.sendYouCanTeleportInXSeconds(player, lastClanHomeTeleport.secondsBeforePlayerCanTeleport());
         }
     }
 
@@ -534,36 +553,32 @@ public class ClanCommands {
         ClanImpl clan = clanPlayer.getClan();
         long setTimeDifference = (System.currentTimeMillis() - clan.getHomeSetTimeStamp()) / 1000;
         if (clan.getHomeSetTimeStamp() == -1 || setTimeDifference > Config.getInteger(Config.RE_SET_CLANHOME_COOLDOWN_SECONDS)) {
-            if (Config.getBoolean(Config.USE_ECONOMY)) {
-                double setClanhomeBaseCost = Config.getDouble(Config.SET_CLANHOME_COST);
-                double reSetClanhomeCostIncrease = Config.getDouble(Config.RE_SET_CLANHOME_COST_INCREASE);
-
-                int homeSetTimes = clan.getHomeSetTimes();
-                double setClanhomeCost = setClanhomeBaseCost + (homeSetTimes * reSetClanhomeCostIncrease);
-
-                boolean success = EconomyUtils.withdraw(clanPlayer.getUUID(), setClanhomeCost);
-                String currencyName = MCClans.getPlugin().getServiceHelper().currency.getDisplayName().toPlain();
-                if (success) {
-                    setHome(player, clanPlayer, setClanhomeCost, currencyName);
-                } else {
-                    Messages.sendYouDoNotHaveEnoughCurrency(player, setClanhomeCost, currencyName);
-                }
+            ClanSetHomeEvent.User event = EventDispatcher.getInstance().dispatchClanSetHomeUser(clanPlayer, player.getLocation());
+            if (event.isCancelled()) {
+                Messages.sendWarningMessage(commandSource, event.getCancelMessage());
             } else {
-                setHome(player, clanPlayer, 0, "");
+                if (Config.getBoolean(Config.USE_ECONOMY)) {
+                    double setClanhomeBaseCost = Config.getDouble(Config.SET_CLANHOME_COST);
+                    double reSetClanhomeCostIncrease = Config.getDouble(Config.RE_SET_CLANHOME_COST_INCREASE);
+
+                    int homeSetTimes = clan.getHomeSetTimes();
+                    double setClanhomeCost = setClanhomeBaseCost + (homeSetTimes * reSetClanhomeCostIncrease);
+                    String currencyName = MCClans.getPlugin().getServiceHelper().currency.getDisplayName().toPlain();
+                    boolean success = EconomyUtils.withdraw(clanPlayer.getUUID(), setClanhomeCost);
+                    if (!success) {
+                        Messages.sendYouDoNotHaveEnoughCurrency(player, setClanhomeCost, currencyName);
+                        return;
+                    }
+                    Messages.sendYouWereChargedCurrency(player, setClanhomeCost, currencyName);
+                }
+                Location<World> location = player.getLocation();
+                clanPlayer.getClan().setHome(location);
+                clanPlayer.getClan().increaseHomeSetTimes();
+                clanPlayer.getClan().setHomeSetTimeStamp(System.currentTimeMillis());
+                Messages.sendBasicMessage(player, Messages.CLAN_HOME_LOCATION_SET);
             }
         } else {
             Messages.sendCannotSetClanhomeForAnotherXTime(commandSource, Config.getInteger(Config.RE_SET_CLANHOME_COOLDOWN_SECONDS) - setTimeDifference);
-        }
-    }
-
-    private void setHome(Player player, ClanPlayerImpl clanPlayer, double setClanhomeCost, String currencyName) {
-        Location<World> location = player.getLocation();
-        clanPlayer.getClan().setHome(location);
-        clanPlayer.getClan().increaseHomeSetTimes();
-        clanPlayer.getClan().setHomeSetTimeStamp(System.currentTimeMillis());
-        Messages.sendBasicMessage(player, Messages.CLAN_HOME_LOCATION_SET);
-        if (setClanhomeCost != 0) {
-            Messages.sendYouWereChargedCurrency(player, setClanhomeCost, currencyName);
         }
     }
 

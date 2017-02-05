@@ -22,25 +22,59 @@
 
 package nl.riebie.mcclans.api.events;
 
-import nl.riebie.mcclans.api.Clan;
 import nl.riebie.mcclans.api.ClanPlayer;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.NamedCause;
 
 /**
  * Created by Kippers on 19-1-2016.
+ * <p>
+ * A clan event which is fired when a clan is created
  */
-public class ClanCreateEvent extends ClanEvent {
+public class ClanCreateEvent extends CancellableClanEvent {
 
-    private Clan clan;
+    private final String clanTag;
+    private final String clanName;
+    private final ClanPlayer owner;
 
-    public ClanCreateEvent(Clan clan, ClanPlayer owner) {
+    public ClanCreateEvent(String clanTag, String clanName, ClanPlayer owner) {
+        super("Clan creation cancelled by an external plugin", Cause.of(NamedCause.owner(owner)));
 
-        super(Cause.of(NamedCause.owner(owner)));
-        this.clan = clan;
+        this.clanTag = clanTag;
+        this.clanName = clanName;
+        this.owner = owner;
     }
 
-    public Clan getClan() {
-        return clan;
+    public String getClanTag() {
+        return clanTag;
+    }
+
+    public String getClanName() {
+        return clanName;
+    }
+
+    public ClanPlayer getOwner() {
+        return owner;
+    }
+
+    public static class User extends ClanCreateEvent {
+
+        public User(String clanTag, String clanName, ClanPlayer owner) {
+            super(clanTag, clanName, owner);
+        }
+    }
+
+    public static class Admin extends ClanCreateEvent {
+
+        public Admin(String clanTag, String clanName, ClanPlayer owner) {
+            super(clanTag, clanName, owner);
+        }
+    }
+
+    public static class Plugin extends ClanCreateEvent {
+
+        public Plugin(String clanTag, String clanName, ClanPlayer owner) {
+            super(clanTag, clanName, owner);
+        }
     }
 }

@@ -22,44 +22,46 @@
 
 package nl.riebie.mcclans.api.events;
 
-import nl.riebie.mcclans.api.Clan;
-import nl.riebie.mcclans.api.ClanPlayer;
+import org.spongepowered.api.event.Cancellable;
 import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.event.cause.NamedCause;
 
 /**
  * Created by Kippers on 19-1-2016.
- *
- * Event fired when a clan is disbanded
+ * <p>
+ * A clan event that is cancellable
  */
-public class ClanDisbandEvent extends CancellableClanEvent {
+public abstract class CancellableClanEvent extends ClanEvent implements Cancellable {
 
-    private Clan clan;
+    private final String defaultCancelMessage;
+    private boolean cancelled;
+    private String cancelMessage;
 
-    private ClanDisbandEvent(Clan clan) {
-        super("Clan disband cancelled by an external plugin", Cause.of(NamedCause.owner(clan.getOwner())));
-        this.clan = clan;
+    public CancellableClanEvent(String defaultCancelMessage, Cause cause) {
+        super(cause);
+        this.defaultCancelMessage = defaultCancelMessage;
     }
 
-    public Clan getClan() {
-        return clan;
+    @Override
+    public boolean isCancelled() {
+        return cancelled;
     }
 
-    public static class Admin extends ClanDisbandEvent {
-        public Admin(Clan clan) {
-            super(clan);
-        }
+    @Override
+    public void setCancelled(boolean cancel) {
+        cancelled = cancel;
     }
 
-    public static class User extends ClanDisbandEvent {
-        public User(Clan clan) {
-            super(clan);
-        }
+    public void setCancelledWithMessage(String reasonMessage) {
+        setCancelled(true);
+        cancelMessage = reasonMessage;
     }
 
-    public static class Plugin extends ClanDisbandEvent {
-        public Plugin(Clan clan) {
-            super(clan);
-        }
+    /**
+     * Get the reason why this event was cancelled
+     *
+     * @return the reason why this event was cancelled, returns null when the event isn't cancelled
+     */
+    public String getCancelMessage() {
+        return cancelled && cancelMessage == null ? defaultCancelMessage : cancelMessage;
     }
 }

@@ -24,11 +24,13 @@ package nl.riebie.mcclans.commands.implementations;
 
 import nl.riebie.mcclans.api.KillDeath;
 import nl.riebie.mcclans.api.enums.KillDeathFactor;
+import nl.riebie.mcclans.api.events.ClanOwnerChangeEvent;
 import nl.riebie.mcclans.clan.ClanImpl;
 import nl.riebie.mcclans.clan.RankFactory;
 import nl.riebie.mcclans.clan.RankImpl;
 import nl.riebie.mcclans.commands.annotations.Command;
 import nl.riebie.mcclans.commands.annotations.Parameter;
+import nl.riebie.mcclans.events.EventDispatcher;
 import nl.riebie.mcclans.messages.Messages;
 import nl.riebie.mcclans.player.ClanPlayerImpl;
 import nl.riebie.mcclans.player.KillDeathFactorHandler;
@@ -50,7 +52,6 @@ public class ClanPlayerCommands {
     @Command(name = "setrank", description = "Set the rank of a member of your clan", isPlayerOnly = true, isClanOnly = true, clanPermission = "setrank", spongePermission = "mcclans.user.player.setrank")
     public void playerSetRankCommand(CommandSource sender, ClanPlayerImpl clanPlayer, @Parameter(name = "playerName") ClanPlayerImpl targetPlayer,
                                      @Parameter(name = "rankName") String rankName) {
-
         ClanImpl clan = clanPlayer.getClan();
         if (targetPlayer.getClan() != clan) {
             Messages.sendPlayerNotAMemberOfThisClan(sender, targetPlayer.getName());
@@ -64,11 +65,22 @@ public class ClanPlayerCommands {
         } else if (targetPlayer.getRank().getName().toLowerCase().equals(RankFactory.getOwnerIdentifier().toLowerCase())) {
             Messages.sendWarningMessage(sender, Messages.YOU_CANNOT_OVERWRITE_THE_OWNER_RANK);
         } else {
-            targetPlayer.setRank(rank);
-            if (RankFactory.getOwnerIdentifier().toLowerCase().equals(rankName.toLowerCase())) {
-                clan.setOwner(targetPlayer);
-                clanPlayer.setRank(clan.getRank(RankFactory.getRecruitIdentifier()));
+            if (RankFactory.getOwnerIdentifier().toLowerCase().equals(rank.getName().toLowerCase())) {
+                if(!clan.getOwner().equals(clanPlayer)){
+                    Messages.sendWarningMessage(sender, Messages.ONLY_THE_OWNER_CAN_CHANGE_OWNER);
+                    return;
+                }
+                ClanOwnerChangeEvent.User clanOwnerChangeEvent = EventDispatcher.getInstance().dispatchUserClanOwnerChangeEvent(clan, clan.getOwner(), targetPlayer);
+                if (clanOwnerChangeEvent.isCancelled()) {
+                    Messages.sendWarningMessage(sender, clanOwnerChangeEvent.getCancelMessage());
+                    return;
+                } else {
+                    clan.setOwnerInternal(targetPlayer);
+                }
+            } else {
+                targetPlayer.setRank(rank);
             }
+
             Messages.sendRankOfPlayerSuccessfullyChangedToRank(sender, targetPlayer.getName(), rank.getName());
 
             targetPlayer.sendMessage(Messages.getYourRankHasBeenChangedToRank(rank.getName()));
@@ -116,7 +128,7 @@ public class ClanPlayerCommands {
 
         if (clanPlayer == null || clanPlayer.equals(targetClanPlayer)
                 || (clanPlayer.getClan() != null && targetClanPlayer.getClan() != null && clanPlayer.getClan().isPlayerFriendlyToThisClan(
-                targetClanPlayer))){
+                targetClanPlayer))) {
             table.setValue("Kill Factor", Text.builder("None").color(TextColors.GRAY).build());
             table.setValue("Death Factor", Text.builder("None").color(TextColors.GRAY).build());
         } else {

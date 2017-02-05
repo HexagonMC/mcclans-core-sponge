@@ -193,7 +193,7 @@ public interface Clan {
      * @param clanPlayer the ClanPlayer of the new owner of this clan
      * @throws NotDefaultImplementationException if the given ClanPlayer is not created by MCClans
      */
-    void setOwner(ClanPlayer clanPlayer);
+    Result<Void> setOwner(ClanPlayer clanPlayer);
 
     /**
      * Get the owner of this clan

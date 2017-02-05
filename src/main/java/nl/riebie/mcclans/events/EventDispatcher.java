@@ -25,9 +25,13 @@ package nl.riebie.mcclans.events;
 import nl.riebie.mcclans.api.Clan;
 import nl.riebie.mcclans.api.ClanPlayer;
 import nl.riebie.mcclans.api.events.*;
+import nl.riebie.mcclans.clan.ClanImpl;
 import nl.riebie.mcclans.player.ClanPlayerImpl;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.event.Event;
+import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
 
 /**
  * Created by Kippers on 9-2-2016.
@@ -42,28 +46,104 @@ public class EventDispatcher {
         return _instance;
     }
 
-    public void dispatchClanCreateEvent(Clan clan, ClanPlayer owner) {
-        dispatchEvent(new ClanCreateEvent(clan, owner));
+    public ClanCreateEvent.Plugin dispatchPluginClanCreateEvent(String clanTag, String clanName, ClanPlayer owner) {
+        ClanCreateEvent.Plugin event = new ClanCreateEvent.Plugin(clanTag, clanName, owner);
+        dispatchEvent(event);
+        return event;
     }
 
-    public void dispatchClanDisbandEvent(Clan clan) {
-        dispatchEvent(new ClanDisbandEvent(clan));
+    public ClanCreateEvent.User dispatchUserClanCreateEvent(String clanTag, String clanName, ClanPlayer owner) {
+        ClanCreateEvent.User event = new ClanCreateEvent.User(clanTag, clanName, owner);
+        dispatchEvent(event);
+        return event;
     }
 
-    public void dispatchClanOwnerChangeEvent(Clan clan, ClanPlayer previousOwner, ClanPlayer newOwner) {
-        dispatchEvent(new ClanOwnerChangeEvent(clan, previousOwner, newOwner));
+    public ClanCreateEvent.Admin dispatchAdminClanCreateEvent(String clanTag, String clanName, ClanPlayer owner) {
+        ClanCreateEvent.Admin event = new ClanCreateEvent.Admin(clanTag, clanName, owner);
+        dispatchEvent(event);
+        return event;
     }
 
-    public void dispatchClanMemberJoinEvent(Clan clan, ClanPlayer clanMember) {
-        dispatchEvent(new ClanMemberJoinEvent(clan, clanMember));
+    public ClanDisbandEvent.Plugin dispatchPluginClanDisbandEvent(Clan clan) {
+        ClanDisbandEvent.Plugin event = new ClanDisbandEvent.Plugin(clan);
+        dispatchEvent(event);
+        return event;
     }
 
-    public void dispatchClanMemberLeaveEvent(Clan clan, ClanPlayer clanMember) {
-        dispatchEvent(new ClanMemberLeaveEvent(clan, clanMember));
+    public ClanDisbandEvent.Admin dispatchAdminClanDisbandEvent(Clan clan) {
+        ClanDisbandEvent.Admin event = new ClanDisbandEvent.Admin(clan);
+        dispatchEvent(event);
+        return event;
+    }
+
+    public ClanDisbandEvent.User dispatchUserClanDisbandEvent(Clan clan) {
+        ClanDisbandEvent.User event = new ClanDisbandEvent.User(clan);
+        dispatchEvent(event);
+        return event;
+    }
+
+    public ClanOwnerChangeEvent.Plugin dispatchPluginClanOwnerChangeEvent(Clan clan, ClanPlayer previousOwner, ClanPlayer newOwner) {
+        ClanOwnerChangeEvent.Plugin event = new ClanOwnerChangeEvent.Plugin(clan, previousOwner, newOwner);
+        dispatchEvent(event);
+        return event;
+    }
+
+    public ClanOwnerChangeEvent.Admin dispatchAdminClanOwnerChangeEvent(Clan clan, ClanPlayer previousOwner, ClanPlayer newOwner) {
+        ClanOwnerChangeEvent.Admin event = new ClanOwnerChangeEvent.Admin(clan, previousOwner, newOwner);
+        dispatchEvent(event);
+        return event;
+    }
+
+    public ClanOwnerChangeEvent.User dispatchUserClanOwnerChangeEvent(Clan clan, ClanPlayer previousOwner, ClanPlayer newOwner) {
+        ClanOwnerChangeEvent.User event = new ClanOwnerChangeEvent.User(clan, previousOwner, newOwner);
+        dispatchEvent(event);
+        return event;
+    }
+
+    public ClanMemberJoinEvent dispatchClanMemberJoinEvent(Clan clan, ClanPlayer clanMember) {
+        ClanMemberJoinEvent event = new ClanMemberJoinEvent(clan, clanMember);
+        dispatchEvent(event);
+        return event;
+    }
+
+    public ClanMemberLeaveEvent.Admin dispatchAdminClanMemberLeaveEvent(Clan clan, ClanPlayer clanMember) {
+        ClanMemberLeaveEvent.Admin clanMemberLeaveEvent = new ClanMemberLeaveEvent.Admin(clan, clanMember);
+        dispatchEvent(clanMemberLeaveEvent);
+        return clanMemberLeaveEvent;
+    }
+
+    public ClanMemberLeaveEvent.User dispatchUserClanMemberLeaveEvent(Clan clan, ClanPlayer clanMember) {
+        ClanMemberLeaveEvent.User clanMemberLeaveEvent = new ClanMemberLeaveEvent.User(clan, clanMember);
+        dispatchEvent(clanMemberLeaveEvent);
+        return clanMemberLeaveEvent;
     }
 
     public void dispatchClanPlayerKillEvent(ClanPlayerImpl killer, ClanPlayerImpl victim) {
         dispatchEvent(new ClanPlayerKillEvent(killer, victim));
+    }
+
+    public ClanSetHomeEvent.Admin dispatchClanSetHomeAdmin(Location<World> location, CommandSource commandSource) {
+        ClanSetHomeEvent.Admin event = new ClanSetHomeEvent.Admin(commandSource, location);
+        dispatchEvent(event);
+        return event;
+    }
+
+    public ClanSetHomeEvent.User dispatchClanSetHomeUser(ClanPlayerImpl player, Location<World> location) {
+        ClanSetHomeEvent.User event = new ClanSetHomeEvent.User(player, location);
+        dispatchEvent(event);
+        return event;
+    }
+
+    public ClanHomeTeleportEvent.User dispatchUserClanHomeTeleportEvent(ClanPlayerImpl player, ClanImpl clan) {
+        ClanHomeTeleportEvent.User event = new ClanHomeTeleportEvent.User(clan, player);
+        dispatchEvent(event);
+        return event;
+    }
+
+    public ClanHomeTeleportEvent.Admin dispatchAdminClanHomeTeleportEvent(ClanPlayerImpl player, ClanImpl clan) {
+        ClanHomeTeleportEvent.Admin event = new ClanHomeTeleportEvent.Admin(clan, player);
+        dispatchEvent(event);
+        return event;
     }
 
     private void dispatchEvent(Event event) {
