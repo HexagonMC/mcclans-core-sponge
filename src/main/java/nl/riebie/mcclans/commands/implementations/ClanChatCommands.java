@@ -22,6 +22,7 @@
 
 package nl.riebie.mcclans.commands.implementations;
 
+import com.google.common.collect.ImmutableMap;
 import nl.riebie.mcclans.channels.AllyMessageChannelImpl;
 import nl.riebie.mcclans.channels.ClanMessageChannelImpl;
 import nl.riebie.mcclans.commands.annotations.ChildGroup;
@@ -33,8 +34,14 @@ import nl.riebie.mcclans.messages.Messages;
 import nl.riebie.mcclans.player.ClanPlayerImpl;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.event.SpongeEventFactory;
+import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.cause.NamedCause;
+import org.spongepowered.api.event.message.MessageChannelEvent;
+import org.spongepowered.api.event.message.MessageEvent;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.channel.MessageChannel;
+import org.spongepowered.api.text.TextTemplate;
 
 import java.util.Optional;
 
@@ -43,6 +50,9 @@ import java.util.Optional;
  */
 public class ClanChatCommands {
 
+    private final TextTemplate chatTemplate = TextTemplate.of(TextTemplate.arg(MessageEvent.PARAM_MESSAGE_HEADER).build(),
+            TextTemplate.arg(MessageEvent.PARAM_MESSAGE_BODY).build(), TextTemplate.arg(MessageEvent.PARAM_MESSAGE_FOOTER).build());
+
     @ChildGroup(ClanChatIgnoreCommands.class)
     @Command(name = "ignore", description = "Top command for all chat ignore commands", spongePermission = "mcclans.user.chat.ignore.helppage")
     public void clanChatIgnoreRootCommand(CommandSource commandSource) {
@@ -50,15 +60,15 @@ public class ClanChatCommands {
     }
 
     @Command(name = "clan", description = "Talk in clan chat", isPlayerOnly = true, isClanOnly = true, clanPermission = "clanchat", spongePermission = "mcclans.user.chat.clan")
-    public void clanChatCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer, @Multiline @Parameter(name = "message") Optional<String> messageOpt) {
+    public void clanChatCommand(Player player, ClanPlayerImpl clanPlayer, @Multiline @Parameter(name = "message") Optional<String> messageOpt) {
         if (messageOpt.isPresent()) {
             String message = messageOpt.get();
             if (clanPlayer.getTempChatState() == null) {
                 if (clanPlayer.getIgnoreClanChat()) {
-                    Messages.sendYouNeedToUnignoreClanChatBeforeTalking(commandSource);
+                    Messages.sendYouNeedToUnignoreClanChatBeforeTalking(player);
                 } else {
                     clanPlayer.setTempChatState(PlayerChatState.CLAN);
-                    ClanMessageChannelImpl.getFor(clanPlayer).send(commandSource, Text.of(message));
+                    ClanMessageChannelImpl.getFor(clanPlayer).send(player, Text.of(message));
                     clanPlayer.setTempChatState(null);
                 }
             }
@@ -66,24 +76,24 @@ public class ClanChatCommands {
             PlayerChatState chatState = clanPlayer.getChatState();
             if (chatState.equals(PlayerChatState.CLAN)) {
                 clanPlayer.setChatState(PlayerChatState.GLOBAL);
-                Messages.sendNowTalkingInGlobal(commandSource);
+                Messages.sendNowTalkingInGlobal(player);
             } else {
                 clanPlayer.setChatState(PlayerChatState.CLAN);
-                Messages.sendNowTalkingInClanChat(commandSource);
+                Messages.sendNowTalkingInClanChat(player);
             }
         }
     }
 
     @Command(name = "ally", description = "Talk in ally chat", isPlayerOnly = true, isClanOnly = true, clanPermission = "allychat", spongePermission = "mcclans.user.chat.ally")
-    public void allyChatCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer, @Multiline @Parameter(name = "message") Optional<String> optionalMessage) {
+    public void allyChatCommand(Player player, ClanPlayerImpl clanPlayer, @Multiline @Parameter(name = "message") Optional<String> optionalMessage) {
         if (optionalMessage.isPresent()) {
             String message = optionalMessage.get();
             if (clanPlayer.getTempChatState() == null) {
                 if (clanPlayer.getIgnoreAllyChat()) {
-                    Messages.sendYouNeedToUnignoreAllyChatBeforeTalking(commandSource);
+                    Messages.sendYouNeedToUnignoreAllyChatBeforeTalking(player);
                 } else {
                     clanPlayer.setTempChatState(PlayerChatState.ALLY);
-                    AllyMessageChannelImpl.getFor(clanPlayer).send(commandSource, Text.of(message));
+                    AllyMessageChannelImpl.getFor(clanPlayer).send(player, Text.of(message));
                     clanPlayer.setTempChatState(null);
                 }
             }
@@ -91,34 +101,46 @@ public class ClanChatCommands {
             PlayerChatState chatState = clanPlayer.getChatState();
             if (chatState.equals(PlayerChatState.ALLY)) {
                 clanPlayer.setChatState(PlayerChatState.GLOBAL);
-                Messages.sendNowTalkingInGlobal(commandSource);
+                Messages.sendNowTalkingInGlobal(player);
             } else {
                 clanPlayer.setChatState(PlayerChatState.ALLY);
-                Messages.sendNowTalkingInAllyChat(commandSource);
+                Messages.sendNowTalkingInAllyChat(player);
             }
         }
     }
 
     @Command(name = "global", description = "Talk in global chat", isPlayerOnly = true, isClanOnly = true, spongePermission = "mcclans.user.chat.global")
-    public void globalChatCommand(CommandSource commandSource, ClanPlayerImpl clanPlayer, @Multiline @Parameter(name = "message") Optional<String> optionalMessage) {
+    public void globalChatCommand(Player player, ClanPlayerImpl clanPlayer, @Multiline @Parameter(name = "message") Optional<String> optionalMessage) {
         if (optionalMessage.isPresent()) {
             String message = optionalMessage.get();
             if (clanPlayer.getTempChatState() == null) {
                 clanPlayer.setTempChatState(PlayerChatState.GLOBAL);
-                MessageChannel messageChannel = Sponge.getServer().getBroadcastChannel();
-                // TODO not fake out <name> message
-                messageChannel.send(
-                        commandSource,
-                        Text.join(
-                                (clanPlayer.getClan() == null) ? Text.of("") : Text.join(clanPlayer.getClan().getTagColored(), Text.of(" ")),
-                                Text.of("<", commandSource.getName(), "> ", message)
-                        )
-                );
-                clanPlayer.setTempChatState(null);
+                sendChat(player, Text.of(message));
             }
         } else {
             clanPlayer.setChatState(PlayerChatState.GLOBAL);
-            Messages.sendNowTalkingInGlobal(commandSource);
+            Messages.sendNowTalkingInGlobal(player);
+        }
+    }
+
+    private void sendChat(Player player, Text message) {
+        Text rawMessage = Text.of(message);
+        MessageChannelEvent.Chat event = SpongeEventFactory.createMessageChannelEventChat(
+                Cause.source(player).named(NamedCause.notifier(player)).build(),
+                player.getMessageChannel(),
+                Optional.of(player.getMessageChannel()),
+                new MessageEvent.MessageFormatter(
+                        Text.builder(player.getName()).build(), rawMessage
+                ),
+                rawMessage,
+                false
+        );
+        if (!Sponge.getEventManager().post(event)) {
+            MessageEvent.MessageFormatter formatter = event.getFormatter();
+            player.getMessageChannel().send(player, chatTemplate.apply(
+                    ImmutableMap.of(MessageEvent.PARAM_MESSAGE_HEADER, formatter.getHeader(),
+                            MessageEvent.PARAM_MESSAGE_BODY, formatter.getBody(),
+                            MessageEvent.PARAM_MESSAGE_FOOTER, formatter.getFooter())).build());
         }
     }
 }
