@@ -31,9 +31,8 @@ import nl.riebie.mcclans.api.enums.KillDeathFactor;
 import nl.riebie.mcclans.api.events.ClanOwnerChangeEvent;
 import nl.riebie.mcclans.api.exceptions.NotDefaultImplementationException;
 import nl.riebie.mcclans.config.Config;
-import nl.riebie.mcclans.messages.Messages;
-import nl.riebie.mcclans.persistence.TaskForwarder;
 import nl.riebie.mcclans.events.EventDispatcher;
+import nl.riebie.mcclans.persistence.TaskForwarder;
 import nl.riebie.mcclans.player.ClanPlayerImpl;
 import nl.riebie.mcclans.utils.ResultImpl;
 import org.spongepowered.api.text.Text;
@@ -408,8 +407,8 @@ public class ClanImpl implements Clan, Cloneable {
         }
     }
 
-    public void removeMember(String playerName) {
-        ClanPlayerImpl member = getMember(playerName);
+    public void removeMember(ClanPlayer player) {
+        ClanPlayerImpl member = getMember(player.getUUID());
         if (member != null) {
             member.setClan(null);
 

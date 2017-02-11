@@ -105,6 +105,8 @@ public class ClanPlayerImpl implements ClanPlayer, Cloneable, CommandSender {
         String name = UUIDUtils.getName(uuid);
         if (name == null) {
             name = lastKnownName;
+        } else {
+            lastKnownName = name;
         }
         return name;
     }
@@ -297,6 +299,22 @@ public class ClanPlayerImpl implements ClanPlayer, Cloneable, CommandSender {
         }
 
         return clone;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ClanPlayerImpl that = (ClanPlayerImpl) o;
+
+        return uuid.equals(that.uuid);
+
+    }
+
+    @Override
+    public int hashCode() {
+        return uuid.hashCode();
     }
 
     public static class Builder {

@@ -31,19 +31,16 @@ import nl.riebie.mcclans.api.events.ClanDisbandEvent;
 import nl.riebie.mcclans.api.events.ClanMemberJoinEvent;
 import nl.riebie.mcclans.api.events.ClanMemberLeaveEvent;
 import nl.riebie.mcclans.api.exceptions.NotDefaultImplementationException;
-import nl.riebie.mcclans.api.permissions.ClanPermissionManager;
 import nl.riebie.mcclans.clan.ClanImpl;
 import nl.riebie.mcclans.clan.RankFactory;
 import nl.riebie.mcclans.clan.RankImpl;
 import nl.riebie.mcclans.comparators.ClanKdrComparator;
 import nl.riebie.mcclans.config.Config;
+import nl.riebie.mcclans.events.ClanPlayerKillEvent;
+import nl.riebie.mcclans.events.EventDispatcher;
 import nl.riebie.mcclans.messages.Messages;
 import nl.riebie.mcclans.permissions.ClanPermissionManagerImpl;
 import nl.riebie.mcclans.persistence.TaskForwarder;
-import nl.riebie.mcclans.events.ClanPlayerKillEvent;
-import nl.riebie.mcclans.events.EventDispatcher;
-import nl.riebie.mcclans.persistence.query.DataType;
-import nl.riebie.mcclans.persistence.query.table.CreateQuery;
 import nl.riebie.mcclans.player.ClanInvite;
 import nl.riebie.mcclans.player.ClanPlayerImpl;
 import nl.riebie.mcclans.utils.ResultImpl;
@@ -270,10 +267,10 @@ public class ClansImpl implements ClanService {
             ClanImpl clan = clanPlayerImpl.getClan();
             ClanInvite clanInvite = clanPlayerImpl.getClanInvite();
             if (clan != null) {
-                if (clan.getOwner().equals(clanPlayer)) {
+                if (clan.getOwner().equals(clanPlayerImpl)) {
                     disbandClan(clan);
                 } else {
-                    clan.removeMember(playerName);
+                    clan.removeMember(clanPlayerImpl);
                 }
             }
             if (clanInvite != null) {
