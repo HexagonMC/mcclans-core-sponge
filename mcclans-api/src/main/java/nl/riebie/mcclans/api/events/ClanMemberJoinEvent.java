@@ -43,10 +43,16 @@ public class ClanMemberJoinEvent extends CancellableClanEvent {
         this.clanMember = clanMember;
     }
 
+    /**
+     * Get the clan that the player is joining.
+     */
     public Clan getClan() {
         return clan;
     }
 
+    /**
+     * Get the player that is joining a clan.
+     */
     public ClanPlayer getClanMember() {
         return clanMember;
     }

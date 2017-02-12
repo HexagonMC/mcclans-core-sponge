@@ -191,7 +191,10 @@ public class ClanImpl implements Clan, Cloneable {
 
     @Override
     public Result<Location<World>> setHome(Location<World> location) {
-        ClanSetHomeEvent.Plugin event = EventDispatcher.getInstance().dispatchPluginSetHomeEvent(location);
+        /**
+         * TODO this method is called from data loader
+         */
+        ClanSetHomeEvent.Plugin event = EventDispatcher.getInstance().dispatchPluginSetHomeEvent(this, location);
         if (event.isCancelled()) {
             return ResultImpl.ofError(event.getCancelMessage());
         } else {

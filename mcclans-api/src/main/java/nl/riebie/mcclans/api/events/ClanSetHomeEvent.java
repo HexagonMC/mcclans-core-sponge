@@ -1,5 +1,6 @@
 package nl.riebie.mcclans.api.events;
 
+import nl.riebie.mcclans.api.Clan;
 import nl.riebie.mcclans.api.ClanPlayer;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.event.cause.Cause;
@@ -14,13 +15,25 @@ import org.spongepowered.api.world.World;
  */
 public class ClanSetHomeEvent extends CancellableClanEvent {
 
+    private final Clan clan;
     private final Location<World> location;
 
-    private ClanSetHomeEvent(Cause cause, Location<World> location) {
+    private ClanSetHomeEvent(Cause cause, Clan clan, Location<World> location) {
         super("Clan set home cancelled by an external plugin", cause);
+        this.clan = clan;
         this.location = location;
     }
 
+    /**
+     * Get the clan whose home location is being set.
+     */
+    public Clan getClan() {
+        return clan;
+    }
+
+    /**
+     * The new clan home location.
+     */
     public Location<World> getLocation() {
         return location;
     }
@@ -32,12 +45,15 @@ public class ClanSetHomeEvent extends CancellableClanEvent {
 
         private final ClanPlayer clanPlayer;
 
-        public User(ClanPlayer clanPlayer, Location<World> location) {
-            super(Cause.of(NamedCause.source(clanPlayer)), location);
+        public User(ClanPlayer clanPlayer, Clan clan, Location<World> location) {
+            super(Cause.of(NamedCause.source(clanPlayer)), clan, location);
 
             this.clanPlayer = clanPlayer;
         }
 
+        /**
+         * Get the player who set the clan home.
+         */
         public ClanPlayer getClanPlayer() {
             return clanPlayer;
         }
@@ -48,8 +64,8 @@ public class ClanSetHomeEvent extends CancellableClanEvent {
      */
     public static class Admin extends ClanSetHomeEvent {
 
-        public Admin(CommandSource commandSource, Location<World> location) {
-            super(Cause.of(NamedCause.source(commandSource)), location);
+        public Admin(CommandSource commandSource, Clan clan, Location<World> location) {
+            super(Cause.of(NamedCause.source(commandSource)), clan, location);
         }
     }
 
@@ -58,8 +74,8 @@ public class ClanSetHomeEvent extends CancellableClanEvent {
      */
     public static class Plugin extends ClanSetHomeEvent {
 
-        public Plugin(Location<World> location) {
-            super(Cause.of(NamedCause.source(location)), location);
+        public Plugin(Clan clan, Location<World> location) {
+            super(Cause.of(NamedCause.source(location)), clan, location);
         }
     }
 }

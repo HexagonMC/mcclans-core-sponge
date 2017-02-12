@@ -228,7 +228,7 @@ public class ClanAdminCommands {
     public void adminSetHomeCommand(CommandSource commandSource, @Parameter(name = "clanTag") ClanImpl clan) {
         Player player = (Player) commandSource;
         Location<World> location = player.getLocation();
-        ClanSetHomeEvent.Admin clanSetHomeEvent = EventDispatcher.getInstance().dispatchClanSetHomeAdmin(location, commandSource);
+        ClanSetHomeEvent.Admin clanSetHomeEvent = EventDispatcher.getInstance().dispatchClanSetHomeAdmin(clan, location, commandSource);
         if (clanSetHomeEvent.isCancelled()) {
             Messages.sendWarningMessage(commandSource, clanSetHomeEvent.getCancelMessage());
         } else {

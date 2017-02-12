@@ -29,7 +29,7 @@ import org.spongepowered.api.event.cause.NamedCause;
 
 /**
  * Created by Kippers on 19-1-2016.
- *
+ * <p>
  * Event fired when a member leaves a clan.
  */
 public class ClanMemberLeaveEvent extends CancellableClanEvent {
@@ -43,10 +43,16 @@ public class ClanMemberLeaveEvent extends CancellableClanEvent {
         this.clanMember = clanMember;
     }
 
+    /**
+     * Get the clan that the player is leaving.
+     */
     public Clan getClan() {
         return clan;
     }
 
+    /**
+     * Get the player that is leaving the clan.
+     */
     public ClanPlayer getClanMember() {
         return clanMember;
     }

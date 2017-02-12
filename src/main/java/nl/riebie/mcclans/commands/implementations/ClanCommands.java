@@ -554,7 +554,7 @@ public class ClanCommands {
         ClanImpl clan = clanPlayer.getClan();
         long setTimeDifference = (System.currentTimeMillis() - clan.getHomeSetTimeStamp()) / 1000;
         if (clan.getHomeSetTimeStamp() == -1 || setTimeDifference > Config.getInteger(Config.RE_SET_CLANHOME_COOLDOWN_SECONDS)) {
-            ClanSetHomeEvent.User event = EventDispatcher.getInstance().dispatchClanSetHomeUser(clanPlayer, player.getLocation());
+            ClanSetHomeEvent.User event = EventDispatcher.getInstance().dispatchClanSetHomeUser(clanPlayer, clan, player.getLocation());
             if (event.isCancelled()) {
                 Messages.sendWarningMessage(commandSource, event.getCancelMessage());
             } else {
@@ -573,9 +573,9 @@ public class ClanCommands {
                     Messages.sendYouWereChargedCurrency(player, setClanhomeCost, currencyName);
                 }
                 Location<World> location = player.getLocation();
-                clanPlayer.getClan().setHomeInternal(location);
-                clanPlayer.getClan().increaseHomeSetTimes();
-                clanPlayer.getClan().setHomeSetTimeStamp(System.currentTimeMillis());
+                clan.setHomeInternal(location);
+                clan.increaseHomeSetTimes();
+                clan.setHomeSetTimeStamp(System.currentTimeMillis());
                 Messages.sendBasicMessage(player, Messages.CLAN_HOME_LOCATION_SET);
             }
         } else {

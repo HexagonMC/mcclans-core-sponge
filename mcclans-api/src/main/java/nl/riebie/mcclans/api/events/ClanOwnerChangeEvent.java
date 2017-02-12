@@ -45,14 +45,23 @@ public class ClanOwnerChangeEvent extends CancellableClanEvent {
         this.newOwner = newOwner;
     }
 
+    /**
+     * Get the clan whose owner changed.
+     */
     public Clan getClan() {
         return clan;
     }
 
+    /**
+     * Get the player who will no longer be the owner of the clan.
+     */
     public ClanPlayer getPreviousOwner() {
         return previousOwner;
     }
 
+    /**
+     * Get the player who will be the new owner of the clan.
+     */
     public ClanPlayer getNewOwner() {
         return newOwner;
     }

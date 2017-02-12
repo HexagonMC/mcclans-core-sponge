@@ -45,14 +45,23 @@ public class ClanCreateEvent extends CancellableClanEvent {
         this.owner = owner;
     }
 
+    /**
+     * Get the clan tag.
+     */
     public String getClanTag() {
         return clanTag;
     }
 
+    /**
+     * Get the clan name.
+     */
     public String getClanName() {
         return clanName;
     }
 
+    /**
+     * Get the owner of the clan.
+     */
     public ClanPlayer getOwner() {
         return owner;
     }
