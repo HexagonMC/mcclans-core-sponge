@@ -89,7 +89,7 @@ public interface Clan {
      *
      * @param location position of the new home location
      */
-    void setHome(Location<World> location);
+    Result<Location<World>> setHome(Location<World> location);
 
     /**
      * Get the home location of this clan
@@ -193,7 +193,7 @@ public interface Clan {
      * @param clanPlayer the ClanPlayer of the new owner of this clan
      * @throws NotDefaultImplementationException if the given ClanPlayer is not created by MCClans
      */
-    Result<Void> setOwner(ClanPlayer clanPlayer);
+    Result<ClanPlayer> setOwner(ClanPlayer clanPlayer);
 
     /**
      * Get the owner of this clan

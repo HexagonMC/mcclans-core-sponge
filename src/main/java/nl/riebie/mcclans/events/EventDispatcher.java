@@ -128,6 +128,12 @@ public class EventDispatcher {
         return event;
     }
 
+    public ClanSetHomeEvent.Plugin dispatchPluginSetHomeEvent(Location<World> location) {
+        ClanSetHomeEvent.Plugin event = new ClanSetHomeEvent.Plugin(location);
+        dispatchEvent(event);
+        return event;
+    }
+
     public ClanSetHomeEvent.User dispatchClanSetHomeUser(ClanPlayerImpl player, Location<World> location) {
         ClanSetHomeEvent.User event = new ClanSetHomeEvent.User(player, location);
         dispatchEvent(event);
@@ -149,4 +155,6 @@ public class EventDispatcher {
     private void dispatchEvent(Event event) {
         Sponge.getEventManager().post(event);
     }
+
+
 }

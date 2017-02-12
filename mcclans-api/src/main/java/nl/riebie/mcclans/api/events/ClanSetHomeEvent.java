@@ -45,8 +45,13 @@ public class ClanSetHomeEvent extends CancellableClanEvent {
 
         public Admin(CommandSource commandSource, Location<World> location) {
             super(Cause.of(NamedCause.source(commandSource)), location);
-
         }
+    }
 
+    public static class Plugin extends ClanSetHomeEvent {
+
+        public Plugin( Location<World> location) {
+            super(Cause.of(NamedCause.source(location)), location);
+        }
     }
 }
