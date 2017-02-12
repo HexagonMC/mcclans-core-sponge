@@ -2,7 +2,6 @@ package nl.riebie.mcclans.api.events;
 
 import nl.riebie.mcclans.api.ClanPlayer;
 import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.event.Cancellable;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.NamedCause;
 import org.spongepowered.api.world.Location;
@@ -10,8 +9,8 @@ import org.spongepowered.api.world.World;
 
 /**
  * Created by riebie on 29/01/2017.
- *
- * An event which is fired when a clan home is set
+ * <p>
+ * An event which is fired when a clan home is set.
  */
 public class ClanSetHomeEvent extends CancellableClanEvent {
 
@@ -26,6 +25,9 @@ public class ClanSetHomeEvent extends CancellableClanEvent {
         return location;
     }
 
+    /**
+     * A user command was used to set the clan home.
+     */
     public static class User extends ClanSetHomeEvent {
 
         private final ClanPlayer clanPlayer;
@@ -41,6 +43,9 @@ public class ClanSetHomeEvent extends CancellableClanEvent {
         }
     }
 
+    /**
+     * An admin command was used to set the clan home.
+     */
     public static class Admin extends ClanSetHomeEvent {
 
         public Admin(CommandSource commandSource, Location<World> location) {
@@ -48,9 +53,12 @@ public class ClanSetHomeEvent extends CancellableClanEvent {
         }
     }
 
+    /**
+     * An external plugin set the clan home.
+     */
     public static class Plugin extends ClanSetHomeEvent {
 
-        public Plugin( Location<World> location) {
+        public Plugin(Location<World> location) {
             super(Cause.of(NamedCause.source(location)), location);
         }
     }

@@ -23,14 +23,13 @@
 package nl.riebie.mcclans.api.events;
 
 import nl.riebie.mcclans.api.Clan;
-import nl.riebie.mcclans.api.ClanPlayer;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.NamedCause;
 
 /**
  * Created by Kippers on 19-1-2016.
- *
- * Event fired when a clan is disbanded
+ * <p>
+ * Event fired when a clan is disbanded.
  */
 public class ClanDisbandEvent extends CancellableClanEvent {
 
@@ -45,18 +44,27 @@ public class ClanDisbandEvent extends CancellableClanEvent {
         return clan;
     }
 
-    public static class Admin extends ClanDisbandEvent {
-        public Admin(Clan clan) {
-            super(clan);
-        }
-    }
-
+    /**
+     * A user command was used to disband the clan.
+     */
     public static class User extends ClanDisbandEvent {
         public User(Clan clan) {
             super(clan);
         }
     }
 
+    /**
+     * An admin command was used to disband the clan.
+     */
+    public static class Admin extends ClanDisbandEvent {
+        public Admin(Clan clan) {
+            super(clan);
+        }
+    }
+
+    /**
+     * An external plugin disbanded the clan.
+     */
     public static class Plugin extends ClanDisbandEvent {
         public Plugin(Clan clan) {
             super(clan);

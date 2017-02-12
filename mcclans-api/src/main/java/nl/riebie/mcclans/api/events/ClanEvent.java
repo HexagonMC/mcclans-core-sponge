@@ -23,7 +23,6 @@
 package nl.riebie.mcclans.api.events;
 
 import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.event.cause.NamedCause;
 import org.spongepowered.api.event.impl.AbstractEvent;
 
 /**
@@ -40,8 +39,5 @@ public abstract class ClanEvent extends AbstractEvent {
     public Cause getCause() {
         return cause;
     }
-
-
-    // TODO SPONGE: https://docs.spongepowered.org/en/plugin/event/custom.html
 
 }

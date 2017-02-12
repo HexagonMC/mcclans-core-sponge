@@ -28,7 +28,7 @@ import org.spongepowered.api.event.cause.Cause;
 /**
  * Created by Kippers on 19-1-2016.
  * <p>
- * A clan event that is cancellable
+ * A clan event that is cancellable.
  */
 public abstract class CancellableClanEvent extends ClanEvent implements Cancellable {
 
@@ -51,6 +51,11 @@ public abstract class CancellableClanEvent extends ClanEvent implements Cancella
         cancelled = cancel;
     }
 
+    /**
+     * Cancel this event.
+     *
+     * @param reasonMessage A user friendly explanation for why the event is cancelled
+     */
     public void setCancelledWithMessage(String reasonMessage) {
         setCancelled(true);
         cancelMessage = reasonMessage;
