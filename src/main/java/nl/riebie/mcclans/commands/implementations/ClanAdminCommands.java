@@ -197,24 +197,30 @@ public class ClanAdminCommands {
     }
 
     @Command(name = "remove", description = "Remove a player from a clan", spongePermission = "mcclans.admin.remove")
-    public void adminRemoveCommand(CommandSource commandSource, @Parameter(name = "clanTag") ClanImpl clan, @Parameter(name = "playerName") ClanPlayerImpl toBeRemovedClanPlayer) {
-        if (clan.equals(toBeRemovedClanPlayer.getClan())) {
-            if (toBeRemovedClanPlayer.getName().equals(commandSource.getName())) {
-                Messages.sendWarningMessage(commandSource, Messages.YOU_CANNOT_REMOVE_YOURSELF_FROM_THE_CLAN);
-            } else if (toBeRemovedClanPlayer.getName().equalsIgnoreCase(clan.getOwner().getName())) {
-                Messages.sendWarningMessage(commandSource, Messages.YOU_CANNOT_REMOVE_THE_OWNER_FROM_THE_CLAN);
-            } else {
-                ClanMemberLeaveEvent.Admin clanMemberLeaveEvent = EventDispatcher.getInstance().dispatchAdminClanMemberLeaveEvent(clan, toBeRemovedClanPlayer);
-                if (clanMemberLeaveEvent.isCancelled()) {
-                    Messages.sendWarningMessage(commandSource, clanMemberLeaveEvent.getCancelMessage());
-                } else {
-                    clan.removeMember(toBeRemovedClanPlayer.getName());
-                    Messages.sendClanBroadcastMessagePlayerRemovedFromTheClanBy(clan, toBeRemovedClanPlayer.getName(), commandSource.getName());
-                    Messages.sendYouHaveBeenRemovedFromClan(toBeRemovedClanPlayer, clan.getName());
-                }
-            }
+    public void adminRemoveCommand(CommandSource commandSource, @Parameter(name = "clanTag") ClanImpl clan, @Parameter(name = "playerName") String removeName) {
+        ClanPlayerImpl toBeRemovedClanPlayer = ClansImpl.getInstance().getClanPlayer(removeName);
+        if (toBeRemovedClanPlayer == null || !clan.equals(toBeRemovedClanPlayer.getClan())) {
+            toBeRemovedClanPlayer = clan.getMember(removeName);
+        }
+        if (toBeRemovedClanPlayer == null) {
+            Messages.sendPlayerNotAMemberOfThisClan(commandSource, removeName);
+            return;
+        }
+
+        if (commandSource instanceof Player && toBeRemovedClanPlayer.equals(
+                ClansImpl.getInstance().getClanPlayer(((Player) commandSource).getUniqueId()))) {
+            Messages.sendWarningMessage(commandSource, Messages.YOU_CANNOT_REMOVE_YOURSELF_FROM_THE_CLAN);
+        } else if (toBeRemovedClanPlayer.equals(clan.getOwner())) {
+            Messages.sendWarningMessage(commandSource, Messages.YOU_CANNOT_REMOVE_THE_OWNER_FROM_THE_CLAN);
         } else {
-            Messages.sendPlayerNotAMemberOfThisClan(commandSource, toBeRemovedClanPlayer.getName());
+            ClanMemberLeaveEvent.Admin clanMemberLeaveEvent = EventDispatcher.getInstance().dispatchAdminClanMemberLeaveEvent(clan, toBeRemovedClanPlayer);
+            if (clanMemberLeaveEvent.isCancelled()) {
+                Messages.sendWarningMessage(commandSource, clanMemberLeaveEvent.getCancelMessage());
+            } else {
+                clan.removeMember(toBeRemovedClanPlayer);
+                Messages.sendClanBroadcastMessagePlayerRemovedFromTheClanBy(clan, toBeRemovedClanPlayer.getName(), commandSource.getName());
+                Messages.sendYouHaveBeenRemovedFromClan(toBeRemovedClanPlayer, clan.getName());
+            }
         }
     }
 
@@ -242,7 +248,7 @@ public class ClanAdminCommands {
             Messages.sendWarningMessage(commandSource, Messages.THIS_PLAYER_IS_ALREADY_THE_OWNER);
         } else {
             ClanOwnerChangeEvent.Admin event = EventDispatcher.getInstance().dispatchAdminClanOwnerChangeEvent(clan, clan.getOwner(), targetClanPlayer);
-            if(event.isCancelled()){
+            if (event.isCancelled()) {
                 Messages.sendWarningMessage(commandSource, event.getCancelMessage());
             } else {
                 clan.setOwnerInternal(targetClanPlayer);
