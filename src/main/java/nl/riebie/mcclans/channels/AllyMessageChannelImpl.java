@@ -84,7 +84,7 @@ public class AllyMessageChannelImpl extends AbstractMutableMessageChannel implem
         List<UUID> spies = new ArrayList<>();
         for (Player player : Sponge.getServer().getOnlinePlayers()) {
             ClanPlayerImpl clanPlayerSpy = ClansImpl.getInstance().getClanPlayer(player.getUniqueId());
-            if (clanPlayerSpy.isSpy() && !receivers.contains(player)) {
+            if (clanPlayerSpy != null && clanPlayerSpy.isSpy() && !receivers.contains(player)) {
                 spies.add(player.getUniqueId());
                 receivers.add(player);
             }
