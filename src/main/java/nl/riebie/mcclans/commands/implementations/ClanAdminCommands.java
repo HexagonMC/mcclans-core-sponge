@@ -128,7 +128,7 @@ public class ClanAdminCommands {
             Messages.sendPlayerNotOnline(commandSource, owner);
         } else {
             if (targetClanPlayer.getClan() == null) {
-                if (clansImpl.tagIsAvailable(clanTag)) {
+                if (clansImpl.isTagAvailable(clanTag)) {
                     ClanCreateEvent.Admin clanCreateEvent = EventDispatcher.getInstance().dispatchAdminClanCreateEvent(clanTag, clanName, targetClanPlayer);
                     if (clanCreateEvent.isCancelled()) {
                         Messages.sendWarningMessage(commandSource, clanCreateEvent.getCancelMessage());

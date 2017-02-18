@@ -133,7 +133,7 @@ public class ClanCommands {
         }
 
         if (clanPlayer.getClan() == null) {
-            if (ClansImpl.getInstance().tagIsAvailable(clanTag)) {
+            if (ClansImpl.getInstance().isTagAvailable(clanTag)) {
                 ClanCreateEvent.User event = EventDispatcher.getInstance().dispatchUserClanCreateEvent(clanTag, clanName, clanPlayer);
                 if (event.isCancelled()) {
                     clanPlayer.sendMessage(Messages.getWarningMessage(event.getCancelMessage()));

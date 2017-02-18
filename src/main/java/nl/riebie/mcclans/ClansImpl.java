@@ -162,20 +162,27 @@ public class ClansImpl implements ClanService {
 
     @Override
     public Result<Clan> createClan(String tag, String name, ClanPlayer owner) {
-        if (owner instanceof ClanPlayerImpl) {
-            ClanPlayerImpl ownerImpl = (ClanPlayerImpl) owner;
-            if (tagIsAvailable(tag)) {
-                ClanCreateEvent.Plugin clanCreateEvent = EventDispatcher.getInstance().dispatchPluginClanCreateEvent(tag, name, owner);
-                if (clanCreateEvent.isCancelled()) {
-                    return ResultImpl.ofError(clanCreateEvent.getCancelMessage());
-                } else {
-                    Clan clan = createClanInternal(tag, name, ownerImpl);
-                    return ResultImpl.ofResult(clan);
-                }
-            }
-            return ResultImpl.ofError("Tag is already taken");
-        } else {
+        if (tag == null || name == null || owner == null) {
+            throw new IllegalArgumentException("arguments may not be null");
+        }
+        if (!(owner instanceof ClanPlayerImpl)) {
             throw new NotDefaultImplementationException(owner.getClass());
+        }
+        ClanPlayerImpl ownerImpl = (ClanPlayerImpl) owner;
+
+        if (ownerImpl.getClan() != null) {
+            throw new IllegalArgumentException("provided player may not already be in a clan");
+        }
+        if (!isTagAvailable(tag)) {
+            throw new IllegalArgumentException("provided tag already taken");
+        }
+
+        ClanCreateEvent.Plugin clanCreateEvent = EventDispatcher.getInstance().dispatchPluginClanCreateEvent(tag, name, owner);
+        if (clanCreateEvent.isCancelled()) {
+            return ResultImpl.ofError(clanCreateEvent.getCancelMessage());
+        } else {
+            Clan clan = createClanInternal(tag, name, ownerImpl);
+            return ResultImpl.ofResult(clan);
         }
     }
 
@@ -314,12 +321,7 @@ public class ClansImpl implements ClanService {
     }
 
     @Override
-    public boolean tagIsFree(String tag) {
-        return tagIsAvailable(tag);
-    }
-
-    @Override
-    public boolean tagIsAvailable(String tag) {
+    public boolean isTagAvailable(String tag) {
         return !clans.containsKey(tag.toLowerCase());
     }
 

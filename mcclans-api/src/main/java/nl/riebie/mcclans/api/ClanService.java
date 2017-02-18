@@ -40,6 +40,7 @@ public interface ClanService {
      * @param owner the owner of the new clan
      * @return the new Clan
      * @throws NotDefaultImplementationException if owner is not created by MCClans
+     * @throws IllegalArgumentException          if a provided argument is null, if the owner is already in a clan, or if the clan tag is already taken
      */
     Result<Clan> createClan(String tag, String name, ClanPlayer owner);
 
@@ -96,18 +97,8 @@ public interface ClanService {
      *
      * @param tag a clanTag
      * @return true if the given clanTag is free
-     * @deprecated use tagIsAvailable
      */
-    @Deprecated
-    boolean tagIsFree(String tag);
-
-    /**
-     * Check if the given clanTag is free
-     *
-     * @param tag a clanTag
-     * @return true if the given clanTag is free
-     */
-    boolean tagIsAvailable(String tag);
+    boolean isTagAvailable(String tag);
 
     /**
      * Get the ClanPermissionManager for registering and retrieving ClanPermissions
