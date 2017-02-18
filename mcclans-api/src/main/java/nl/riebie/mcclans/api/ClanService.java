@@ -96,13 +96,23 @@ public interface ClanService {
      *
      * @param tag a clanTag
      * @return true if the given clanTag is free
+     * @deprecated use tagIsAvailable
      */
+    @Deprecated
     boolean tagIsFree(String tag);
+
+    /**
+     * Check if the given clanTag is free
+     *
+     * @param tag a clanTag
+     * @return true if the given clanTag is free
+     */
+    boolean tagIsAvailable(String tag);
 
     /**
      * Get the ClanPermissionManager for registering and retrieving ClanPermissions
      *
-     * @return  the ClanPermissionManager
+     * @return the ClanPermissionManager
      */
     ClanPermissionManager getClanPermissionManager();
 

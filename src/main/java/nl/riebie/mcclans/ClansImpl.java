@@ -164,7 +164,7 @@ public class ClansImpl implements ClanService {
     public Result<Clan> createClan(String tag, String name, ClanPlayer owner) {
         if (owner instanceof ClanPlayerImpl) {
             ClanPlayerImpl ownerImpl = (ClanPlayerImpl) owner;
-            if (tagIsFree(tag)) {
+            if (tagIsAvailable(tag)) {
                 ClanCreateEvent.Plugin clanCreateEvent = EventDispatcher.getInstance().dispatchPluginClanCreateEvent(tag, name, owner);
                 if (clanCreateEvent.isCancelled()) {
                     return ResultImpl.ofError(clanCreateEvent.getCancelMessage());
@@ -230,7 +230,6 @@ public class ClansImpl implements ClanService {
         TaskForwarder.sendDeleteClan(clan.getID());
         updateClanTagCache();
     }
-
 
 
     @Override
@@ -316,9 +315,13 @@ public class ClansImpl implements ClanService {
 
     @Override
     public boolean tagIsFree(String tag) {
-        return !clans.containsKey(tag.toLowerCase());
+        return tagIsAvailable(tag);
     }
 
+    @Override
+    public boolean tagIsAvailable(String tag) {
+        return !clans.containsKey(tag.toLowerCase());
+    }
 
     @Override
     public ClanPermissionManagerImpl getClanPermissionManager() {
