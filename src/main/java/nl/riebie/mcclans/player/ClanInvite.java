@@ -46,7 +46,7 @@ public class ClanInvite {
             clanPlayer.sendMessage(Messages.getWarningMessage(event.getCancelMessage()));
         } else {
             Messages.sendClanBroadcastMessagePlayerJoinedTheClan(clan, clanPlayer.getName());
-            clanPlayer.setRank(clan.getRank(RankFactory.getRecruitIdentifier()));
+            clanPlayer.setRankInternal(clan.getRank(RankFactory.getRecruitIdentifier()));
             clan.addMember(clanPlayer);
             clanPlayer.setClan(clan);
             clan.removeInvitedPlayer(clanPlayer.getName());

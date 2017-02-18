@@ -78,7 +78,7 @@ public class ClanPlayerCommands {
                     clan.setOwnerInternal(targetPlayer);
                 }
             } else {
-                targetPlayer.setRank(rank);
+                targetPlayer.setRankInternal(rank);
             }
 
             Messages.sendRankOfPlayerSuccessfullyChangedToRank(sender, targetPlayer.getName(), rank.getName());

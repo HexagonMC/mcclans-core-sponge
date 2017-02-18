@@ -172,14 +172,6 @@ public interface Clan {
     Rank getRank(String rank);
 
     /**
-     * Rename a rank
-     *
-     * @param oldName name of the rank to be renamed
-     * @param newName new name for the rank
-     */
-    void renameRank(String oldName, String newName);
-
-    /**
      * Check if this clan contains a rank with the given name
      *
      * @param name name of the rank to be checked
@@ -191,6 +183,7 @@ public interface Clan {
      * Set the owner of this clan
      *
      * @param clanPlayer the ClanPlayer of the new owner of this clan
+     * @return Result of the action
      * @throws NotDefaultImplementationException if the given ClanPlayer is not created by MCClans
      */
     Result<ClanPlayer> setOwner(ClanPlayer clanPlayer);
