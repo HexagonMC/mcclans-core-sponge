@@ -15,7 +15,7 @@ public interface Result<T> {
     T getItem();
 
     /**
-     * @return The error message if the result is not successful
+     * @return The user friendly error message if the result is not successful
      */
     String getErrorMessage();
 
