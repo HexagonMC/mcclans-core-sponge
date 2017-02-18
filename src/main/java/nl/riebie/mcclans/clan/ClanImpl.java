@@ -42,6 +42,7 @@ import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
+import javax.annotation.Nullable;
 import java.text.DateFormat;
 import java.util.*;
 
@@ -190,10 +191,7 @@ public class ClanImpl implements Clan, Cloneable {
     }
 
     @Override
-    public Result<Location<World>> setHome(Location<World> location) {
-        /**
-         * TODO this method is called from data loader
-         */
+    public Result<Location<World>> setHome(@Nullable Location<World> location) {
         ClanSetHomeEvent.Plugin event = EventDispatcher.getInstance().dispatchPluginSetHomeEvent(this, location);
         if (event.isCancelled()) {
             return ResultImpl.ofError(event.getCancelMessage());
@@ -203,18 +201,14 @@ public class ClanImpl implements Clan, Cloneable {
         }
     }
 
-    public void setHomeInternal(Location<World> location) {
-        home = new Location<>(location.getExtent(), location.getPosition());
+    public void setHomeInternal(@Nullable Location<World> location) {
+        home = location == null ? null : new Location<>(location.getExtent(), location.getPosition());
         TaskForwarder.sendUpdateClan(this);
     }
 
     @Override
     public Location<World> getHome() {
-        if (home != null) {
-            return home;
-        } else {
-            return null;
-        }
+        return home;
     }
 
     public int getHomeSetTimes() {
@@ -301,17 +295,30 @@ public class ClanImpl implements Clan, Cloneable {
 
     @Override
     public Result<ClanPlayer> setOwner(ClanPlayer clanPlayer) {
-        if (clanPlayer instanceof ClanPlayerImpl) {
-            ClanOwnerChangeEvent event = EventDispatcher.getInstance().dispatchPluginClanOwnerChangeEvent(this, owner, clanPlayer);
-            if (event.isCancelled()) {
-                return ResultImpl.ofError(event.getCancelMessage());
-            } else {
-                setOwnerInternal((ClanPlayerImpl) clanPlayer);
-                return ResultImpl.ofResult(clanPlayer);
-            }
-        } else {
+        if (clanPlayer == null) {
+            throw new IllegalArgumentException("clan player may not be null");
+        }
+        if (!(clanPlayer instanceof ClanPlayerImpl)) {
             throw new NotDefaultImplementationException(clanPlayer.getClass());
         }
+        ClanPlayerImpl clanPlayerImpl = (ClanPlayerImpl) clanPlayer;
+
+        if (clanPlayer.getClan() == null || !this.equals(clanPlayer.getClan())) {
+            throw new IllegalArgumentException("player not a member of this clan");
+        }
+        if (owner.equals(clanPlayer)) {
+            // Already the owner, yay! Do nothing.
+            return ResultImpl.ofResult(clanPlayerImpl);
+        }
+
+        ClanOwnerChangeEvent event = EventDispatcher.getInstance().dispatchPluginClanOwnerChangeEvent(this, owner, clanPlayerImpl);
+        if (event.isCancelled()) {
+            return ResultImpl.ofError(event.getCancelMessage());
+        } else {
+            setOwnerInternal(clanPlayerImpl);
+            return ResultImpl.ofResult(clanPlayerImpl);
+        }
+
     }
 
     public void setOwnerInternal(ClanPlayerImpl clanPlayer) {

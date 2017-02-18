@@ -29,6 +29,7 @@ import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
+import javax.annotation.Nullable;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -87,15 +88,16 @@ public interface Clan {
     /**
      * Sets the home location of this clan
      *
-     * @param location position of the new home location
+     * @param location position of the new home location, or null
      */
-    Result<Location<World>> setHome(Location<World> location);
+    Result<Location<World>> setHome(@Nullable Location<World> location);
 
     /**
      * Get the home location of this clan
      *
-     * @return position of the home location
+     * @return position of the home location, or null
      */
+    @Nullable
     Location<World> getHome();
 
     /**
@@ -185,6 +187,7 @@ public interface Clan {
      * @param clanPlayer the ClanPlayer of the new owner of this clan
      * @return Result of the action
      * @throws NotDefaultImplementationException if the given ClanPlayer is not created by MCClans
+     * @throws IllegalArgumentException          if the provided ClanPlayer is null, or is not a member of this clan
      */
     Result<ClanPlayer> setOwner(ClanPlayer clanPlayer);
 
