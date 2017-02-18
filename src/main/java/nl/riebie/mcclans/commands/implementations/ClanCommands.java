@@ -234,7 +234,7 @@ public class ClanCommands {
         } else {
             ClansImpl clansImpl = ClansImpl.getInstance();
             Messages.sendBroadcastMessageClanDisbandedBy(clan.getName(), clan.getTagColored(), commandSource.getName());
-            clansImpl.disbandClan(clan);
+            clansImpl.disbandClanInternal(clan);
         }
     }
 

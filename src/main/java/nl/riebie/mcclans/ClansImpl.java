@@ -268,7 +268,7 @@ public class ClansImpl implements ClanService {
             ClanInvite clanInvite = clanPlayerImpl.getClanInvite();
             if (clan != null) {
                 if (clan.getOwner().equals(clanPlayerImpl)) {
-                    disbandClan(clan);
+                    disbandClanInternal(clan);
                 } else {
                     clan.removeMember(clanPlayerImpl);
                 }
