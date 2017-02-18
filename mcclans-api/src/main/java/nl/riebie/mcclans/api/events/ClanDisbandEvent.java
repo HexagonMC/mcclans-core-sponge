@@ -40,6 +40,9 @@ public class ClanDisbandEvent extends CancellableClanEvent {
         this.clan = clan;
     }
 
+    /**
+     * Get the disbanded clan.
+     */
     public Clan getClan() {
         return clan;
     }

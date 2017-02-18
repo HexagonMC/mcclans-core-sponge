@@ -107,7 +107,7 @@ public class ClanRankCommands {
             if (rank.isChangeable()) {
                 for (ClanPlayerImpl member : clan.getMembersImpl()) {
                     if (member.getRank().getName().toLowerCase().equals(rankName.toLowerCase())) {
-                        member.setRank(clan.getRank(RankFactory.getRecruitIdentifier()));
+                        member.setRankInternal(clan.getRank(RankFactory.getRecruitIdentifier()));
                     }
                 }
                 clan.removeRank(rankName);

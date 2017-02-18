@@ -10,7 +10,7 @@ package nl.riebie.mcclans.api;
 public interface Result<T> {
 
     /**
-     * @return The result if the action was successful
+     * @return The result if the action was successful, otherwise null
      */
     T getItem();
 

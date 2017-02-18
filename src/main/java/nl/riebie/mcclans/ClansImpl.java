@@ -184,7 +184,7 @@ public class ClansImpl implements ClanService {
         newClan.setupDefaultRanks();
         newClan.addMember(owner);
 
-        owner.setRank(newClan.getRank(RankFactory.getOwnerIdentifier()));
+        owner.setRankInternal(newClan.getRank(RankFactory.getOwnerIdentifier()));
         owner.setClan(newClan);
         clans.put(tag.toLowerCase(), newClan);
         TaskForwarder.sendInsertClan(newClan);
@@ -209,7 +209,7 @@ public class ClansImpl implements ClanService {
     public void disbandClanInternal(ClanImpl clan) {
         for (ClanPlayerImpl clanPlayer : clan.getMembersImpl()) {
             clanPlayer.setClan(null);
-            clanPlayer.setRank(null);
+            clanPlayer.setRankInternal(null);
         }
         List<RankImpl> ranks = clan.getRankImpls();
         for (RankImpl rank : ranks) {

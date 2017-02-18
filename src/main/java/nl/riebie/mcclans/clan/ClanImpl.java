@@ -191,7 +191,10 @@ public class ClanImpl implements Clan, Cloneable {
 
     @Override
     public Result<Location<World>> setHome(Location<World> location) {
-        ClanSetHomeEvent.Plugin event = EventDispatcher.getInstance().dispatchPluginSetHomeEvent(location);
+        /**
+         * TODO this method is called from data loader
+         */
+        ClanSetHomeEvent.Plugin event = EventDispatcher.getInstance().dispatchPluginSetHomeEvent(this, location);
         if (event.isCancelled()) {
             return ResultImpl.ofError(event.getCancelMessage());
         } else {
@@ -312,8 +315,8 @@ public class ClanImpl implements Clan, Cloneable {
     }
 
     public void setOwnerInternal(ClanPlayerImpl clanPlayer) {
-        this.owner.setRank(getRank(RankFactory.getRecruitIdentifier()));
-        clanPlayer.setRank(getRank(RankFactory.getOwnerIdentifier()));
+        this.owner.setRankInternal(getRank(RankFactory.getRecruitIdentifier()));
+        clanPlayer.setRankInternal(getRank(RankFactory.getOwnerIdentifier()));
         this.owner = clanPlayer;
         TaskForwarder.sendUpdateClan(this);
     }
@@ -394,7 +397,6 @@ public class ClanImpl implements Clan, Cloneable {
         }
     }
 
-    @Override
     public void renameRank(String oldName, String newName) {
         RankImpl rank = getRank(oldName);
         ranks.remove(oldName.toLowerCase());
@@ -406,6 +408,10 @@ public class ClanImpl implements Clan, Cloneable {
     @Override
     public boolean containsRank(String rankName) {
         return this.ranks.containsKey(rankName.toLowerCase());
+    }
+
+    public boolean containsRank(RankImpl rank) {
+        return ranks.containsValue(rank);
     }
 
     public void addMember(ClanPlayer player) {
@@ -423,7 +429,7 @@ public class ClanImpl implements Clan, Cloneable {
         if (member != null) {
             member.setClan(null);
 
-            member.setRank(null);
+            member.setRankInternal(null);
 
             members.remove(member);
             TaskForwarder.sendUpdateClanPlayer(member);
