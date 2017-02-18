@@ -53,7 +53,7 @@ public class ClanPlayerCommands {
     public void playerSetRankCommand(CommandSource sender, ClanPlayerImpl clanPlayer, @Parameter(name = "playerName") ClanPlayerImpl targetPlayer,
                                      @Parameter(name = "rankName") String rankName) {
         ClanImpl clan = clanPlayer.getClan();
-        if (targetPlayer.getClan() != clan) {
+        if (!clan.equals(targetPlayer.getClan())) {
             Messages.sendPlayerNotAMemberOfThisClan(sender, targetPlayer.getName());
             return;
         }
@@ -66,7 +66,7 @@ public class ClanPlayerCommands {
             Messages.sendWarningMessage(sender, Messages.YOU_CANNOT_OVERWRITE_THE_OWNER_RANK);
         } else {
             if (RankFactory.getOwnerIdentifier().toLowerCase().equals(rank.getName().toLowerCase())) {
-                if(!clan.getOwner().equals(clanPlayer)){
+                if (!clan.getOwner().equals(clanPlayer)) {
                     Messages.sendWarningMessage(sender, Messages.ONLY_THE_OWNER_CAN_CHANGE_OWNER);
                     return;
                 }

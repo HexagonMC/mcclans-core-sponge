@@ -250,9 +250,7 @@ public class ClanCommands {
             return;
         }
 
-        if (toBeRemovedClanPlayer.equals(clanPlayer)) {
-            Messages.sendWarningMessage(commandSource, Messages.YOU_CANNOT_REMOVE_YOURSELF_FROM_THE_CLAN);
-        } else if (toBeRemovedClanPlayer.equals(clan.getOwner())) {
+        if (toBeRemovedClanPlayer.equals(clan.getOwner())) {
             Messages.sendWarningMessage(commandSource, Messages.YOU_CANNOT_REMOVE_THE_OWNER_FROM_THE_CLAN);
         } else {
             ClanMemberLeaveEvent.User clanMemberLeaveEvent = EventDispatcher.getInstance().dispatchUserClanMemberLeaveEvent(clan, toBeRemovedClanPlayer);
