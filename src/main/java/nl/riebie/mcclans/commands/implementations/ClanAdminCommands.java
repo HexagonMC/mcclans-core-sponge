@@ -111,11 +111,6 @@ public class ClanAdminCommands {
         ClansImpl clansImpl = ClansImpl.getInstance();
         ClanPlayerImpl targetClanPlayer = clansImpl.getClanPlayer(owner);
 
-        ClanCreateEvent.Admin clanCreateEvent = EventDispatcher.getInstance().dispatchAdminClanCreateEvent(clanTag, clanName, targetClanPlayer);
-        if (clanCreateEvent.isCancelled()) {
-            Messages.sendWarningMessage(commandSource, clanCreateEvent.getCancelMessage());
-            return;
-        }
         if (targetClanPlayer == null) {
             UUID uuid = UUIDUtils.getUUID(owner);
             Optional<Player> playerOpt;
@@ -134,6 +129,11 @@ public class ClanAdminCommands {
         } else {
             if (targetClanPlayer.getClan() == null) {
                 if (clansImpl.tagIsFree(clanTag)) {
+                    ClanCreateEvent.Admin clanCreateEvent = EventDispatcher.getInstance().dispatchAdminClanCreateEvent(clanTag, clanName, targetClanPlayer);
+                    if (clanCreateEvent.isCancelled()) {
+                        Messages.sendWarningMessage(commandSource, clanCreateEvent.getCancelMessage());
+                        return;
+                    }
                     ClanImpl clanImpl = clansImpl.createClanInternal(clanTag, clanName, targetClanPlayer);
                     Messages.sendBroadcastMessageClanCreatedBy(clanImpl.getName(), clanImpl.getTagColored(), commandSource.getName());
                 } else {
