@@ -46,11 +46,10 @@ public class Messages {
     public static final String RANK_DOES_NOT_EXIST = "Rank does not exist";
     public static final String RANK_IS_NOT_CHANGEABLE = "Rank is not changeable";
     public static final String PLAYER_DOES_NOT_EXIST = "Player does not exist";
-    public static final String YOU_CANNOT_RESIGN_FROM_THE_CLAN_AS_THE_OWNER = "You cannot resign from the clan as the Owner. Relinquish your rank to another clan member before resigning";
-    public static final String YOU_CANNOT_OVERWRITE_THE_OWNER_RANK = "You cannot overwrite the Owner rank. The Owner needs to relinquish his rank to another clan member first";
+    public static final String YOU_CANNOT_RESIGN_FROM_THE_CLAN_AS_THE_OWNER = "You cannot resign from the clan as the Owner. Transfer your rank to another clan member before resigning";
+    public static final String YOU_CANNOT_OVERWRITE_THE_OWNER_RANK = "You cannot overwrite the Owner rank. The Owner needs to transfer his rank to another clan member first";
     public static final String ONLY_THE_OWNER_CAN_CHANGE_OWNER = "Only the owner can change the owner of the clan";
 
-    public static final String THIS_PLAYER_IS_ALREADY_THE_OWNER = "This player is already the owner";
     public static final String NO_PENDING_CLAN_INVITE = "You have no pending clan invite";
     public static final String CLAN_INVITE_ACCEPTED = "Clan invite accepted";
     public static final String CLAN_INVITE_DECLINED = "Clan invite declined";
