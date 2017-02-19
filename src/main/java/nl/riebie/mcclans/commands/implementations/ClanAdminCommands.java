@@ -207,10 +207,7 @@ public class ClanAdminCommands {
             return;
         }
 
-        if (commandSource instanceof Player && toBeRemovedClanPlayer.equals(
-                ClansImpl.getInstance().getClanPlayer(((Player) commandSource).getUniqueId()))) {
-            Messages.sendWarningMessage(commandSource, Messages.YOU_CANNOT_REMOVE_YOURSELF_FROM_THE_CLAN);
-        } else if (toBeRemovedClanPlayer.equals(clan.getOwner())) {
+        if (toBeRemovedClanPlayer.equals(clan.getOwner())) {
             Messages.sendWarningMessage(commandSource, Messages.YOU_CANNOT_REMOVE_THE_OWNER_FROM_THE_CLAN);
         } else {
             ClanMemberLeaveEvent.Admin clanMemberLeaveEvent = EventDispatcher.getInstance().dispatchAdminClanMemberLeaveEvent(clan, toBeRemovedClanPlayer);
@@ -237,23 +234,36 @@ public class ClanAdminCommands {
         }
     }
 
-    @Command(name = "setowner", description = "Set the owner of a clan", spongePermission = "mcclans.admin.setowner")
-    public void adminSetOwnerCommand(CommandSource commandSource, @Parameter(name = "clanTag") ClanImpl clan, @Parameter(name = "playerName") ClanPlayerImpl targetClanPlayer) {
-        if (targetClanPlayer.getClan() != clan) {
-            Messages.sendPlayerNotAMemberOfThisClan(commandSource, targetClanPlayer.getName());
+    @Command(name = "setrank", description = "Set the rank of a member of a clan", spongePermission = "mcclans.admin.setrank")
+    public void adminSetRankCommand(CommandSource sender, @Parameter(name = "clanTag") ClanImpl clan, @Parameter(name = "playerName") ClanPlayerImpl targetClanPlayer,
+                                    @Parameter(name = "rankName") String rankName) {
+        if (!clan.equals(targetClanPlayer.getClan())) {
+            Messages.sendPlayerNotAMemberOfThisClan(sender, targetClanPlayer.getName());
             return;
         }
-        RankImpl rank = clan.getRank(RankFactory.getOwnerIdentifier());
-        if (targetClanPlayer.getRank().getName().toLowerCase().equals(RankFactory.getOwnerIdentifier().toLowerCase())) {
-            Messages.sendWarningMessage(commandSource, Messages.THIS_PLAYER_IS_ALREADY_THE_OWNER);
+
+        RankImpl rank = clan.getRank(rankName);
+
+        if (rank == null) {
+            Messages.sendWarningMessage(sender, Messages.RANK_DOES_NOT_EXIST);
+        } else if (targetClanPlayer.getRank().getName().toLowerCase().equals(RankFactory.getOwnerIdentifier().toLowerCase())) {
+            Messages.sendWarningMessage(sender, Messages.YOU_CANNOT_OVERWRITE_THE_OWNER_RANK);
         } else {
-            ClanOwnerChangeEvent.Admin event = EventDispatcher.getInstance().dispatchAdminClanOwnerChangeEvent(clan, clan.getOwner(), targetClanPlayer);
-            if (event.isCancelled()) {
-                Messages.sendWarningMessage(commandSource, event.getCancelMessage());
+            if (RankFactory.getOwnerIdentifier().toLowerCase().equals(rank.getName().toLowerCase())) {
+                ClanOwnerChangeEvent.Admin clanOwnerChangeEvent = EventDispatcher.getInstance().dispatchAdminClanOwnerChangeEvent(clan, clan.getOwner(), targetClanPlayer);
+                if (clanOwnerChangeEvent.isCancelled()) {
+                    Messages.sendWarningMessage(sender, clanOwnerChangeEvent.getCancelMessage());
+                    return;
+                } else {
+                    clan.setOwnerInternal(targetClanPlayer);
+                }
             } else {
-                clan.setOwnerInternal(targetClanPlayer);
-                Messages.sendRankOfPlayerSuccessfullyChangedToRank(commandSource, targetClanPlayer.getName(), rank.getName());
+                targetClanPlayer.setRank(rank);
             }
+
+            Messages.sendRankOfPlayerSuccessfullyChangedToRank(sender, targetClanPlayer.getName(), rank.getName());
+
+            targetClanPlayer.sendMessage(Messages.getYourRankHasBeenChangedToRank(rank.getName()));
         }
     }
 

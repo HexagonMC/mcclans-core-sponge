@@ -57,7 +57,6 @@ public class Messages {
     public static final String NO_PENDING_ALLY_INVITE = "You have no pending ally invite";
     public static final String ALLY_INVITE_ACCEPTED = "Ally invite accepted";
     public static final String ALLY_INVITE_DECLINED = "Ally invite declined";
-    public static final String YOU_CANNOT_REMOVE_YOURSELF_FROM_THE_CLAN = "You cannot remove yourself from the clan. Use resign to leave";
     public static final String YOU_CANNOT_REMOVE_THE_OWNER_FROM_THE_CLAN = "You cannot remove the owner from the clan";
     public static final String THIS_CLAN_IS_NOT_ACCEPTING_ALLY_INVITES = "This clan is not accepting ally invites";
     public static final String YOUR_CLANS_ARE_ALREADY_ALLIES = "Your clans are already allies";
@@ -72,7 +71,6 @@ public class Messages {
     public static final String TELEPORT_CANCELLED = "Teleport cancelled";
     public static final String YOU_NEED_TO_MOVE_BEFORE_ATTEMPTING_ANOTHER_TELEPORT = "You need to move before attempting another teleport";
     public static final String PLAYER_PROPERTIES_REMOVED = "Player properties removed";
-    public static final String PLAYER_NAME_UPDATED = "Player name(s) updated";
     public static final String THESE_ARE_THE_SAME_PLAYERS = "These are the same players";
     public static final String FRIENDLY_FIRE_IS_OFF = "Friendly fire protection is on";
     public static final String ACTIVATED_PERSONAL_FRIENDLY_FIRE_PROTECTION = "Activated personal friendly fire protection";

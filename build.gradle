@@ -40,6 +40,7 @@ shadowJar {
     dependencies {
         include dependency(':mcclans-api')
         include dependency('net.minecrell.mcstats:statslite-sponge')
+        include dependency('io.github.nucleuspowered:nucleus-api')
     }
 
     relocate 'net.minecrell.mcstats', 'nl.riebie.mcclans.mcstats'
