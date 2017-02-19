@@ -249,10 +249,10 @@ public interface Clan {
     void sendMessage(Text... message);
 
     /**
-     * Send a message to all the members of this clan with the given permission
+     * Send a message to all the members of this clan with the given clan permission
      *
      * @param message    the message to be sent
-     * @param permission the permission needed by the members to receive this message
+     * @param permission the clan permission needed by the members to receive this message
      */
     void sendMessage(String permission, Text... message);
 

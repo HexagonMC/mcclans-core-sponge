@@ -201,6 +201,10 @@ public class ClansImpl implements ClanService {
 
     @Override
     public void disbandClan(Clan disbandedClan) {
+        if (disbandedClan == null) {
+            return;
+        }
+
         if (disbandedClan instanceof ClanImpl) {
             ClanDisbandEvent.Plugin event = EventDispatcher.getInstance().dispatchPluginClanDisbandEvent(disbandedClan);
             if (event.isCancelled()) {
@@ -267,6 +271,10 @@ public class ClansImpl implements ClanService {
 
     @Override
     public void removeClanPlayer(ClanPlayer clanPlayer) {
+        if (clanPlayer == null) {
+            return;
+        }
+
         if (clanPlayer instanceof ClanPlayerImpl) {
             ClanPlayerImpl clanPlayerImpl = (ClanPlayerImpl) clanPlayer;
             String playerName = clanPlayerImpl.getName();

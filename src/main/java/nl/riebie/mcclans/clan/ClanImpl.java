@@ -162,6 +162,10 @@ public class ClanImpl implements Clan, Cloneable {
 
     @Override
     public boolean isPlayerFriendlyToThisClan(ClanPlayer clanPlayer) {
+        if (clanPlayer == null) {
+            return false;
+        }
+
         if (clanPlayer instanceof ClanPlayerImpl) {
             ClanPlayerImpl clanPlayerImpl = (ClanPlayerImpl) clanPlayer;
             ClanImpl clan = clanPlayerImpl.getClan();
@@ -386,6 +390,10 @@ public class ClanImpl implements Clan, Cloneable {
     }
 
     public void addRank(Rank rank) {
+        if (rank == null) {
+            return;
+        }
+
         if (rank instanceof RankImpl) {
             RankImpl rankImpl = (RankImpl) rank;
             ranks.put(rank.getName().toLowerCase(), rankImpl);
@@ -422,6 +430,10 @@ public class ClanImpl implements Clan, Cloneable {
     }
 
     public void addMember(ClanPlayer player) {
+        if (player == null) {
+            return;
+        }
+
         if (player instanceof ClanPlayerImpl) {
             ClanPlayerImpl clanPlayerImpl = (ClanPlayerImpl) player;
             members.add(clanPlayerImpl);
@@ -444,6 +456,10 @@ public class ClanImpl implements Clan, Cloneable {
     }
 
     public void addInvitedPlayer(ClanPlayer player) {
+        if (player == null) {
+            return;
+        }
+
         if (player instanceof ClanPlayerImpl) {
             invitedMembers.add((ClanPlayerImpl) player);
         } else {
@@ -536,6 +552,10 @@ public class ClanImpl implements Clan, Cloneable {
     }
 
     public void addAlly(Clan clan) {
+        if (clan == null) {
+            return;
+        }
+
         if (clan instanceof ClanImpl) {
             ClanImpl clanImpl = (ClanImpl) clan;
             if (!allies.contains(clanImpl)) {
@@ -549,12 +569,14 @@ public class ClanImpl implements Clan, Cloneable {
 
     @Override
     public void removeAlly(Clan ally) {
+        if (ally == null) {
+            return;
+        }
+
         if (ally instanceof ClanImpl) {
             ClanImpl clanImpl = (ClanImpl) ally;
-            if (ally != null) {
-                allies.remove(clanImpl);
-                TaskForwarder.sendDeleteClanAlly(getID(), clanImpl.getID());
-            }
+            allies.remove(clanImpl);
+            TaskForwarder.sendDeleteClanAlly(getID(), clanImpl.getID());
         } else {
             throw new NotDefaultImplementationException(ally.getClass());
         }
