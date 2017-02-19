@@ -27,9 +27,9 @@ import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.NamedCause;
 
 /**
- * Created by Kippers on 19-1-2016.
- * <p>
  * A clan event which is fired when a clan is created.
+ * <p>
+ * Created by Kippers on 19-1-2016.
  */
 public class ClanCreateEvent extends CancellableClanEvent {
 

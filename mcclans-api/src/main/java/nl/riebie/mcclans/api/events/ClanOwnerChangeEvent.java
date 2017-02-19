@@ -28,9 +28,9 @@ import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.NamedCause;
 
 /**
- * Created by Kippers on 19-1-2016.
- * <p>
  * Event fired when an owner of a clan is changed.
+ * <p>
+ * Created by Kippers on 19-1-2016.
  */
 public class ClanOwnerChangeEvent extends CancellableClanEvent {
 

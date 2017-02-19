@@ -29,6 +29,8 @@ import java.util.List;
 import java.util.UUID;
 
 /**
+ * Starting point for interacting with the MCClans api. Provided as a Sponge service.
+ * <p>
  * Created by Kippers on 19-1-2016.
  */
 public interface ClanService {

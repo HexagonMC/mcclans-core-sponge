@@ -26,6 +26,8 @@ package nl.riebie.mcclans.api.permissions;
 import java.util.List;
 
 /**
+ * Keeps track of all registered clan permissions.
+ * <p>
  * Created by riebie on 10/04/2016.
  */
 public interface ClanPermissionManager {

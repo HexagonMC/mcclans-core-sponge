@@ -27,6 +27,8 @@ import nl.riebie.mcclans.api.Clan;
 import java.util.List;
 
 /**
+ * Message channel for all ally chats.
+ * <p>
  * Created by Kippers on 30/12/2016.
  */
 public interface AllyMessageChannel {

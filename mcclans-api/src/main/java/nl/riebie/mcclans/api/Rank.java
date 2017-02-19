@@ -23,11 +23,12 @@
 package nl.riebie.mcclans.api;
 
 import nl.riebie.mcclans.api.enums.PermissionModifyResponse;
-import nl.riebie.mcclans.api.permissions.ClanPermission;
 
 import java.util.List;
 
 /**
+ * Rank of a player in a clan.
+ * <p>
  * Created by Kippers on 19-1-2016.
  */
 public interface Rank {
@@ -60,8 +61,6 @@ public interface Rank {
      * @return PermissionModifyResponse enum value
      */
     PermissionModifyResponse removePermission(String permission);
-
-
 
     /**
      * Check if this Rank contains the given permission

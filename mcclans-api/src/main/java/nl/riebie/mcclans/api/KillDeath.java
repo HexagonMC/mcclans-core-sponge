@@ -26,6 +26,8 @@ package nl.riebie.mcclans.api;
 import nl.riebie.mcclans.api.enums.KillDeathFactor;
 
 /**
+ * Holds the kills and deaths of a player. Contains convenience methods for adding kills and deaths with their weight factor.
+ * <p>
  * Created by riebie on 10/04/2016.
  */
 public interface KillDeath {
@@ -50,7 +52,7 @@ public interface KillDeath {
      * Set the kills for the provided KillDeathFactor
      *
      * @param factor the KillDeathFactor to set the kills for
-     * @param kills the kills for the provided KillDeathFactor
+     * @param kills  the kills for the provided KillDeathFactor
      */
     void setKills(KillDeathFactor factor, int kills);
 

@@ -25,6 +25,8 @@ package nl.riebie.mcclans.api.channels;
 import nl.riebie.mcclans.api.Clan;
 
 /**
+ * Message channel for all clan chats.
+ * <p>
  * Created by Kippers on 30/12/2016.
  */
 public interface ClanMessageChannel {

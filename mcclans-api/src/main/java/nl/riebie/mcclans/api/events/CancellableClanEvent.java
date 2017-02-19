@@ -26,9 +26,9 @@ import org.spongepowered.api.event.Cancellable;
 import org.spongepowered.api.event.cause.Cause;
 
 /**
- * Created by Kippers on 19-1-2016.
- * <p>
  * A clan event that is cancellable.
+ * <p>
+ * Created by Kippers on 19-1-2016.
  */
 public abstract class CancellableClanEvent extends ClanEvent implements Cancellable {
 

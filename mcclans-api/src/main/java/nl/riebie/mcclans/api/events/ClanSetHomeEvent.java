@@ -9,9 +9,9 @@ import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 /**
- * Created by riebie on 29/01/2017.
- * <p>
  * An event which is fired when a clan home is set.
+ * <p>
+ * Created by riebie on 29/01/2017.
  */
 public class ClanSetHomeEvent extends CancellableClanEvent {
 

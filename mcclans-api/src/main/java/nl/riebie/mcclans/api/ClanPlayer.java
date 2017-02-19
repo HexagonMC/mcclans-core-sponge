@@ -28,6 +28,8 @@ import org.spongepowered.api.text.Text;
 import java.util.UUID;
 
 /**
+ * A player that may or may not be a member of a clan.
+ * <p>
  * Created by Kippers on 19-1-2016.
  */
 public interface ClanPlayer {

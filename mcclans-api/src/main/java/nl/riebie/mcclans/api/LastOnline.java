@@ -23,6 +23,8 @@
 package nl.riebie.mcclans.api;
 
 /**
+ * Contains information of when a player was last online.
+ * <p>
  * Created by Kippers on 19-1-2016.
  */
 public interface LastOnline {

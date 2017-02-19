@@ -35,6 +35,8 @@ import java.util.List;
 import java.util.UUID;
 
 /**
+ * A group of players.
+ * <p>
  * Created by Kippers on 19-1-2016.
  */
 public interface Clan {

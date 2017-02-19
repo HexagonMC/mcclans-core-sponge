@@ -26,12 +26,14 @@ import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.impl.AbstractEvent;
 
 /**
+ * Base event for clan events.
+ * <p>
  * Created by Kippers on 19-1-2016.
  */
 public abstract class ClanEvent extends AbstractEvent {
     private final Cause cause;
 
-    public ClanEvent(Cause cause){
+    public ClanEvent(Cause cause) {
         this.cause = cause;
     }
 

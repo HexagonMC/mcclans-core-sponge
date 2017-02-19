@@ -24,6 +24,8 @@
 package nl.riebie.mcclans.api.enums;
 
 /**
+ * Weight factor for kills and deaths.
+ * <p>
  * Created by Kippers on 19-1-2016.
  */
 public enum KillDeathFactor {

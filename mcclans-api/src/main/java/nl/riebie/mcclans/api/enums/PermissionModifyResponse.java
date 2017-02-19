@@ -23,6 +23,8 @@
 package nl.riebie.mcclans.api.enums;
 
 /**
+ * Contains the result of an attempt to modify a clan permission.
+ * <p>
  * Created by Kippers on 19-1-2016.
  */
 public enum PermissionModifyResponse {

@@ -23,6 +23,8 @@
 package nl.riebie.mcclans.api.exceptions;
 
 /**
+ * Thrown when a not default implementation is provided.
+ * <p>
  * Created by Kippers on 19-1-2016.
  */
 public class NotDefaultImplementationException extends RuntimeException {
@@ -34,7 +36,7 @@ public class NotDefaultImplementationException extends RuntimeException {
 
     public NotDefaultImplementationException(Class<?> implementation) {
         super(implementation.getName() + " is not the default implementation for " + implementation.getInterfaces()[0].getName()
-                + ", use the API to get the right implementation of this interface");
+                + ", use the API to get the MCClans implementation of this interface");
 
     }
 
