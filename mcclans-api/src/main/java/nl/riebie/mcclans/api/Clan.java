@@ -29,6 +29,7 @@ import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
+import javax.annotation.Nullable;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -87,15 +88,16 @@ public interface Clan {
     /**
      * Sets the home location of this clan
      *
-     * @param location position of the new home location
+     * @param location position of the new home location, or null
      */
-    void setHome(Location<World> location);
+    Result<Location<World>> setHome(@Nullable Location<World> location);
 
     /**
      * Get the home location of this clan
      *
-     * @return position of the home location
+     * @return position of the home location, or null
      */
+    @Nullable
     Location<World> getHome();
 
     /**
@@ -172,14 +174,6 @@ public interface Clan {
     Rank getRank(String rank);
 
     /**
-     * Rename a rank
-     *
-     * @param oldName name of the rank to be renamed
-     * @param newName new name for the rank
-     */
-    void renameRank(String oldName, String newName);
-
-    /**
      * Check if this clan contains a rank with the given name
      *
      * @param name name of the rank to be checked
@@ -191,9 +185,11 @@ public interface Clan {
      * Set the owner of this clan
      *
      * @param clanPlayer the ClanPlayer of the new owner of this clan
+     * @return Result of the action
      * @throws NotDefaultImplementationException if the given ClanPlayer is not created by MCClans
+     * @throws IllegalArgumentException          if the provided ClanPlayer is null, or is not a member of this clan
      */
-    Result<Void> setOwner(ClanPlayer clanPlayer);
+    Result<ClanPlayer> setOwner(ClanPlayer clanPlayer);
 
     /**
      * Get the owner of this clan
@@ -253,10 +249,10 @@ public interface Clan {
     void sendMessage(Text... message);
 
     /**
-     * Send a message to all the members of this clan with the given permission
+     * Send a message to all the members of this clan with the given clan permission
      *
      * @param message    the message to be sent
-     * @param permission the permission needed by the members to receive this message
+     * @param permission the clan permission needed by the members to receive this message
      */
     void sendMessage(String permission, Text... message);
 

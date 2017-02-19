@@ -79,9 +79,11 @@ public interface ClanPlayer {
      * Set the rank of the player
      *
      * @param rank the Rank object to be set
-     * @throws NotDefaultImplementationException when using a wrong implementation of Rank
+     * @throws NotDefaultImplementationException when using an implementation not from MCClans
+     * @throws IllegalArgumentException          if rank is null, or the new rank is the owner rank
+     * @throws IllegalStateException             if the clanplayer is not in a clan, or if the clanplayer has the owner rank
      */
-    void setRank(Rank rank) throws NotDefaultImplementationException;
+    void setRank(Rank rank);
 
     /**
      * Get the lastonline time of the clanplayer

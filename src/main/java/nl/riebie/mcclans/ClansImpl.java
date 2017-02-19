@@ -162,20 +162,27 @@ public class ClansImpl implements ClanService {
 
     @Override
     public Result<Clan> createClan(String tag, String name, ClanPlayer owner) {
-        if (owner instanceof ClanPlayerImpl) {
-            ClanPlayerImpl ownerImpl = (ClanPlayerImpl) owner;
-            if (tagIsFree(tag)) {
-                ClanCreateEvent.Plugin clanCreateEvent = EventDispatcher.getInstance().dispatchPluginClanCreateEvent(tag, name, owner);
-                if (clanCreateEvent.isCancelled()) {
-                    return ResultImpl.ofError(clanCreateEvent.getCancelMessage());
-                } else {
-                    Clan clan = createClanInternal(tag, name, ownerImpl);
-                    return ResultImpl.ofResult(clan);
-                }
-            }
-            return ResultImpl.ofError("Tag is already taken");
-        } else {
+        if (tag == null || name == null || owner == null) {
+            throw new IllegalArgumentException("arguments may not be null");
+        }
+        if (!(owner instanceof ClanPlayerImpl)) {
             throw new NotDefaultImplementationException(owner.getClass());
+        }
+        ClanPlayerImpl ownerImpl = (ClanPlayerImpl) owner;
+
+        if (ownerImpl.getClan() != null) {
+            throw new IllegalArgumentException("provided player may not already be in a clan");
+        }
+        if (!isTagAvailable(tag)) {
+            throw new IllegalArgumentException("provided tag already taken");
+        }
+
+        ClanCreateEvent.Plugin clanCreateEvent = EventDispatcher.getInstance().dispatchPluginClanCreateEvent(tag, name, owner);
+        if (clanCreateEvent.isCancelled()) {
+            return ResultImpl.ofError(clanCreateEvent.getCancelMessage());
+        } else {
+            Clan clan = createClanInternal(tag, name, ownerImpl);
+            return ResultImpl.ofResult(clan);
         }
     }
 
@@ -184,7 +191,7 @@ public class ClansImpl implements ClanService {
         newClan.setupDefaultRanks();
         newClan.addMember(owner);
 
-        owner.setRank(newClan.getRank(RankFactory.getOwnerIdentifier()));
+        owner.setRankInternal(newClan.getRank(RankFactory.getOwnerIdentifier()));
         owner.setClan(newClan);
         clans.put(tag.toLowerCase(), newClan);
         TaskForwarder.sendInsertClan(newClan);
@@ -194,6 +201,10 @@ public class ClansImpl implements ClanService {
 
     @Override
     public void disbandClan(Clan disbandedClan) {
+        if (disbandedClan == null) {
+            return;
+        }
+
         if (disbandedClan instanceof ClanImpl) {
             ClanDisbandEvent.Plugin event = EventDispatcher.getInstance().dispatchPluginClanDisbandEvent(disbandedClan);
             if (event.isCancelled()) {
@@ -209,7 +220,7 @@ public class ClansImpl implements ClanService {
     public void disbandClanInternal(ClanImpl clan) {
         for (ClanPlayerImpl clanPlayer : clan.getMembersImpl()) {
             clanPlayer.setClan(null);
-            clanPlayer.setRank(null);
+            clanPlayer.setRankInternal(null);
         }
         List<RankImpl> ranks = clan.getRankImpls();
         for (RankImpl rank : ranks) {
@@ -230,7 +241,6 @@ public class ClansImpl implements ClanService {
         TaskForwarder.sendDeleteClan(clan.getID());
         updateClanTagCache();
     }
-
 
 
     @Override
@@ -261,6 +271,10 @@ public class ClansImpl implements ClanService {
 
     @Override
     public void removeClanPlayer(ClanPlayer clanPlayer) {
+        if (clanPlayer == null) {
+            return;
+        }
+
         if (clanPlayer instanceof ClanPlayerImpl) {
             ClanPlayerImpl clanPlayerImpl = (ClanPlayerImpl) clanPlayer;
             String playerName = clanPlayerImpl.getName();
@@ -268,7 +282,7 @@ public class ClansImpl implements ClanService {
             ClanInvite clanInvite = clanPlayerImpl.getClanInvite();
             if (clan != null) {
                 if (clan.getOwner().equals(clanPlayerImpl)) {
-                    disbandClan(clan);
+                    disbandClanInternal(clan);
                 } else {
                     clan.removeMember(clanPlayerImpl);
                 }
@@ -315,10 +329,9 @@ public class ClansImpl implements ClanService {
     }
 
     @Override
-    public boolean tagIsFree(String tag) {
+    public boolean isTagAvailable(String tag) {
         return !clans.containsKey(tag.toLowerCase());
     }
-
 
     @Override
     public ClanPermissionManagerImpl getClanPermissionManager() {

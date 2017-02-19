@@ -122,14 +122,20 @@ public class EventDispatcher {
         dispatchEvent(new ClanPlayerKillEvent(killer, victim));
     }
 
-    public ClanSetHomeEvent.Admin dispatchClanSetHomeAdmin(Location<World> location, CommandSource commandSource) {
-        ClanSetHomeEvent.Admin event = new ClanSetHomeEvent.Admin(commandSource, location);
+    public ClanSetHomeEvent.Admin dispatchClanSetHomeAdmin(ClanImpl clan, Location<World> location, CommandSource commandSource) {
+        ClanSetHomeEvent.Admin event = new ClanSetHomeEvent.Admin(commandSource, clan, location);
         dispatchEvent(event);
         return event;
     }
 
-    public ClanSetHomeEvent.User dispatchClanSetHomeUser(ClanPlayerImpl player, Location<World> location) {
-        ClanSetHomeEvent.User event = new ClanSetHomeEvent.User(player, location);
+    public ClanSetHomeEvent.Plugin dispatchPluginSetHomeEvent(ClanImpl clan, Location<World> location) {
+        ClanSetHomeEvent.Plugin event = new ClanSetHomeEvent.Plugin(clan, location);
+        dispatchEvent(event);
+        return event;
+    }
+
+    public ClanSetHomeEvent.User dispatchClanSetHomeUser(ClanPlayerImpl player, ClanImpl clan, Location<World> location) {
+        ClanSetHomeEvent.User event = new ClanSetHomeEvent.User(player, clan, location);
         dispatchEvent(event);
         return event;
     }
@@ -149,4 +155,6 @@ public class EventDispatcher {
     private void dispatchEvent(Event event) {
         Sponge.getEventManager().post(event);
     }
+
+
 }

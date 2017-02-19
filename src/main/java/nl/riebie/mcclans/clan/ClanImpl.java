@@ -29,6 +29,7 @@ import nl.riebie.mcclans.api.Rank;
 import nl.riebie.mcclans.api.Result;
 import nl.riebie.mcclans.api.enums.KillDeathFactor;
 import nl.riebie.mcclans.api.events.ClanOwnerChangeEvent;
+import nl.riebie.mcclans.api.events.ClanSetHomeEvent;
 import nl.riebie.mcclans.api.exceptions.NotDefaultImplementationException;
 import nl.riebie.mcclans.config.Config;
 import nl.riebie.mcclans.events.EventDispatcher;
@@ -41,6 +42,7 @@ import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
+import javax.annotation.Nullable;
 import java.text.DateFormat;
 import java.util.*;
 
@@ -160,6 +162,10 @@ public class ClanImpl implements Clan, Cloneable {
 
     @Override
     public boolean isPlayerFriendlyToThisClan(ClanPlayer clanPlayer) {
+        if (clanPlayer == null) {
+            return false;
+        }
+
         if (clanPlayer instanceof ClanPlayerImpl) {
             ClanPlayerImpl clanPlayerImpl = (ClanPlayerImpl) clanPlayer;
             ClanImpl clan = clanPlayerImpl.getClan();
@@ -189,18 +195,24 @@ public class ClanImpl implements Clan, Cloneable {
     }
 
     @Override
-    public void setHome(Location<World> location) {
-        home = new Location<>(location.getExtent(), location.getPosition());
+    public Result<Location<World>> setHome(@Nullable Location<World> location) {
+        ClanSetHomeEvent.Plugin event = EventDispatcher.getInstance().dispatchPluginSetHomeEvent(this, location);
+        if (event.isCancelled()) {
+            return ResultImpl.ofError(event.getCancelMessage());
+        } else {
+            setHomeInternal(location);
+            return ResultImpl.ofResult(location);
+        }
+    }
+
+    public void setHomeInternal(@Nullable Location<World> location) {
+        home = location == null ? null : new Location<>(location.getExtent(), location.getPosition());
         TaskForwarder.sendUpdateClan(this);
     }
 
     @Override
     public Location<World> getHome() {
-        if (home != null) {
-            return home;
-        } else {
-            return null;
-        }
+        return home;
     }
 
     public int getHomeSetTimes() {
@@ -286,23 +298,36 @@ public class ClanImpl implements Clan, Cloneable {
     }
 
     @Override
-    public Result<Void> setOwner(ClanPlayer clanPlayer) {
-        if (clanPlayer instanceof ClanPlayerImpl) {
-            ClanOwnerChangeEvent event = EventDispatcher.getInstance().dispatchPluginClanOwnerChangeEvent(this, owner, clanPlayer);
-            if (event.isCancelled()) {
-                return ResultImpl.ofError(event.getCancelMessage());
-            } else {
-                setOwnerInternal((ClanPlayerImpl) clanPlayer);
-                return ResultImpl.ofResult(null);
-            }
-        } else {
+    public Result<ClanPlayer> setOwner(ClanPlayer clanPlayer) {
+        if (clanPlayer == null) {
+            throw new IllegalArgumentException("clan player may not be null");
+        }
+        if (!(clanPlayer instanceof ClanPlayerImpl)) {
             throw new NotDefaultImplementationException(clanPlayer.getClass());
         }
+        ClanPlayerImpl clanPlayerImpl = (ClanPlayerImpl) clanPlayer;
+
+        if (clanPlayer.getClan() == null || !this.equals(clanPlayer.getClan())) {
+            throw new IllegalArgumentException("player not a member of this clan");
+        }
+        if (owner.equals(clanPlayer)) {
+            // Already the owner, yay! Do nothing.
+            return ResultImpl.ofResult(clanPlayerImpl);
+        }
+
+        ClanOwnerChangeEvent event = EventDispatcher.getInstance().dispatchPluginClanOwnerChangeEvent(this, owner, clanPlayerImpl);
+        if (event.isCancelled()) {
+            return ResultImpl.ofError(event.getCancelMessage());
+        } else {
+            setOwnerInternal(clanPlayerImpl);
+            return ResultImpl.ofResult(clanPlayerImpl);
+        }
+
     }
 
     public void setOwnerInternal(ClanPlayerImpl clanPlayer) {
-        this.owner.setRank(getRank(RankFactory.getRecruitIdentifier()));
-        clanPlayer.setRank(getRank(RankFactory.getOwnerIdentifier()));
+        this.owner.setRankInternal(getRank(RankFactory.getRecruitIdentifier()));
+        clanPlayer.setRankInternal(getRank(RankFactory.getOwnerIdentifier()));
         this.owner = clanPlayer;
         TaskForwarder.sendUpdateClan(this);
     }
@@ -365,6 +390,10 @@ public class ClanImpl implements Clan, Cloneable {
     }
 
     public void addRank(Rank rank) {
+        if (rank == null) {
+            return;
+        }
+
         if (rank instanceof RankImpl) {
             RankImpl rankImpl = (RankImpl) rank;
             ranks.put(rank.getName().toLowerCase(), rankImpl);
@@ -383,7 +412,6 @@ public class ClanImpl implements Clan, Cloneable {
         }
     }
 
-    @Override
     public void renameRank(String oldName, String newName) {
         RankImpl rank = getRank(oldName);
         ranks.remove(oldName.toLowerCase());
@@ -397,7 +425,15 @@ public class ClanImpl implements Clan, Cloneable {
         return this.ranks.containsKey(rankName.toLowerCase());
     }
 
+    public boolean containsRank(RankImpl rank) {
+        return ranks.containsValue(rank);
+    }
+
     public void addMember(ClanPlayer player) {
+        if (player == null) {
+            return;
+        }
+
         if (player instanceof ClanPlayerImpl) {
             ClanPlayerImpl clanPlayerImpl = (ClanPlayerImpl) player;
             members.add(clanPlayerImpl);
@@ -412,7 +448,7 @@ public class ClanImpl implements Clan, Cloneable {
         if (member != null) {
             member.setClan(null);
 
-            member.setRank(null);
+            member.setRankInternal(null);
 
             members.remove(member);
             TaskForwarder.sendUpdateClanPlayer(member);
@@ -420,6 +456,10 @@ public class ClanImpl implements Clan, Cloneable {
     }
 
     public void addInvitedPlayer(ClanPlayer player) {
+        if (player == null) {
+            return;
+        }
+
         if (player instanceof ClanPlayerImpl) {
             invitedMembers.add((ClanPlayerImpl) player);
         } else {
@@ -512,6 +552,10 @@ public class ClanImpl implements Clan, Cloneable {
     }
 
     public void addAlly(Clan clan) {
+        if (clan == null) {
+            return;
+        }
+
         if (clan instanceof ClanImpl) {
             ClanImpl clanImpl = (ClanImpl) clan;
             if (!allies.contains(clanImpl)) {
@@ -525,12 +569,14 @@ public class ClanImpl implements Clan, Cloneable {
 
     @Override
     public void removeAlly(Clan ally) {
+        if (ally == null) {
+            return;
+        }
+
         if (ally instanceof ClanImpl) {
             ClanImpl clanImpl = (ClanImpl) ally;
-            if (ally != null) {
-                allies.remove(clanImpl);
-                TaskForwarder.sendDeleteClanAlly(getID(), clanImpl.getID());
-            }
+            allies.remove(clanImpl);
+            TaskForwarder.sendDeleteClanAlly(getID(), clanImpl.getID());
         } else {
             throw new NotDefaultImplementationException(ally.getClass());
         }

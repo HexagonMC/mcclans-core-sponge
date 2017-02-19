@@ -111,11 +111,6 @@ public class ClanAdminCommands {
         ClansImpl clansImpl = ClansImpl.getInstance();
         ClanPlayerImpl targetClanPlayer = clansImpl.getClanPlayer(owner);
 
-        ClanCreateEvent.Admin clanCreateEvent = EventDispatcher.getInstance().dispatchAdminClanCreateEvent(clanTag, clanName, targetClanPlayer);
-        if (clanCreateEvent.isCancelled()) {
-            Messages.sendWarningMessage(commandSource, clanCreateEvent.getCancelMessage());
-            return;
-        }
         if (targetClanPlayer == null) {
             UUID uuid = UUIDUtils.getUUID(owner);
             Optional<Player> playerOpt;
@@ -133,7 +128,12 @@ public class ClanAdminCommands {
             Messages.sendPlayerNotOnline(commandSource, owner);
         } else {
             if (targetClanPlayer.getClan() == null) {
-                if (clansImpl.tagIsFree(clanTag)) {
+                if (clansImpl.isTagAvailable(clanTag)) {
+                    ClanCreateEvent.Admin clanCreateEvent = EventDispatcher.getInstance().dispatchAdminClanCreateEvent(clanTag, clanName, targetClanPlayer);
+                    if (clanCreateEvent.isCancelled()) {
+                        Messages.sendWarningMessage(commandSource, clanCreateEvent.getCancelMessage());
+                        return;
+                    }
                     ClanImpl clanImpl = clansImpl.createClanInternal(clanTag, clanName, targetClanPlayer);
                     Messages.sendBroadcastMessageClanCreatedBy(clanImpl.getName(), clanImpl.getTagColored(), commandSource.getName());
                 } else {
@@ -225,11 +225,11 @@ public class ClanAdminCommands {
     public void adminSetHomeCommand(CommandSource commandSource, @Parameter(name = "clanTag") ClanImpl clan) {
         Player player = (Player) commandSource;
         Location<World> location = player.getLocation();
-        ClanSetHomeEvent.Admin clanSetHomeEvent = EventDispatcher.getInstance().dispatchClanSetHomeAdmin(location, commandSource);
+        ClanSetHomeEvent.Admin clanSetHomeEvent = EventDispatcher.getInstance().dispatchClanSetHomeAdmin(clan, location, commandSource);
         if (clanSetHomeEvent.isCancelled()) {
             Messages.sendWarningMessage(commandSource, clanSetHomeEvent.getCancelMessage());
         } else {
-            clan.setHome(location);
+            clan.setHomeInternal(location);
             Messages.sendBasicMessage(commandSource, Messages.CLAN_HOME_LOCATION_SET);
         }
     }

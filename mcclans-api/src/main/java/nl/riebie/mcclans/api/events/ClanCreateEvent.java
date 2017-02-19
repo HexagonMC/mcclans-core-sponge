@@ -29,7 +29,7 @@ import org.spongepowered.api.event.cause.NamedCause;
 /**
  * Created by Kippers on 19-1-2016.
  * <p>
- * A clan event which is fired when a clan is created
+ * A clan event which is fired when a clan is created.
  */
 public class ClanCreateEvent extends CancellableClanEvent {
 
@@ -45,18 +45,30 @@ public class ClanCreateEvent extends CancellableClanEvent {
         this.owner = owner;
     }
 
+    /**
+     * Get the clan tag.
+     */
     public String getClanTag() {
         return clanTag;
     }
 
+    /**
+     * Get the clan name.
+     */
     public String getClanName() {
         return clanName;
     }
 
+    /**
+     * Get the owner of the clan.
+     */
     public ClanPlayer getOwner() {
         return owner;
     }
 
+    /**
+     * A user command was used to create then clan.
+     */
     public static class User extends ClanCreateEvent {
 
         public User(String clanTag, String clanName, ClanPlayer owner) {
@@ -64,6 +76,9 @@ public class ClanCreateEvent extends CancellableClanEvent {
         }
     }
 
+    /**
+     * An admin commmand was used to create the clan.
+     */
     public static class Admin extends ClanCreateEvent {
 
         public Admin(String clanTag, String clanName, ClanPlayer owner) {
@@ -71,6 +86,9 @@ public class ClanCreateEvent extends CancellableClanEvent {
         }
     }
 
+    /**
+     * An external plugin created the clan.
+     */
     public static class Plugin extends ClanCreateEvent {
 
         public Plugin(String clanTag, String clanName, ClanPlayer owner) {

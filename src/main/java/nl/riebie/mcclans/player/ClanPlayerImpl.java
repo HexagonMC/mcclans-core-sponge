@@ -22,14 +22,18 @@
 
 package nl.riebie.mcclans.player;
 
-import nl.riebie.mcclans.api.*;
+import nl.riebie.mcclans.api.Clan;
+import nl.riebie.mcclans.api.ClanPlayer;
+import nl.riebie.mcclans.api.KillDeath;
+import nl.riebie.mcclans.api.Rank;
+import nl.riebie.mcclans.api.enums.KillDeathFactor;
 import nl.riebie.mcclans.api.exceptions.NotDefaultImplementationException;
 import nl.riebie.mcclans.clan.ClanImpl;
+import nl.riebie.mcclans.clan.RankFactory;
 import nl.riebie.mcclans.clan.RankImpl;
 import nl.riebie.mcclans.config.Config;
-import nl.riebie.mcclans.persistence.TaskForwarder;
-import nl.riebie.mcclans.api.enums.KillDeathFactor;
 import nl.riebie.mcclans.enums.PlayerChatState;
+import nl.riebie.mcclans.persistence.TaskForwarder;
 import nl.riebie.mcclans.utils.UUIDUtils;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
@@ -138,15 +142,32 @@ public class ClanPlayerImpl implements ClanPlayer, Cloneable, CommandSender {
 
     @Override
     public void setRank(Rank rank) {
-        if (rank instanceof RankImpl) {
-            this.rank = (RankImpl) rank;
-            TaskForwarder.sendUpdateClanPlayer(this);
-        } else if (rank == null) {
-            this.rank = null;
-            TaskForwarder.sendUpdateClanPlayer(this);
-        } else {
+        if (rank == null) {
+            throw new IllegalArgumentException("rank may not be null");
+        } else if (!(rank instanceof RankImpl)) {
             throw new NotDefaultImplementationException(rank.getClass());
         }
+        RankImpl newRank = (RankImpl) rank;
+
+        if (clan == null) {
+            throw new IllegalStateException("player not part of a clan");
+        }
+        if (!clan.containsRank(newRank)) {
+            throw new IllegalArgumentException("rank not part of player's clan");
+        }
+        if (this.rank != null && this.rank.getName().equalsIgnoreCase(RankFactory.getOwnerIdentifier())) {
+            throw new IllegalStateException("cannot overwrite owner's rank");
+        }
+        if (newRank.getName().equalsIgnoreCase(RankFactory.getOwnerIdentifier())) {
+            throw new IllegalArgumentException("cannot set owner rank, use setowner");
+        }
+
+        setRankInternal(newRank);
+    }
+
+    public void setRankInternal(RankImpl rank) {
+        this.rank = rank;
+        TaskForwarder.sendUpdateClanPlayer(this);
     }
 
     public void setClan(Clan clan) {
