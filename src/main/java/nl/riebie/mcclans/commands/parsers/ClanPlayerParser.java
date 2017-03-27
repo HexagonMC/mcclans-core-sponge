@@ -63,9 +63,9 @@ public class ClanPlayerParser implements ParameterParser<ClanPlayer> {
             return ParseResult.newSuccessResult((ClanPlayer) clanPlayer);
         } else {
             UUID playerUUID = UUIDUtils.getUUID(value);
-            Optional<Player> playerOp = playerUUID == null ? Optional.empty() : Sponge.getServer().getPlayer(playerUUID);
-            if (playerOp.isPresent()) {
-                return ParseResult.newSuccessResult(ClansImpl.getInstance().createClanPlayer(playerUUID, value));
+            Optional<Player> playerOpt = playerUUID == null ? Optional.empty() : Sponge.getServer().getPlayer(playerUUID);
+            if (playerOpt.isPresent()) {
+                return ParseResult.newSuccessResult(ClansImpl.getInstance().createClanPlayer(playerUUID, playerOpt.get().getName()));
             } else {
                 return ParseResult.newErrorResult(Messages.PLAYER_DOES_NOT_EXIST);
             }
