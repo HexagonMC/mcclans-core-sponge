@@ -22,78 +22,78 @@
 
 package nl.riebie.mcclans.persistence;
 
-import java.sql.PreparedStatement;
-
 import nl.riebie.mcclans.clan.ClanImpl;
 import nl.riebie.mcclans.clan.RankImpl;
 import nl.riebie.mcclans.config.Config;
 import nl.riebie.mcclans.persistence.implementations.DatabaseSaver;
 import nl.riebie.mcclans.player.ClanPlayerImpl;
 
+import java.sql.PreparedStatement;
+
 public class TaskForwarder {
 
     public static void sendInsertClanPlayer(ClanPlayerImpl clanPlayer) {
-        if (TaskExecutor.getInstance().isRunning()) {
+        if (TaskExecutor.getInstance().isEnabled()) {
             queueTask(DatabaseSaver.getInsertClanPlayerQuery(clanPlayer));
         }
     }
 
     public static void sendUpdateClanPlayer(ClanPlayerImpl clanPlayer) {
-        if (TaskExecutor.getInstance().isRunning()) {
+        if (TaskExecutor.getInstance().isEnabled()) {
             queueTask(DatabaseSaver.getUpdateClanPlayerQuery(clanPlayer));
         }
     }
 
     public static void sendDeleteClanPlayer(int clanPlayerID) {
-        if (TaskExecutor.getInstance().isRunning()) {
+        if (TaskExecutor.getInstance().isEnabled()) {
             queueTask(DatabaseSaver.getDeleteClanPlayerQuery(clanPlayerID));
         }
     }
 
     public static void sendInsertClan(ClanImpl clan) {
-        if (TaskExecutor.getInstance().isRunning()) {
+        if (TaskExecutor.getInstance().isEnabled()) {
             queueTask(DatabaseSaver.getInsertClanQuery(clan));
         }
     }
 
     public static void sendUpdateClan(ClanImpl clan) {
-        if (TaskExecutor.getInstance().isRunning()) {
+        if (TaskExecutor.getInstance().isEnabled()) {
             queueTask(DatabaseSaver.getUpdateClanQuery(clan));
         }
     }
 
     public static void sendDeleteClan(int clanID) {
-        if (TaskExecutor.getInstance().isRunning()) {
+        if (TaskExecutor.getInstance().isEnabled()) {
             queueTask(DatabaseSaver.getDeleteClanQuery(clanID));
         }
     }
 
     public static void sendInsertRank(int clanID, RankImpl rank) {
-        if (TaskExecutor.getInstance().isRunning()) {
+        if (TaskExecutor.getInstance().isEnabled()) {
             queueTask(DatabaseSaver.getInsertRankQuery(clanID, rank));
         }
     }
 
     public static void sendUpdateRank(RankImpl rank) {
-        if (TaskExecutor.getInstance().isRunning()) {
+        if (TaskExecutor.getInstance().isEnabled()) {
             queueTask(DatabaseSaver.getUpdateRankQuery(rank));
         }
     }
 
     public static void sendDeleteRank(int rankID) {
-        if (TaskExecutor.getInstance().isRunning()) {
+        if (TaskExecutor.getInstance().isEnabled()) {
             queueTask(DatabaseSaver.getDeleteRankQuery(rankID));
         }
     }
 
     public static void sendInsertClanAlly(int clanID, int clanID_ally) {
-        if (TaskExecutor.getInstance().isRunning()) {
+        if (TaskExecutor.getInstance().isEnabled()) {
             queueTask(DatabaseSaver.getInsertClanAllyQuery(clanID, clanID_ally));
         }
     }
 
     public static void sendDeleteClanAlly(int clanID, int clanID_ally) {
-        if (TaskExecutor.getInstance().isRunning()) {
+        if (TaskExecutor.getInstance().isEnabled()) {
             queueTask(DatabaseSaver.getDeleteClanAllyQuery(clanID, clanID_ally));
         }
     }

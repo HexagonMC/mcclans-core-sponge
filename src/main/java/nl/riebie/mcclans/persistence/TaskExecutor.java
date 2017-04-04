@@ -22,22 +22,21 @@
 
 package nl.riebie.mcclans.persistence;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.util.concurrent.ConcurrentLinkedQueue;
-
 import nl.riebie.mcclans.MCClans;
-import nl.riebie.mcclans.config.Config;
 
-public class TaskExecutor extends Thread {
+import java.sql.SQLException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
+public class TaskExecutor {
 
     private static TaskExecutor instance;
 
-    private boolean running = false;
-    private boolean finished = true;
-    private ConcurrentLinkedQueue<MCClansDatabaseTask> queue = new ConcurrentLinkedQueue<MCClansDatabaseTask>();
+    public final ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
+    private boolean enabled;
 
-    protected TaskExecutor() {
+    private TaskExecutor() {
     }
 
     public static TaskExecutor getInstance() {
@@ -48,65 +47,54 @@ public class TaskExecutor extends Thread {
     }
 
     public boolean initialize() {
-        if (!running && finished) {
-            running = true;
-            finished = false;
-            super.start();
-            return true;
-        } else {
-            MCClans.getPlugin().getLogger().warn("Could not initialize TaskExecutor! Running: " + running + ", finished: " + finished, true);
+        if (enabled || service.isShutdown() || service.isTerminated()) {
+            MCClans.getPlugin().getLogger().warn(
+                    "Could not initialize TaskExecutor! Enabled: " + enabled
+                            + ", isShutdown: " + service.isShutdown()
+                            + ", isTerminated: " + service.isTerminated()
+                    , true);
             return false;
         }
-    }
 
-    public boolean enqueue(MCClansDatabaseTask task) {
-        return running && queue.add(task);
-    }
-
-    public boolean isQueueEmpty() {
-        return queue.isEmpty();
+        enabled = true;
+        return true;
     }
 
     public void terminate() {
-        if (!finished) {
-            synchronized (this) {
-                running = false;
-                while (!finished) {
-                    try {
-                        this.wait();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
+        if (!enabled) {
+            return;
+        }
+
+        enabled = false;
+        service.shutdown();
+
+        try {
+            service.awaitTermination(15, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            MCClans.getPlugin().getLogger().error("Service shutdown interrupted", e, true);
         }
     }
 
-    @Override
-    public void run() {
-        while (!finished) {
-            MCClansDatabaseTask task = queue.poll();
-            if (task == null) {
-                if (!running) {
-                    synchronized (this) {
-                        this.notifyAll();
-                        finished = true;
-                    }
-                }
-            } else {
-                PreparedStatement query = task.getQuery();
+    public boolean enqueue(final MCClansDatabaseTask task) {
+        if (!enabled) {
+            return false;
+        }
+
+        service.execute(new Runnable() {
+            @Override
+            public void run() {
                 try {
-                    query.execute();
+                    task.getQuery().execute();
                 } catch (SQLException e) {
-                    if (Config.getBoolean(Config.DEBUGGING)) {
-                        e.printStackTrace();
-                    }
+                    MCClans.getPlugin().getLogger().error("Failed to execute database task", e, true);
                 }
             }
-        }
+        });
+
+        return true;
     }
 
-    public boolean isRunning() {
-        return running;
+    public boolean isEnabled() {
+        return enabled;
     }
 }
