@@ -23,10 +23,7 @@
 package nl.riebie.mcclans.clan;
 
 import nl.riebie.mcclans.ClansImpl;
-import nl.riebie.mcclans.api.Clan;
-import nl.riebie.mcclans.api.ClanPlayer;
-import nl.riebie.mcclans.api.Rank;
-import nl.riebie.mcclans.api.Result;
+import nl.riebie.mcclans.api.*;
 import nl.riebie.mcclans.api.enums.KillDeathFactor;
 import nl.riebie.mcclans.api.events.ClanOwnerChangeEvent;
 import nl.riebie.mcclans.api.events.ClanSetHomeEvent;
@@ -68,7 +65,7 @@ public class ClanImpl implements Clan, Cloneable {
     private boolean allowAllyInvites = true;
     private Date creationDate;
     private boolean ffProtection;
-    private String bankId;
+    private ClanBank clanBank;
 
     private ClanImpl(Builder builder) {
         this.clanID = builder.clanID;
@@ -84,7 +81,7 @@ public class ClanImpl implements Clan, Cloneable {
         this.creationDate = builder.creationDate;
         this.ffProtection = builder.ffProtection;
 
-        this.bankId = builder.bankId;
+        this.clanBank = new ClanBankImpl(builder.bankId);
     }
 
     public int getID() {
@@ -643,7 +640,12 @@ public class ClanImpl implements Clan, Cloneable {
 
     @Override
     public String getBankId() {
-        return bankId;
+        return this.clanBank.getId();
+    }
+
+    @Override
+    public ClanBank getBank() {
+        return this.clanBank;
     }
 
     public void setupDefaultRanks() {

@@ -7,7 +7,7 @@ apply plugin: 'java'
 sourceCompatibility = 1.8
 
 group = 'nl.riebie'
-version = '1.5.1'
+version = '1.6'
 description = 'MCClans allows players to group together by forming clans'
 
 jar.enabled = false
@@ -41,7 +41,7 @@ dependencies {
     compile 'org.spongepowered:spongeapi:5.0.0'
     compile 'net.minecrell.mcstats:statslite-sponge:0.2.2'
     compile 'io.github.nucleuspowered:nucleus-api:0.22.0-S5.1'
-    compile(group: 'nl.riebie', name: 'mcclans-api', version: '1.3.1-SNAPSHOT')
+    compile(group: 'nl.riebie', name: 'mcclans-api', version: '1.4-SNAPSHOT')
 }
 
 shadowJar {

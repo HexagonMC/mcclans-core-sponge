@@ -41,11 +41,18 @@ import java.util.UUID;
  */
 public class EconomyUtils {
 
-    public static boolean withdraw(UUID uuid, double charge) {
-        if (charge == 0) {
-            return true;
+    public static double getBalance(String clanBankIdentifier) {
+        EconomyService economyService = MCClans.getPlugin().getServiceHelper().economyService;
+        Currency currency = MCClans.getPlugin().getServiceHelper().currency;
+        Optional<Account> clanAccountOpt = economyService.getOrCreateAccount(clanBankIdentifier);
+        if (!clanAccountOpt.isPresent()) {
+            return 0;
         }
 
+        return clanAccountOpt.get().getBalance(currency).doubleValue();
+    }
+
+    public static boolean withdraw(UUID uuid, double charge) {
         EconomyService economyService = MCClans.getPlugin().getServiceHelper().economyService;
         Currency currency = MCClans.getPlugin().getServiceHelper().currency;
         Optional<UniqueAccount> accountOpt = economyService.getOrCreateAccount(uuid);
@@ -53,8 +60,59 @@ public class EconomyUtils {
             return false;
         }
 
-        UniqueAccount account = accountOpt.get();
+        return withdraw(accountOpt.get(), currency, charge);
+    }
+
+    public static boolean withdraw(String clanBankIdentifier, Currency currency, double charge) {
+        EconomyService economyService = MCClans.getPlugin().getServiceHelper().economyService;
+        Optional<Account> clanAccountOpt = economyService.getOrCreateAccount(clanBankIdentifier);
+        if (!clanAccountOpt.isPresent()) {
+            return false;
+        }
+
+        return withdraw(clanAccountOpt.get(), currency, charge);
+    }
+
+    public static boolean withdraw(Account account, Currency currency, double charge) {
+        if (charge == 0) {
+            return true;
+        }
+
         TransactionResult result = account.withdraw(
+                currency,
+                BigDecimal.valueOf(charge),
+                Cause.of(NamedCause.of("MCClans", MCClans.getPlugin()))
+        );
+        return (result.getResult().equals(ResultType.SUCCESS));
+    }
+
+    public static boolean deposit(UUID uuid, double charge) {
+        EconomyService economyService = MCClans.getPlugin().getServiceHelper().economyService;
+        Currency currency = MCClans.getPlugin().getServiceHelper().currency;
+        Optional<UniqueAccount> accountOpt = economyService.getOrCreateAccount(uuid);
+        if (!accountOpt.isPresent()) {
+            return false;
+        }
+
+        return deposit(accountOpt.get(), currency, charge);
+    }
+
+    public static boolean deposit(String clanBankIdentifier, Currency currency, double charge) {
+        EconomyService economyService = MCClans.getPlugin().getServiceHelper().economyService;
+        Optional<Account> clanAccountOpt = economyService.getOrCreateAccount(clanBankIdentifier);
+        if (!clanAccountOpt.isPresent()) {
+            return false;
+        }
+
+        return deposit(clanAccountOpt.get(), currency, charge);
+    }
+
+    public static boolean deposit(Account account, Currency currency, double charge) {
+        if (charge == 0) {
+            return true;
+        }
+
+        TransactionResult result = account.deposit(
                 currency,
                 BigDecimal.valueOf(charge),
                 Cause.of(NamedCause.of("MCClans", MCClans.getPlugin()))
@@ -65,31 +123,43 @@ public class EconomyUtils {
     public static boolean transferToBank(String clanBankIdentifier, UUID clanMember, double charge) {
         EconomyService economyService = MCClans.getPlugin().getServiceHelper().economyService;
         Currency currency = MCClans.getPlugin().getServiceHelper().currency;
-        Optional<Account> clanAccountOpt = economyService.getOrCreateAccount(clanBankIdentifier);
-        if (!clanAccountOpt.isPresent()) {
-            return false;
-        }
         Optional<UniqueAccount> memberAccountOpt = economyService.getOrCreateAccount(clanMember);
         if (!memberAccountOpt.isPresent()) {
             return false;
         }
 
-        return transfer(memberAccountOpt.get(), clanAccountOpt.get(), currency, charge);
+        return transferToBank(clanBankIdentifier, currency, memberAccountOpt.get(), charge);
+    }
+
+    public static boolean transferToBank(String clanBankIdentifier, Currency currency, Account account, double charge) {
+        EconomyService economyService = MCClans.getPlugin().getServiceHelper().economyService;
+        Optional<Account> clanAccountOpt = economyService.getOrCreateAccount(clanBankIdentifier);
+        if (!clanAccountOpt.isPresent()) {
+            return false;
+        }
+
+        return transfer(account, clanAccountOpt.get(), currency, charge);
     }
 
     public static boolean transferFromBank(String clanBankIdentifier, UUID clanMember, double charge) {
         EconomyService economyService = MCClans.getPlugin().getServiceHelper().economyService;
         Currency currency = MCClans.getPlugin().getServiceHelper().currency;
-        Optional<Account> clanAccountOpt = economyService.getOrCreateAccount(clanBankIdentifier);
-        if (!clanAccountOpt.isPresent()) {
-            return false;
-        }
         Optional<UniqueAccount> memberAccountOpt = economyService.getOrCreateAccount(clanMember);
         if (!memberAccountOpt.isPresent()) {
             return false;
         }
 
-        return transfer(clanAccountOpt.get(), memberAccountOpt.get(), currency, charge);
+        return transferFromBank(clanBankIdentifier, currency, memberAccountOpt.get(), charge);
+    }
+
+    public static boolean transferFromBank(String clanBankIdentifier, Currency currency, Account account, double charge) {
+        EconomyService economyService = MCClans.getPlugin().getServiceHelper().economyService;
+        Optional<Account> clanAccountOpt = economyService.getOrCreateAccount(clanBankIdentifier);
+        if (!clanAccountOpt.isPresent()) {
+            return false;
+        }
+
+        return transfer(clanAccountOpt.get(), account, currency, charge);
     }
 
     private static boolean transfer(Account fromAccount, Account toAccount, Currency currency, double charge) {
