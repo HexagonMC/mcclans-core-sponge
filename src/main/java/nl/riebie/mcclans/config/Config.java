@@ -93,6 +93,9 @@ public class Config {
     public static final String SET_CLANHOME_COST = "set-clanhome-cost";
     public static final String RE_SET_CLANHOME_COST_INCREASE = "re-set-clanhome-cost-increase";
     public static final String TELEPORT_COST = "teleport-cost";
+    public static final String USE_CLAN_TAX = "use-clan-tax";
+    public static final String CLAN_TAX_COST = "clan-tax-cost";
+    public static final String CLAN_TAX_INTERVAL_SECONDS = "clan-tax-interval-seconds";
 
     // ======================================== SECTION COMMAND ALIASES ======================================== //
     private static final String SECTION_COMMAND_ALIASES = "command-aliases";
@@ -155,7 +158,10 @@ public class Config {
                 ConfigOption.builder(CLAN_CREATION_COST, 50).addMinimumNumberConstraint(0).build(),
                 ConfigOption.builder(SET_CLANHOME_COST, 10).addMinimumNumberConstraint(0).build(),
                 ConfigOption.builder(RE_SET_CLANHOME_COST_INCREASE, 0).addMinimumNumberConstraint(0).build(),
-                ConfigOption.builder(TELEPORT_COST, 0).addMinimumNumberConstraint(0).build()
+                ConfigOption.builder(TELEPORT_COST, 0).addMinimumNumberConstraint(0).build(),
+                ConfigOption.builder(USE_CLAN_TAX, false).build(),
+                ConfigOption.builder(CLAN_TAX_COST, 5).addMinimumNumberConstraint(0).build(),
+                ConfigOption.builder(CLAN_TAX_INTERVAL_SECONDS, 86400).addMinimumNumberConstraint(60).build()
         ).build();
 
         Map<String, String> commandAliases = new HashMap<>();
