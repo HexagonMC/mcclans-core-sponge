@@ -95,6 +95,7 @@ public class Config {
     public static final String TELEPORT_COST = "teleport-cost";
     public static final String USE_CLAN_TAX = "use-clan-tax";
     public static final String CLAN_TAX_COST = "clan-tax-cost";
+    public static final String CLAN_TAX_PER_MEMBER = "clan-tax-per-member";
     public static final String CLAN_TAX_INTERVAL_SECONDS = "clan-tax-interval-seconds";
 
     // ======================================== SECTION COMMAND ALIASES ======================================== //
@@ -161,6 +162,7 @@ public class Config {
                 ConfigOption.builder(TELEPORT_COST, 0).addMinimumNumberConstraint(0).build(),
                 ConfigOption.builder(USE_CLAN_TAX, false).build(),
                 ConfigOption.builder(CLAN_TAX_COST, 5).addMinimumNumberConstraint(0).build(),
+                ConfigOption.builder(CLAN_TAX_PER_MEMBER, false).build(),
                 ConfigOption.builder(CLAN_TAX_INTERVAL_SECONDS, 86400).addMinimumNumberConstraint(60).build()
         ).build();
 

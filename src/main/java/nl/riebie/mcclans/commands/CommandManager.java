@@ -80,6 +80,7 @@ public class CommandManager {
         registerParameterValidator(new FloatParser(), float.class, Float.class);
         registerParameterValidator(new BooleanParser(), boolean.class, Boolean.class);
 
+        registerParameterValidator(new FeeParser(), Fee.class);
         registerParameterValidator(new PermissionParser(), ClanPermission.class);
         registerParameterValidator(new ToggleParser(), Toggle.class);
         registerParameterValidator(new ClanParser(), Clan.class, ClanImpl.class);

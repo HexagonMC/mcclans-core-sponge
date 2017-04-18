@@ -27,6 +27,7 @@ import nl.riebie.mcclans.api.enums.KillDeathFactor;
 import nl.riebie.mcclans.commands.annotations.Command;
 import nl.riebie.mcclans.commands.annotations.Parameter;
 import nl.riebie.mcclans.messages.Messages;
+import nl.riebie.mcclans.persistence.TaskForwarder;
 import nl.riebie.mcclans.player.ClanPlayerImpl;
 import nl.riebie.mcclans.utils.UUIDUtils;
 import org.spongepowered.api.Sponge;
@@ -54,6 +55,7 @@ public class ClanAdminClanPlayerCommands {
         targetClanPlayer.getKillDeath().setDeaths(KillDeathFactor.HIGH, high);
         targetClanPlayer.getKillDeath().setDeaths(KillDeathFactor.MEDIUM, medium);
         targetClanPlayer.getKillDeath().setDeaths(KillDeathFactor.LOW, low);
+        TaskForwarder.sendUpdateClanPlayer(targetClanPlayer);
         Messages.sendBasicMessage(commandSource, Messages.PLAYER_STATISTICS_SUCCESSFULLY_MODIFIED);
     }
 
@@ -63,6 +65,7 @@ public class ClanAdminClanPlayerCommands {
         targetClanPlayer.getKillDeath().setKills(KillDeathFactor.HIGH, high);
         targetClanPlayer.getKillDeath().setKills(KillDeathFactor.MEDIUM, medium);
         targetClanPlayer.getKillDeath().setKills(KillDeathFactor.LOW, low);
+        TaskForwarder.sendUpdateClanPlayer(targetClanPlayer);
         Messages.sendBasicMessage(commandSource, Messages.PLAYER_STATISTICS_SUCCESSFULLY_MODIFIED);
     }
 

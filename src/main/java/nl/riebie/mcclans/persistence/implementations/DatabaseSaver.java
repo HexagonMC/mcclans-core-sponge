@@ -110,12 +110,18 @@ public class DatabaseSaver extends DataSaver {
         boolean ffProtection = clanPlayer.isFfProtected();
         long lastOnlineTime = clanPlayer.getLastOnline().getTime();
 
+        double deposit = clanPlayer.getEconomyStats().getDeposit();
+        double withdraw = clanPlayer.getEconomyStats().getWithdraw();
+        double tax = clanPlayer.getEconomyStats().getTax();
+        double debt = clanPlayer.getEconomyStats().getDebt();
+
         return QueryGenerator.createInsertQuery("mcc_clanplayers", databaseConnectionOwner.getConnection()).value("clanplayer_id", clanPlayerID)
                 .value("uuid_most_sig_bits", uuid.getMostSignificantBits()).value("uuid_least_sig_bits", uuid.getLeastSignificantBits())
                 .value("playername", name).value("clan_id", clanID).value("rank_id", rankID).value("kills_high", killsHigh)
                 .value("kills_medium", killsMedium).value("kills_low", killsLow).value("deaths_high", deathsHigh)
                 .value("deaths_medium", deathsMedium).value("deaths_low", deathsLow).value("last_online_time", lastOnlineTime)
-                .value("ff_protection", ffProtection).create();
+                .value("ff_protection", ffProtection).value("deposit", deposit).value("withdraw", withdraw).value("tax", tax)
+                .value("debt", debt).create();
 
     }
 
@@ -139,12 +145,18 @@ public class DatabaseSaver extends DataSaver {
         boolean ffProtection = clanPlayer.isFfProtected();
         long lastOnlineTime = clanPlayer.getLastOnline().getTime();
 
+        double deposit = clanPlayer.getEconomyStats().getDeposit();
+        double withdraw = clanPlayer.getEconomyStats().getWithdraw();
+        double tax = clanPlayer.getEconomyStats().getTax();
+        double debt = clanPlayer.getEconomyStats().getDebt();
+
         return QueryGenerator.createUpdateQuery("mcc_clanplayers", databaseConnectionOwner.getConnection())
                 .value("uuid_most_sig_bits", uuid.getMostSignificantBits()).value("uuid_least_sig_bits", uuid.getLeastSignificantBits())
                 .value("playername", name).value("clan_id", clanID).value("rank_id", rankID).value("kills_high", killsHigh)
                 .value("kills_medium", killsMedium).value("kills_low", killsLow).value("deaths_high", deathsHigh)
                 .value("deaths_medium", deathsMedium).value("deaths_low", deathsLow).value("last_online_time", lastOnlineTime)
-                .value("ff_protection", ffProtection).where("clanplayer_id", clanPlayerID).create();
+                .value("ff_protection", ffProtection).value("deposit", deposit).value("withdraw", withdraw).value("tax", tax)
+                .value("debt", debt).where("clanplayer_id", clanPlayerID).create();
 
     }
 
@@ -180,7 +192,9 @@ public class DatabaseSaver extends DataSaver {
         }
         int homeSetTimes = clan.getHomeSetTimes();
         long homeLastSetTimeStamp = clan.getHomeSetTimeStamp();
-        String bankId = clan.getBankId();
+        String bankId = clan.getBank().getId();
+        double debt = clan.getBank().getDebt();
+        double memberFee = clan.getBank().getMemberFee();
 
         return QueryGenerator.createInsertQuery("mcc_clans", databaseConnectionOwner.getConnection()).value("clan_id", clanID).value("clantag", tag)
                 .value("clanname", name).value("clanplayer_id_owner", ownerID).value("tagcolor", tagColorId)
@@ -188,7 +202,7 @@ public class DatabaseSaver extends DataSaver {
                 .value("clanhome_y", clanHomeY).value("clanhome_z", clanHomeZ).value("clanhome_yaw", clanHomeYaw)
                 .value("clanhome_pitch", clanHomePitch).value("clanhome_set_times", homeSetTimes)
                 .value("clanhome_set_timestamp", homeLastSetTimeStamp).value("ff_protection", ffProtection).value("creation_time", creationTime)
-                .value("bank_id", bankId).create();
+                .value("bank_id", bankId).value("debt", debt).value("member_fee", memberFee).create();
     }
 
     public static PreparedStatement getUpdateClanQuery(ClanImpl clan) {
@@ -218,7 +232,9 @@ public class DatabaseSaver extends DataSaver {
         }
         int homeSetTimes = clan.getHomeSetTimes();
         long homeLastSetTimeStamp = clan.getHomeSetTimeStamp();
-        String bankId = clan.getBankId();
+        String bankId = clan.getBank().getId();
+        double debt = clan.getBank().getDebt();
+        double memberFee = clan.getBank().getMemberFee();
 
         return QueryGenerator.createUpdateQuery("mcc_clans", databaseConnectionOwner.getConnection()).value("clantag", tag).value("clanname", name)
                 .value("clanplayer_id_owner", ownerID).value("tagcolor", tagColorId)
@@ -226,7 +242,7 @@ public class DatabaseSaver extends DataSaver {
                 .value("clanhome_world", clanHomeWorld).value("clanhome_x", clanHomeX).value("clanhome_y", clanHomeY).value("clanhome_z", clanHomeZ)
                 .value("clanhome_yaw", clanHomeYaw).value("clanhome_pitch", clanHomePitch).value("clanhome_set_times", homeSetTimes)
                 .value("clanhome_set_timestamp", homeLastSetTimeStamp).value("ff_protection", ffProtection).value("creation_time", creationTime)
-                .value("bank_id", bankId).where("clan_id", clanID).create();
+                .value("bank_id", bankId).value("debt", debt).value("member_fee", memberFee).where("clan_id", clanID).create();
     }
 
     public static PreparedStatement getDeleteClanQuery(int clanID) {

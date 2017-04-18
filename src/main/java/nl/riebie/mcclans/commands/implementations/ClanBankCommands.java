@@ -24,11 +24,13 @@ package nl.riebie.mcclans.commands.implementations;
 
 import nl.riebie.mcclans.MCClans;
 import nl.riebie.mcclans.clan.ClanImpl;
+import nl.riebie.mcclans.commands.Fee;
 import nl.riebie.mcclans.commands.annotations.Command;
 import nl.riebie.mcclans.commands.annotations.Parameter;
 import nl.riebie.mcclans.commands.constraints.PositiveNumberConstraint;
 import nl.riebie.mcclans.config.Config;
 import nl.riebie.mcclans.messages.Messages;
+import nl.riebie.mcclans.persistence.TaskForwarder;
 import nl.riebie.mcclans.player.ClanPlayerImpl;
 import nl.riebie.mcclans.utils.EconomyUtils;
 import org.spongepowered.api.command.CommandSource;
@@ -90,6 +92,24 @@ public class ClanBankCommands {
             }
         } else {
             Messages.sendWarningMessage(sender, Messages.ECONOMY_USAGE_IS_CURRENTLY_DISABLED);
+        }
+    }
+
+    @Command(name = "fee", description = "Set the member fee", isPlayerOnly = true, isClanOnly = true, clanPermission = "fee", spongePermission = "mcclans.user.bank.fee")
+    public void clanBankFeeCommand(CommandSource sender, ClanPlayerImpl clanPlayer, @Parameter(name = "amount", constraint = PositiveNumberConstraint.class) Fee fee) {
+        if (!Config.getBoolean(Config.USE_ECONOMY)) {
+            Messages.sendWarningMessage(sender, Messages.ECONOMY_USAGE_IS_CURRENTLY_DISABLED);
+        }
+        double amount = (double) ((int) (fee.value * 100)) / 100;
+
+        ClanImpl clan = clanPlayer.getClan();
+        clan.getBank().setMemberFee(amount);
+        TaskForwarder.sendUpdateClan(clan);
+        // TODO messages
+        if (amount == -1) {
+            clan.sendMessage(clanPlayer.getName() + " set the member fee to share the tax bill");
+        } else {
+            clan.sendMessage(clanPlayer.getName() + " set the member fee to $" + amount);
         }
     }
 }

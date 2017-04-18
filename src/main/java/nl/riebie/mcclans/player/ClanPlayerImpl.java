@@ -56,7 +56,7 @@ public class ClanPlayerImpl implements ClanPlayer, Cloneable, CommandSender {
     private RankImpl rank;
     private ClanImpl clan;
 
-    private KillDeath killDeath;
+    private KillDeathImpl killDeath;
 
     private ClanInvite clanInvite;
     private LastOnlineImpl lastOnline = new LastOnlineImpl();
@@ -69,6 +69,8 @@ public class ClanPlayerImpl implements ClanPlayer, Cloneable, CommandSender {
     private boolean ignoreClanChat;
     private boolean ignoreAllyChat;
     private boolean spy;
+
+    private EconomyStats economyStats;
 
     private ClanPlayerImpl(Builder builder) {
         this.clanPlayerID = builder.clanPlayerID;
@@ -87,6 +89,8 @@ public class ClanPlayerImpl implements ClanPlayer, Cloneable, CommandSender {
         this.lastOnline = builder.lastOnline;
         this.rank = builder.rank;
         this.ffProtection = builder.ffProtection;
+
+        economyStats = new EconomyStats(builder.deposit, builder.withdraw, builder.tax, builder.debt);
     }
 
     public int getID() {
@@ -305,6 +309,18 @@ public class ClanPlayerImpl implements ClanPlayer, Cloneable, CommandSender {
         this.spy = spy;
     }
 
+    public EconomyStats getEconomyStats() {
+        return economyStats;
+    }
+
+    public void resetEconomyStats() {
+        economyStats.setDeposit(0);
+        economyStats.setWithdraw(0);
+        economyStats.setTax(0);
+        economyStats.setDebt(0);
+        TaskForwarder.sendUpdateClanPlayer(this);
+    }
+
     @Override
     public ClanPlayerImpl clone() {
         ClanPlayerImpl clone = null;
@@ -356,6 +372,11 @@ public class ClanPlayerImpl implements ClanPlayer, Cloneable, CommandSender {
 
         private boolean ffProtection = true;
 
+        private double deposit = 0;
+        private double withdraw = 0;
+        private double tax = 0;
+        private double debt = 0;
+
         public Builder(int clanPlayerID, UUID uuid, String lastKnownName) {
             this.clanPlayerID = clanPlayerID;
             this.uuid = uuid;
@@ -393,6 +414,14 @@ public class ClanPlayerImpl implements ClanPlayer, Cloneable, CommandSender {
 
         public Builder ffProtection(boolean ffProtection) {
             this.ffProtection = ffProtection;
+            return this;
+        }
+
+        public Builder economyStats(double deposit, double withdraw, double tax, double debt) {
+            this.deposit = deposit;
+            this.withdraw = withdraw;
+            this.tax = tax;
+            this.debt = debt;
             return this;
         }
 
