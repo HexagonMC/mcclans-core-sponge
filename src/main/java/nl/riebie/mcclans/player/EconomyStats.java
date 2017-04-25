@@ -27,12 +27,21 @@ public class EconomyStats {
         this.deposit = deposit;
     }
 
+
+    public void addDeposit(double deposit) {
+        setDeposit(getDeposit() + deposit);
+    }
+
     public double getWithdraw() {
         return withdraw;
     }
 
     public void setWithdraw(double withdraw) {
         this.withdraw = withdraw;
+    }
+
+    public void addWithdraw(double withdraw) {
+        setWithdraw(getWithdraw() + withdraw);
     }
 
     public double getTax() {
@@ -43,11 +52,19 @@ public class EconomyStats {
         this.tax = tax;
     }
 
+    public void addTax(double tax) {
+        setTax(getTax() + tax);
+    }
+
     public double getDebt() {
         return debt;
     }
 
     public void setDebt(double debt) {
         this.debt = debt;
+    }
+
+    public void addDebt(double debt) {
+        setDebt(getDebt() + debt);
     }
 }

@@ -32,6 +32,7 @@ import nl.riebie.mcclans.config.Config;
 import nl.riebie.mcclans.messages.Messages;
 import nl.riebie.mcclans.persistence.TaskForwarder;
 import nl.riebie.mcclans.player.ClanPlayerImpl;
+import nl.riebie.mcclans.player.EconomyStats;
 import nl.riebie.mcclans.utils.EconomyUtils;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.service.economy.Currency;
@@ -47,58 +48,110 @@ public class ClanBankCommands {
 
     @Command(name = "balance", description = "View the balance of the clan bank", isPlayerOnly = true, isClanOnly = true, spongePermission = "mcclans.user.bank.balance")
     public void clanBankBalanceCommand(CommandSource sender, ClanPlayerImpl clanPlayer) {
-        if (Config.getBoolean(Config.USE_ECONOMY)) {
-            ClanImpl clan = clanPlayer.getClan();
-            Currency currency = MCClans.getPlugin().getServiceHelper().currency;
-            Optional<Account> accountOpt = MCClans.getPlugin().getServiceHelper().economyService.getOrCreateAccount(clan.getBankId());
-            if (accountOpt.isPresent()) {
-                Account account = accountOpt.get();
-                BigDecimal balance = account.getBalance(currency);
-                Messages.sendClanBankBalance(sender, balance.doubleValue(), currency.getDisplayName().toPlain());
-            } else {
-                Messages.sendWarningMessage(sender, Messages.NO_ECONOMY_ACCOUNT_FOUND);
-            }
-        } else {
+        if (!Config.getBoolean(Config.USE_ECONOMY)) {
             Messages.sendWarningMessage(sender, Messages.ECONOMY_USAGE_IS_CURRENTLY_DISABLED);
+            return;
+        }
+
+        ClanImpl clan = clanPlayer.getClan();
+        Currency currency = MCClans.getPlugin().getServiceHelper().currency;
+        Optional<Account> accountOpt = MCClans.getPlugin().getServiceHelper().economyService.getOrCreateAccount(clan.getBankId());
+        if (accountOpt.isPresent()) {
+            Account account = accountOpt.get();
+            BigDecimal balance = account.getBalance(currency);
+            Messages.sendClanBankBalance(sender, balance.doubleValue(), clan.getBank().getDebt(), currency.getDisplayName().toPlain());
+        } else {
+            Messages.sendWarningMessage(sender, Messages.NO_ECONOMY_ACCOUNT_FOUND);
         }
     }
 
     @Command(name = "deposit", description = "Deposit currency in the clan bank", isPlayerOnly = true, isClanOnly = true, clanPermission = "deposit", spongePermission = "mcclans.user.bank.deposit")
     public void clanBankDepositCommand(CommandSource sender, ClanPlayerImpl clanPlayer, @Parameter(name = "amount", constraint = PositiveNumberConstraint.class) double amount) {
-        if (Config.getBoolean(Config.USE_ECONOMY)) {
-            ClanImpl clan = clanPlayer.getClan();
+        if (!Config.getBoolean(Config.USE_ECONOMY)) {
+            Messages.sendWarningMessage(sender, Messages.ECONOMY_USAGE_IS_CURRENTLY_DISABLED);
+            return;
+        }
+
+        ClanImpl clan = clanPlayer.getClan();
+        double clanDebt = clan.getBank().getDebt();
+        String currencyName = MCClans.getPlugin().getServiceHelper().currency.getDisplayName().toPlain();
+        if (clanDebt <= 0) {
             boolean success = EconomyUtils.transferToBank(clan.getBankId(), clanPlayer.getUUID(), amount);
-            String currencyName = MCClans.getPlugin().getServiceHelper().currency.getDisplayName().toPlain();
             if (success) {
+                updateClanPlayerEconomyStatsDeposit(clanPlayer, amount);
                 Messages.sendClanBroadcastMessageDepositedInClanBank(clan, sender.getName(), sender, amount, currencyName);
             } else {
                 Messages.sendYouDoNotHaveEnoughCurrency(sender, amount, currencyName);
             }
         } else {
-            Messages.sendWarningMessage(sender, Messages.ECONOMY_USAGE_IS_CURRENTLY_DISABLED);
+            if (EconomyUtils.withdraw(clanPlayer.getUUID(), amount)) {
+                if (amount >= clanDebt) {
+                    clan.getBank().setDebt(0);
+                    clan.getBank().deposit(amount - clanDebt);
+                } else {
+                    clan.getBank().addDebt(-amount);
+                }
+                updateClanPlayerEconomyStatsDeposit(clanPlayer, amount);
+                Messages.sendClanBroadcastMessageDepositedInClanBank(clan, sender.getName(), sender, amount, currencyName);
+                TaskForwarder.sendUpdateClan(clan);
+
+            } else {
+                Messages.sendYouDoNotHaveEnoughCurrency(sender, amount, currencyName);
+            }
+        }
+    }
+
+    private void updateClanPlayerEconomyStatsDeposit(ClanPlayerImpl clanPlayer, double amount) {
+        if (amount == 0) {
+            return;
+        }
+
+        EconomyStats economyStats = clanPlayer.getEconomyStats();
+        double playerDebt = economyStats.getDebt();
+        if (playerDebt > 0) {
+            if (amount >= playerDebt) {
+                economyStats.setDebt(0);
+                economyStats.addTax(amount - playerDebt);
+            } else {
+                economyStats.addDebt(-amount);
+            }
+
+            TaskForwarder.sendUpdateClanPlayer(clanPlayer);
         }
     }
 
     @Command(name = "withdraw", description = "Withdraw currency from the clan bank", isPlayerOnly = true, isClanOnly = true, clanPermission = "withdraw", spongePermission = "mcclans.user.bank.withdraw")
     public void clanBankWithdrawCommand(CommandSource sender, ClanPlayerImpl clanPlayer, @Parameter(name = "amount", constraint = PositiveNumberConstraint.class) double amount) {
-        if (Config.getBoolean(Config.USE_ECONOMY)) {
-            ClanImpl clan = clanPlayer.getClan();
-            boolean success = EconomyUtils.transferFromBank(clan.getBankId(), clanPlayer.getUUID(), amount);
-            String currencyName = MCClans.getPlugin().getServiceHelper().currency.getDisplayName().toPlain();
-            if (success) {
-                Messages.sendClanBroadcastMessageWithdrewFromClanBank(clan, sender.getName(), sender, amount, currencyName);
-            } else {
-                Messages.sendNotEnoughCurrencyOnClanBank(sender, amount, currencyName);
-            }
-        } else {
+        if (!Config.getBoolean(Config.USE_ECONOMY)) {
             Messages.sendWarningMessage(sender, Messages.ECONOMY_USAGE_IS_CURRENTLY_DISABLED);
+            return;
         }
+
+        ClanImpl clan = clanPlayer.getClan();
+        boolean success = EconomyUtils.transferFromBank(clan.getBankId(), clanPlayer.getUUID(), amount);
+        String currencyName = MCClans.getPlugin().getServiceHelper().currency.getDisplayName().toPlain();
+        if (success) {
+            updateClanPlayerEconomyStatsWithdraw(clanPlayer, amount);
+            Messages.sendClanBroadcastMessageWithdrewFromClanBank(clan, sender.getName(), sender, amount, currencyName);
+        } else {
+            Messages.sendNotEnoughCurrencyOnClanBank(sender, amount, currencyName);
+        }
+    }
+
+    private void updateClanPlayerEconomyStatsWithdraw(ClanPlayerImpl clanPlayer, double amount) {
+        if (amount == 0) {
+            return;
+        }
+
+        clanPlayer.getEconomyStats().addWithdraw(amount);
+        TaskForwarder.sendUpdateClanPlayer(clanPlayer);
     }
 
     @Command(name = "fee", description = "Set the member fee", isPlayerOnly = true, isClanOnly = true, clanPermission = "fee", spongePermission = "mcclans.user.bank.fee")
     public void clanBankFeeCommand(CommandSource sender, ClanPlayerImpl clanPlayer, @Parameter(name = "amount", constraint = PositiveNumberConstraint.class) Fee fee) {
         if (!Config.getBoolean(Config.USE_ECONOMY)) {
             Messages.sendWarningMessage(sender, Messages.ECONOMY_USAGE_IS_CURRENTLY_DISABLED);
+            return;
         }
         double amount = (double) ((int) (fee.value * 100)) / 100;
 

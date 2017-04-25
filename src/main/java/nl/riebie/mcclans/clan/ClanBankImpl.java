@@ -91,6 +91,10 @@ public class ClanBankImpl implements ClanBank {
         this.debt = debt;
     }
 
+    public void addDebt(double debt) {
+        setDebt(getDebt() + debt);
+    }
+
     public double getMemberFee() {
         return memberFee;
     }

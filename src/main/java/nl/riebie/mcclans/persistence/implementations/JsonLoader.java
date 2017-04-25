@@ -33,6 +33,7 @@ import nl.riebie.mcclans.persistence.interfaces.DataLoader;
 import nl.riebie.mcclans.persistence.pojo.*;
 import nl.riebie.mcclans.persistence.upgrade.interfaces.DataUpgrade;
 import nl.riebie.mcclans.persistence.upgrade.versions.JsonUpgrade2;
+import nl.riebie.mcclans.persistence.upgrade.versions.JsonUpgrade3;
 import nl.riebie.mcclans.utils.FileUtils;
 
 import java.io.File;
@@ -168,7 +169,7 @@ public class JsonLoader extends DataLoader {
     @Override
     protected List<DataUpgrade> getDataUpgrades(List<DataUpgrade> dataUpgrades) {
         dataUpgrades.add(new JsonUpgrade2());
-        // todo dataUpgrades.add(new JsonUpgrade3());
+        dataUpgrades.add(new JsonUpgrade3());
         return dataUpgrades;
     }
 

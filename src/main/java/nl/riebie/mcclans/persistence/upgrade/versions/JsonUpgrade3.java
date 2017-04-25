@@ -41,8 +41,12 @@ public class JsonUpgrade3 extends JsonUpgrade {
 
     @Override
     protected List<FieldAdd> getFieldAdditions(List<FieldAdd> fieldAdditions) {
-        // todo
-//        fieldAdditions.add(new FieldAdd("clans", "bankId", () -> UUID.randomUUID().toString()));
+        fieldAdditions.add(new FieldAdd("clans", "debt", 0d));
+        fieldAdditions.add(new FieldAdd("clans", "memberFee", 0d));
+        fieldAdditions.add(new FieldAdd("clanPlayers", "deposit", 0d));
+        fieldAdditions.add(new FieldAdd("clanPlayers", "withdraw", 0d));
+        fieldAdditions.add(new FieldAdd("clanPlayers", "tax", 0d));
+        fieldAdditions.add(new FieldAdd("clanPlayers", "debt", 0d));
         return fieldAdditions;
     }
 

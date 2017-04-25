@@ -22,10 +22,10 @@
 
 package nl.riebie.mcclans.persistence.upgrade.versions;
 
+import nl.riebie.mcclans.persistence.query.DataType;
 import nl.riebie.mcclans.persistence.upgrade.interfaces.DatabaseUpgrade;
 
 public class DatabaseUpgrade3 extends DatabaseUpgrade {
-    private static final String GET_CLANS_QUERY = "SELECT * FROM mcc_clans";
 
     @Override
     public int getVersion() {
@@ -34,23 +34,11 @@ public class DatabaseUpgrade3 extends DatabaseUpgrade {
 
     @Override
     public void upgradeDatabase() {
-        // todo
-//        alterTable("mcc_clans").addColumn("bank_id", DataType.STRING);
-//        updateClanIdColumn();
+        alterTable("mcc_clans").addColumn("debt", DataType.DOUBLE);
+        alterTable("mcc_clans").addColumn("member_fee", DataType.DOUBLE);
+        alterTable("mcc_clanplayers").addColumn("deposit", DataType.DOUBLE);
+        alterTable("mcc_clanplayers").addColumn("withdraw", DataType.DOUBLE);
+        alterTable("mcc_clanplayers").addColumn("tax", DataType.DOUBLE);
+        alterTable("mcc_clanplayers").addColumn("debt", DataType.DOUBLE);
     }
-
-//    private void updateClanIdColumn() {
-//        ResultSet clanResultSet = DatabaseConnectionOwner.getInstance().executeQuery(GET_CLANS_QUERY);
-//        if (clanResultSet != null) {
-//            try {
-//                while (clanResultSet.next()) {
-//                    int clanId = clanResultSet.getInt("clan_id");
-//                    UUID uuid = UUID.randomUUID();
-//                    updateQuery("mcc_clans").value("bank_id", uuid.toString()).where("clan_id", clanId);
-//                }
-//            } catch (SQLException e) {
-//                e.printStackTrace();
-//            }
-//        }
-//    }
 }

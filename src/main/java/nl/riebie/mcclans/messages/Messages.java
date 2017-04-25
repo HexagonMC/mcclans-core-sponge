@@ -574,13 +574,23 @@ public class Messages {
         commandSource.sendMessage(message);
     }
 
-    public static void sendClanBankBalance(CommandSource commandSource, double balance, String currencyName) {
-        Text message = Text.join(
+    public static void sendClanBankBalance(CommandSource commandSource, double balance, double debt, String currencyName) {
+        Text messageBalance = Text.join(
                 Text.builder("Clan bank balance: ").color(BASIC_CHAT_COLOR).build(),
                 Text.builder(String.valueOf(balance)).color(BASIC_HIGHLIGHT).build(),
                 Text.builder(" " + currencyName).color(BASIC_CHAT_COLOR).build()
         );
-        commandSource.sendMessage(message);
+        Text messageDebt = Text.join(
+                Text.builder("Clan bank debt: ").color(WARNING_CHAT_COLOR).build(),
+                Text.builder(String.valueOf(debt)).color(WARNING_HIGHLIGHT).build(),
+                Text.builder(" " + currencyName).color(WARNING_CHAT_COLOR).build()
+        );
+
+        if (debt > 0) {
+            commandSource.sendMessages(messageBalance, messageDebt);
+        } else {
+            commandSource.sendMessage(messageBalance);
+        }
     }
 
     public static void sendClanBroadcastMessageDepositedInClanBank(ClanImpl clan, String playerName, CommandSource commandSource, double amount, String currencyName) {
