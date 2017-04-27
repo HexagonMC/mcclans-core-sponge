@@ -60,6 +60,7 @@ import org.spongepowered.api.service.economy.Currency;
 import org.spongepowered.api.service.economy.EconomyService;
 import org.spongepowered.api.service.user.UserStorageService;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.format.TextColors;
 
 import javax.annotation.Nonnull;
 import java.io.File;
@@ -378,19 +379,22 @@ public class MCClans {
                         @Nonnull
                         @Override
                         public Optional<Text> parse(String tokenInput, CommandSource source, Map<String, Object> variables) {
-                            if (!"clantag".equals(tokenInput)) {
-                                return Optional.empty();
-                            }
                             if (!(source instanceof Player)) {
                                 return Optional.empty();
                             }
                             Player player = (Player) source;
                             ClanPlayerImpl clanPlayer = ClansImpl.getInstance().getClanPlayer(player.getUniqueId());
-                            if (clanPlayer == null || clanPlayer.getClan() == null) {
+                            if (clanPlayer == null || clanPlayer.getClan() == null || clanPlayer.getRank() == null) {
                                 return Optional.empty();
                             }
 
-                            return Optional.of(clanPlayer.getClan().getTagColored());
+                            if ("clantag".equals(tokenInput)) {
+                                return Optional.of(clanPlayer.getClan().getTagColored());
+                            } else if ("rankname".equals(tokenInput)) {
+                                return Optional.of(Text.builder(clanPlayer.getRank().getName()).color(TextColors.BLUE).build());
+                            } else {
+                                return Optional.empty();
+                            }
                         }
                     });
                 } catch (PluginAlreadyRegisteredException e) {
