@@ -30,6 +30,7 @@ import nl.riebie.mcclans.clan.RankFactory;
 import nl.riebie.mcclans.commands.CommandRoot;
 import nl.riebie.mcclans.commands.implementations.ClanCommands;
 import nl.riebie.mcclans.config.Config;
+import nl.riebie.mcclans.economy.TaxManager;
 import nl.riebie.mcclans.enums.DBMSType;
 import nl.riebie.mcclans.listeners.*;
 import nl.riebie.mcclans.metrics.BStatsMetrics;
@@ -189,6 +190,10 @@ public class MCClans {
 
         if (Config.getInteger(Config.CREATE_BACKUP_AFTER_HOURS) != 0) {
             registerBackupTask();
+        }
+
+        if (Config.getBoolean(Config.USE_CLAN_TAX)) {
+            TaxManager.get().init();
         }
 
         ClansImpl.getInstance().updateClanTagCache();

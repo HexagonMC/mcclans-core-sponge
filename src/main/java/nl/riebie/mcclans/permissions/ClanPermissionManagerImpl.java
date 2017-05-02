@@ -35,6 +35,7 @@ public class ClanPermissionManagerImpl implements ClanPermissionManager {
         registerClanPermission("deposit", "Deposit currency in the clan bank");
         registerClanPermission("withdraw", "Withdraw currency from the clan bank");
         registerClanPermission("fee", "Change the clan member fee");
+        registerClanPermission("resetbankstats", "Reset the bank statistics");
     }
 
     public void setInitialized() {

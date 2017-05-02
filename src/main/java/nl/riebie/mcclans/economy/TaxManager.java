@@ -35,7 +35,7 @@ public class TaxManager {
         }
     };
 
-    public TaxManager get() {
+    public static TaxManager get() {
         if (instance == null) {
             instance = new TaxManager();
         }
@@ -52,7 +52,7 @@ public class TaxManager {
         MCClans.getPlugin().getLogger().info("Registered tax task to run every " + interval + "s (" + TimeUnit.HOURS.convert(interval, TimeUnit.SECONDS) + "h), starting in " + interval + "s", false);
     }
 
-    public void triggerTaxEvent() {
+    private void triggerTaxEvent() {
         List<Clan> clans = ClansImpl.getInstance().getClans();
         TaxEvent taxEvent = new TaxEvent(Cause.of(NamedCause.source(MCClans.getPlugin())), clans);
         double cost = Config.getDouble(Config.CLAN_TAX_COST);
@@ -62,7 +62,7 @@ public class TaxManager {
                 taxEvent.addTax(clan, new Tax("Clan upkeep", clanCost));
             }
         }
-        if (Sponge.getEventManager().post(taxEvent)) {
+        if (!Sponge.getEventManager().post(taxEvent)) {
             processTaxEvent(taxEvent);
         }
     }
@@ -89,36 +89,38 @@ public class TaxManager {
         }
 
         double memberBill = clan.getBank().getMemberFee() == -1 ? bill / clan.getMemberCount() : clan.getBank().getMemberFee();
-        for (ClanPlayerImpl clanPlayer : clan.getMembersImpl()) {
-            Optional<UniqueAccount> accountOpt = economyService.getOrCreateAccount(clanPlayer.getUUID());
-            if (!accountOpt.isPresent()) {
-                clanPlayer.sendMessage(Text.of("You failed to pay the clan tax of $" + memberBill));
-                clanPlayer.getEconomyStats().addDebt(memberBill);
-                TaskForwarder.sendUpdateClanPlayer(clanPlayer);
-                continue;
-            }
-            UniqueAccount account = accountOpt.get();
-
-            if (EconomyUtils.withdraw(account, currency, memberBill)) {
-                bill -= memberBill;
-                clanPlayer.sendMessage(Text.of("You paid the clan tax of $" + memberBill));
-                clanPlayer.getEconomyStats().addTax(memberBill);
-            } else {
-                double balance = account.getBalance(currency).doubleValue();
-                if (balance > 0) {
-                    if (EconomyUtils.withdraw(account, currency, balance)) {
-                        bill -= balance;
-                        clanPlayer.sendMessage(Text.of("You failed to pay the clan tax of $" + memberBill + ", being short $" + (memberBill - balance)));
-                        clanPlayer.getEconomyStats().addTax(balance);
-                        clanPlayer.getEconomyStats().addDebt(memberBill - balance);
-                        TaskForwarder.sendUpdateClanPlayer(clanPlayer);
-                        continue;
-                    }
+        if (memberBill != 0) { // TODO move out to separate method
+            for (ClanPlayerImpl clanPlayer : clan.getMembersImpl()) {
+                Optional<UniqueAccount> accountOpt = economyService.getOrCreateAccount(clanPlayer.getUUID());
+                if (!accountOpt.isPresent()) {
+                    clanPlayer.sendMessage(Text.of("You failed to pay the clan tax of $" + memberBill));
+                    clanPlayer.getEconomyStats().addDebt(memberBill);
+                    TaskForwarder.sendUpdateClanPlayer(clanPlayer);
+                    continue;
                 }
-                clanPlayer.sendMessage(Text.of("You failed to pay the clan tax of $" + memberBill));
-                clanPlayer.getEconomyStats().addDebt(memberBill);
+                UniqueAccount account = accountOpt.get();
+
+                if (EconomyUtils.withdraw(account, currency, memberBill)) {
+                    bill -= memberBill;
+                    clanPlayer.sendMessage(Text.of("You paid the clan tax of $" + memberBill));
+                    clanPlayer.getEconomyStats().addTax(memberBill);
+                } else {
+                    double balance = account.getBalance(currency).doubleValue();
+                    if (balance > 0) {
+                        if (EconomyUtils.withdraw(account, currency, balance)) {
+                            bill -= balance;
+                            clanPlayer.sendMessage(Text.of("You failed to pay the clan tax of $" + memberBill + ", being short $" + (memberBill - balance)));
+                            clanPlayer.getEconomyStats().addTax(balance);
+                            clanPlayer.getEconomyStats().addDebt(memberBill - balance);
+                            TaskForwarder.sendUpdateClanPlayer(clanPlayer);
+                            continue;
+                        }
+                    }
+                    clanPlayer.sendMessage(Text.of("You failed to pay the clan tax of $" + memberBill));
+                    clanPlayer.getEconomyStats().addDebt(memberBill);
+                }
+                TaskForwarder.sendUpdateClanPlayer(clanPlayer);
             }
-            TaskForwarder.sendUpdateClanPlayer(clanPlayer);
         }
 
         if (bill >= 0.01) {
@@ -133,10 +135,10 @@ public class TaxManager {
                 TaskForwarder.sendUpdateClan(clan);
 
                 clan.sendMessage(Text.of("Your clan failed to pay the tax of $" + taxTotal(taxes) + ", and is now $" + bill + " in debt"));
+                return;
             }
-        } else {
-            clan.sendMessage(Text.of("Your clan paid the tax of $" + taxTotal(taxes)));
         }
+        clan.sendMessage(Text.of("Your clan paid the tax of $" + taxTotal(taxes)));
     }
 
     private static double taxTotal(List<Tax> taxes) {

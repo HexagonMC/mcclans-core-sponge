@@ -26,19 +26,26 @@ import nl.riebie.mcclans.MCClans;
 import nl.riebie.mcclans.clan.ClanImpl;
 import nl.riebie.mcclans.commands.Fee;
 import nl.riebie.mcclans.commands.annotations.Command;
+import nl.riebie.mcclans.commands.annotations.PageParameter;
 import nl.riebie.mcclans.commands.annotations.Parameter;
 import nl.riebie.mcclans.commands.constraints.PositiveNumberConstraint;
+import nl.riebie.mcclans.comparators.BankStatsComparator;
 import nl.riebie.mcclans.config.Config;
 import nl.riebie.mcclans.messages.Messages;
 import nl.riebie.mcclans.persistence.TaskForwarder;
 import nl.riebie.mcclans.player.ClanPlayerImpl;
 import nl.riebie.mcclans.player.EconomyStats;
+import nl.riebie.mcclans.table.HorizontalTable;
 import nl.riebie.mcclans.utils.EconomyUtils;
+import nl.riebie.mcclans.utils.Utils;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.service.economy.Currency;
 import org.spongepowered.api.service.economy.account.Account;
+import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.format.TextColors;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -111,13 +118,16 @@ public class ClanBankCommands {
         if (playerDebt > 0) {
             if (amount >= playerDebt) {
                 economyStats.setDebt(0);
-                economyStats.addTax(amount - playerDebt);
+                economyStats.addTax(playerDebt);
+                economyStats.addDeposit(amount - playerDebt);
             } else {
                 economyStats.addDebt(-amount);
+                economyStats.addTax(amount);
             }
-
-            TaskForwarder.sendUpdateClanPlayer(clanPlayer);
+        } else {
+            economyStats.addDeposit(amount);
         }
+        TaskForwarder.sendUpdateClanPlayer(clanPlayer);
     }
 
     @Command(name = "withdraw", description = "Withdraw currency from the clan bank", isPlayerOnly = true, isClanOnly = true, clanPermission = "withdraw", spongePermission = "mcclans.user.bank.withdraw")
@@ -153,16 +163,62 @@ public class ClanBankCommands {
             Messages.sendWarningMessage(sender, Messages.ECONOMY_USAGE_IS_CURRENTLY_DISABLED);
             return;
         }
-        double amount = (double) ((int) (fee.value * 100)) / 100;
+        double amount = Utils.round(fee.value, 2);
 
         ClanImpl clan = clanPlayer.getClan();
         clan.getBank().setMemberFee(amount);
         TaskForwarder.sendUpdateClan(clan);
         // TODO messages
         if (amount == -1) {
-            clan.sendMessage(clanPlayer.getName() + " set the member fee to share the tax bill");
+            clan.sendMessage(Text.of(clanPlayer.getName() + " set the member fee to share the tax bill"));
         } else {
-            clan.sendMessage(clanPlayer.getName() + " set the member fee to $" + amount);
+            clan.sendMessage(Text.of(clanPlayer.getName() + " set the member fee to $" + amount));
         }
+    }
+
+    @Command(name = "stats", description = "See the bank stats of a clan's members", isPlayerOnly = true, isClanOnly = true, spongePermission = "mcclans.user.bank.stats")
+    public void clanBankStatsCommand(CommandSource sender, ClanPlayerImpl clanPlayer, @PageParameter int page) {
+        if (!Config.getBoolean(Config.USE_ECONOMY)) {
+            Messages.sendWarningMessage(sender, Messages.ECONOMY_USAGE_IS_CURRENTLY_DISABLED);
+            return;
+        }
+
+        printBankStats(sender, clanPlayer.getClan(), page);
+    }
+
+    private void printBankStats(CommandSource commandSource, ClanImpl clan, int page) {
+        List<ClanPlayerImpl> members = clan.getMembersImpl();
+        members.sort(new BankStatsComparator());
+
+        HorizontalTable<ClanPlayerImpl> table = new HorizontalTable<>("Bank statistics " + clan.getName(), 10,
+                (row, member, index) -> {
+                    row.setValue("Player", Text.of(member.getName()));
+                    EconomyStats stats = member.getEconomyStats();
+                    row.setValue("Deposit", Text.of(Utils.round(stats.getDeposit(), 2)));
+                    row.setValue("Withdraw", Text.builder(String.valueOf(Utils.round(stats.getWithdraw(), 2))).color(TextColors.RED).build());
+                    row.setValue("Tax", Text.of(Utils.round(stats.getTax(), 2)));
+                    row.setValue("Debt", Text.builder(String.valueOf(Utils.round(stats.getDebt(), 2))).color(TextColors.RED).build());
+                });
+        table.defineColumn("Player", 20, true);
+        table.defineColumn("Deposit", 15);
+        table.defineColumn("Withdraw", 15);
+        table.defineColumn("Tax", 15);
+        table.defineColumn("Debt", 15);
+
+        table.draw(members, page, commandSource);
+    }
+
+    @Command(name = "resetstats", description = "Reset the bank statistics", isPlayerOnly = true, isClanOnly = true, clanPermission = "resetbankstats", spongePermission = "mcclans.user.bank.resetstats")
+    public void clanBankResetStatsCommand(CommandSource sender, ClanPlayerImpl clanPlayer) {
+        if (!Config.getBoolean(Config.USE_ECONOMY)) {
+            Messages.sendWarningMessage(sender, Messages.ECONOMY_USAGE_IS_CURRENTLY_DISABLED);
+            return;
+        }
+
+        for (ClanPlayerImpl clanMember : clanPlayer.getClan().getMembersImpl()) {
+            clanMember.resetEconomyStats();
+        }
+        // TODO messages
+        sender.sendMessage(Text.of("Clan bank statistics reset"));
     }
 }
