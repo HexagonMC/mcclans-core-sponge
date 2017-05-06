@@ -53,6 +53,8 @@ public class Messages {
     public static final String NO_PENDING_CLAN_INVITE = "You have no pending clan invite";
     public static final String CLAN_INVITE_ACCEPTED = "Clan invite accepted";
     public static final String CLAN_INVITE_DECLINED = "Clan invite declined";
+    public static final String CLAN_MEMBERS_MAXIMUM_REACHED_OWN = "Your clan has reached the maximum amount of members";
+    public static final String CLAN_MEMBERS_MAXIMUM_REACHED_EXTERNAL = "This clan has reached the maximum amount of members";
     public static final String NO_PENDING_ALLY_INVITE = "You have no pending ally invite";
     public static final String ALLY_INVITE_ACCEPTED = "Ally invite accepted";
     public static final String ALLY_INVITE_DECLINED = "Ally invite declined";
