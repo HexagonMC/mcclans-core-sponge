@@ -194,7 +194,7 @@ public class ClanCommands {
         ClanImpl clan = clanPlayer.getClan();
         if (clan != null) {
             if (Config.getInteger(Config.CLAN_MEMBERS_MAXIMUM) != -1 && clan.getMemberCount() >= Config.getInteger(Config.CLAN_MEMBERS_MAXIMUM)) {
-                Messages.sendWarningMessage(player, Messages.CLAN_MEMBERS_MAXIMUM_REACHED);
+                Messages.sendWarningMessage(player, Messages.CLAN_MEMBERS_MAXIMUM_REACHED_OWN);
                 return;
             }
 
@@ -275,6 +275,10 @@ public class ClanCommands {
         if (clanInvite == null) {
             Messages.sendWarningMessage(commandSource, Messages.NO_PENDING_CLAN_INVITE);
         } else {
+            if (Config.getInteger(Config.CLAN_MEMBERS_MAXIMUM) != -1 && clanInvite.getClan().getMemberCount() >= Config.getInteger(Config.CLAN_MEMBERS_MAXIMUM)) {
+                Messages.sendWarningMessage(commandSource, Messages.CLAN_MEMBERS_MAXIMUM_REACHED_EXTERNAL);
+                return;
+            }
             Messages.sendBasicMessage(commandSource, Messages.CLAN_INVITE_ACCEPTED);
             clanInvite.accept();
         }
