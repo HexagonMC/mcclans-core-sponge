@@ -193,6 +193,11 @@ public class ClanCommands {
         // TODO SPONGE: Check if command is properly and fully implemented
         ClanImpl clan = clanPlayer.getClan();
         if (clan != null) {
+            if (Config.getInteger(Config.CLAN_MEMBERS_MAXIMUM) != -1 && clan.getMemberCount() >= Config.getInteger(Config.CLAN_MEMBERS_MAXIMUM)) {
+                Messages.sendWarningMessage(player, Messages.CLAN_MEMBERS_MAXIMUM_REACHED);
+                return;
+            }
+
             UUID uuid = UUIDUtils.getUUID(playerName);
             Optional<Player> invitedPlayerOpt = uuid == null ? Optional.empty() : Sponge.getServer().getPlayer(uuid);
             if (!invitedPlayerOpt.isPresent()) {
