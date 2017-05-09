@@ -640,6 +640,7 @@ public class ClanImpl implements Clan, Cloneable {
         TaskForwarder.sendUpdateClan(this);
     }
 
+    @Deprecated
     @Override
     public String getBankId() {
         return this.clanBank.getId();

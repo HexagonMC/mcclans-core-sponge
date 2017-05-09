@@ -582,7 +582,7 @@ public class Messages {
         );
         Text messageDebt = Text.join(
                 Text.builder("Clan bank debt: ").color(WARNING_CHAT_COLOR).build(),
-                Text.builder(String.valueOf(debt)).color(WARNING_HIGHLIGHT).build(),
+                Text.builder(String.valueOf(Utils.round(debt, 2))).color(WARNING_HIGHLIGHT).build(),
                 Text.builder(" " + currencyName).color(WARNING_CHAT_COLOR).build()
         );
 

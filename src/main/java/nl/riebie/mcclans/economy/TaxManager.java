@@ -1,13 +1,38 @@
+/*
+ * Copyright (c) 2016 riebie, Kippers <https://bitbucket.org/Kippers/mcclans-core-sponge>
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
 package nl.riebie.mcclans.economy;
 
 import nl.riebie.mcclans.ClansImpl;
 import nl.riebie.mcclans.MCClans;
 import nl.riebie.mcclans.api.Clan;
+import nl.riebie.mcclans.api.Tax;
+import nl.riebie.mcclans.api.events.ClanTaxEvent;
 import nl.riebie.mcclans.clan.ClanImpl;
 import nl.riebie.mcclans.config.Config;
 import nl.riebie.mcclans.persistence.TaskForwarder;
 import nl.riebie.mcclans.player.ClanPlayerImpl;
 import nl.riebie.mcclans.utils.EconomyUtils;
+import nl.riebie.mcclans.utils.Utils;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.NamedCause;
@@ -54,7 +79,7 @@ public class TaxManager {
 
     private void triggerTaxEvent() {
         List<Clan> clans = ClansImpl.getInstance().getClans();
-        TaxEvent taxEvent = new TaxEvent(Cause.of(NamedCause.source(MCClans.getPlugin())), clans);
+        ClanTaxEvent taxEvent = new ClanTaxEvent(Cause.of(NamedCause.source(MCClans.getPlugin())), clans);
         double cost = Config.getDouble(Config.CLAN_TAX_COST);
         if (cost > 0) {
             for (Clan clan : clans) {
@@ -67,7 +92,7 @@ public class TaxManager {
         }
     }
 
-    private void processTaxEvent(TaxEvent taxEvent) {
+    private void processTaxEvent(ClanTaxEvent taxEvent) {
         for (ClanImpl clan : ClansImpl.getInstance().getClanImpls()) {
             List<Tax> taxes = taxEvent.getTax(clan);
             if (taxes.isEmpty()) {
@@ -88,7 +113,7 @@ public class TaxManager {
             return;
         }
 
-        double memberBill = clan.getBank().getMemberFee() == -1 ? bill / clan.getMemberCount() : clan.getBank().getMemberFee();
+        double memberBill = Utils.round(clan.getBank().getMemberFee() == -1 ? bill / clan.getMemberCount() : clan.getBank().getMemberFee(), 2);
         if (memberBill != 0) { // TODO move out to separate method
             for (ClanPlayerImpl clanPlayer : clan.getMembersImpl()) {
                 Optional<UniqueAccount> accountOpt = economyService.getOrCreateAccount(clanPlayer.getUUID());
@@ -123,7 +148,7 @@ public class TaxManager {
             }
         }
 
-        if (bill >= 0.01) {
+        if (bill >= 0.1) {
             if (!clan.getBank().withdraw(bill)) {
                 double balance = clan.getBank().getBalance();
                 if (balance > 0) {

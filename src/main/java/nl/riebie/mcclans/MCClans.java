@@ -358,7 +358,8 @@ public class MCClans {
                     currency = economyService.getDefaultCurrency();
                 } else {
                     for (Currency checkCurrency : economyService.getCurrencies()) {
-                        if (currencyName.equalsIgnoreCase(checkCurrency.getDisplayName().toPlain())) {
+                        if (currencyName.equalsIgnoreCase(checkCurrency.getDisplayName().toPlain())
+                                || currencyName.equalsIgnoreCase(checkCurrency.getPluralDisplayName().toPlain())) {
                             currency = checkCurrency;
                             break;
                         }

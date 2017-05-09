@@ -74,7 +74,7 @@ public class ClanHomeTeleportTask implements Consumer<Task> {
                     if (Config.getBoolean(Config.USE_ECONOMY) && !forceNoCurrency) {
                         double teleportCost = Config.getDouble(Config.TELEPORT_COST);
                         boolean success = EconomyUtils.withdraw(clanPlayer.getUUID(), teleportCost);
-                        String currencyName = MCClans.getPlugin().getServiceHelper().currency.getDisplayName().toPlain();
+                        String currencyName = MCClans.getPlugin().getServiceHelper().currency.getPluralDisplayName().toPlain();
                         if (success) {
                             teleport(player, clanPlayer, teleportLocation);
                             if (teleportCost != 0) {

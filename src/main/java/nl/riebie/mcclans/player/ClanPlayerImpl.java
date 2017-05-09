@@ -41,6 +41,7 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
+import javax.annotation.Nullable;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -132,6 +133,10 @@ public class ClanPlayerImpl implements ClanPlayer, Cloneable, CommandSender {
     @Override
     public boolean isMemberOfAClan() {
         return clan != null;
+    }
+
+    public boolean isMemberOfClan(@Nullable ClanImpl clan) {
+        return !(clan == null || this.clan == null) && this.clan.equals(clan);
     }
 
     @Override

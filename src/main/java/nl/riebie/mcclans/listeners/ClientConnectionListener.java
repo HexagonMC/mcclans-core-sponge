@@ -25,15 +25,18 @@ package nl.riebie.mcclans.listeners;
 import nl.riebie.mcclans.ClansImpl;
 import nl.riebie.mcclans.MCClans;
 import nl.riebie.mcclans.clan.ClanImpl;
+import nl.riebie.mcclans.config.Config;
 import nl.riebie.mcclans.messages.Messages;
 import nl.riebie.mcclans.player.ClanInvite;
 import nl.riebie.mcclans.player.ClanPlayerImpl;
 import nl.riebie.mcclans.player.LastOnlineImpl;
+import nl.riebie.mcclans.utils.Utils;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
 import org.spongepowered.api.scheduler.Task;
+import org.spongepowered.api.text.Text;
 
 /**
  * Created by Kippers on 13/02/2016.
@@ -73,6 +76,15 @@ public class ClientConnectionListener {
                         });
                         taskBuilder.delayTicks(20L).submit(MCClans.getPlugin());
                     }
+                }
+            }
+
+            if (Config.getBoolean(Config.USE_ECONOMY)) {
+                if (clanPlayer.getEconomyStats().getDebt() > 0) {
+                    clanPlayer.sendMessage(Text.of("You have a debt to your clan of $" + Utils.round(clanPlayer.getEconomyStats().getDebt(), 2) + "!"));
+                }
+                if (clan != null && clan.getBank().getDebt() > 0) {
+                    clanPlayer.sendMessage(Text.of("Your clan has a debt of $" + Utils.round(clan.getBank().getDebt(), 2) + "!"));
                 }
             }
         }

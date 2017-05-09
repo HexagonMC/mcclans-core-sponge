@@ -62,11 +62,11 @@ public class ClanBankCommands {
 
         ClanImpl clan = clanPlayer.getClan();
         Currency currency = MCClans.getPlugin().getServiceHelper().currency;
-        Optional<Account> accountOpt = MCClans.getPlugin().getServiceHelper().economyService.getOrCreateAccount(clan.getBankId());
+        Optional<Account> accountOpt = MCClans.getPlugin().getServiceHelper().economyService.getOrCreateAccount(clan.getBank().getId());
         if (accountOpt.isPresent()) {
             Account account = accountOpt.get();
             BigDecimal balance = account.getBalance(currency);
-            Messages.sendClanBankBalance(sender, balance.doubleValue(), clan.getBank().getDebt(), currency.getDisplayName().toPlain());
+            Messages.sendClanBankBalance(sender, balance.doubleValue(), clan.getBank().getDebt(), currency.getPluralDisplayName().toPlain());
         } else {
             Messages.sendWarningMessage(sender, Messages.NO_ECONOMY_ACCOUNT_FOUND);
         }
@@ -81,9 +81,9 @@ public class ClanBankCommands {
 
         ClanImpl clan = clanPlayer.getClan();
         double clanDebt = clan.getBank().getDebt();
-        String currencyName = MCClans.getPlugin().getServiceHelper().currency.getDisplayName().toPlain();
+        String currencyName = MCClans.getPlugin().getServiceHelper().currency.getPluralDisplayName().toPlain();
         if (clanDebt <= 0) {
-            boolean success = EconomyUtils.transferToBank(clan.getBankId(), clanPlayer.getUUID(), amount);
+            boolean success = EconomyUtils.transferToBank(clan.getBank().getId(), clanPlayer.getUUID(), amount);
             if (success) {
                 updateClanPlayerEconomyStatsDeposit(clanPlayer, amount);
                 Messages.sendClanBroadcastMessageDepositedInClanBank(clan, sender.getName(), sender, amount, currencyName);
@@ -138,8 +138,8 @@ public class ClanBankCommands {
         }
 
         ClanImpl clan = clanPlayer.getClan();
-        boolean success = EconomyUtils.transferFromBank(clan.getBankId(), clanPlayer.getUUID(), amount);
-        String currencyName = MCClans.getPlugin().getServiceHelper().currency.getDisplayName().toPlain();
+        boolean success = EconomyUtils.transferFromBank(clan.getBank().getId(), clanPlayer.getUUID(), amount);
+        String currencyName = MCClans.getPlugin().getServiceHelper().currency.getPluralDisplayName().toPlain();
         if (success) {
             updateClanPlayerEconomyStatsWithdraw(clanPlayer, amount);
             Messages.sendClanBroadcastMessageWithdrewFromClanBank(clan, sender.getName(), sender, amount, currencyName);
@@ -176,7 +176,7 @@ public class ClanBankCommands {
         }
     }
 
-    @Command(name = "stats", description = "See the bank stats of a clan's members", isPlayerOnly = true, isClanOnly = true, spongePermission = "mcclans.user.bank.stats")
+    @Command(name = "stats", description = "See the bank stats of a clan's members", isPlayerOnly = true, isClanOnly = true, clanPermission = "bankstats", spongePermission = "mcclans.user.bank.stats")
     public void clanBankStatsCommand(CommandSource sender, ClanPlayerImpl clanPlayer, @PageParameter int page) {
         if (!Config.getBoolean(Config.USE_ECONOMY)) {
             Messages.sendWarningMessage(sender, Messages.ECONOMY_USAGE_IS_CURRENTLY_DISABLED);
@@ -195,9 +195,9 @@ public class ClanBankCommands {
                     row.setValue("Player", Text.of(member.getName()));
                     EconomyStats stats = member.getEconomyStats();
                     row.setValue("Deposit", Text.of(Utils.round(stats.getDeposit(), 2)));
-                    row.setValue("Withdraw", Text.builder(String.valueOf(Utils.round(stats.getWithdraw(), 2))).color(TextColors.RED).build());
+                    row.setValue("Withdraw", Text.builder(String.valueOf(Utils.round(stats.getWithdraw(), 2))).color(stats.getWithdraw() == 0 ? TextColors.NONE : TextColors.RED).build());
                     row.setValue("Tax", Text.of(Utils.round(stats.getTax(), 2)));
-                    row.setValue("Debt", Text.builder(String.valueOf(Utils.round(stats.getDebt(), 2))).color(TextColors.RED).build());
+                    row.setValue("Debt", Text.builder(String.valueOf(Utils.round(stats.getDebt(), 2))).color(stats.getDebt() == 0 ? TextColors.NONE : TextColors.RED).build());
                 });
         table.defineColumn("Player", 20, true);
         table.defineColumn("Deposit", 15);
@@ -208,7 +208,7 @@ public class ClanBankCommands {
         table.draw(members, page, commandSource);
     }
 
-    @Command(name = "resetstats", description = "Reset the bank statistics", isPlayerOnly = true, isClanOnly = true, clanPermission = "resetbankstats", spongePermission = "mcclans.user.bank.resetstats")
+    @Command(name = "resetstats", description = "Reset the bank statistics", isPlayerOnly = true, isClanOnly = true, clanPermission = "bankstats", spongePermission = "mcclans.user.bank.resetstats")
     public void clanBankResetStatsCommand(CommandSource sender, ClanPlayerImpl clanPlayer) {
         if (!Config.getBoolean(Config.USE_ECONOMY)) {
             Messages.sendWarningMessage(sender, Messages.ECONOMY_USAGE_IS_CURRENTLY_DISABLED);

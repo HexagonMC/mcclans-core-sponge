@@ -141,7 +141,7 @@ public class ClanCommands {
                     if (Config.getBoolean(Config.USE_ECONOMY)) {
                         double clanCreationCost = Config.getDouble(Config.CLAN_CREATION_COST);
                         boolean success = EconomyUtils.withdraw(clanPlayer.getUUID(), clanCreationCost);
-                        String currencyName = MCClans.getPlugin().getServiceHelper().currency.getDisplayName().toPlain();
+                        String currencyName = MCClans.getPlugin().getServiceHelper().currency.getPluralDisplayName().toPlain();
 
                         if (!success) {
                             Messages.sendYouDoNotHaveEnoughCurrency(commandSource, clanCreationCost, currencyName);
@@ -392,6 +392,12 @@ public class ClanCommands {
         table.setValue("Owner", Text.of(clan.getOwner().getName()));
         table.setValue("Members", Text.of(String.valueOf(clan.getMembers().size())));
         table.setValue("Allies", generateAllyList(clan));
+        if (Config.getBoolean(Config.USE_ECONOMY) && clan.getBank().getDebt() > 0) {
+            table.setValue("Debt",
+                    Text.builder(String.valueOf(Utils.round(clan.getBank().getDebt(), 2))
+                            + " " + MCClans.getPlugin().getServiceHelper().currency.getPluralDisplayName().toPlain()).color(TextColors.RED).build()
+            );
+        }
         table.setValue("Kills", Utils.formatKdr(clan.getTotalKills(),
                 clan.getKills(KillDeathFactor.HIGH), clan.getKills(KillDeathFactor.MEDIUM), clan.getKills(KillDeathFactor.LOW)));
         table.setValue("Deaths", Utils.formatKdr(clan.getTotalDeaths(),
@@ -562,7 +568,7 @@ public class ClanCommands {
 
                     int homeSetTimes = clan.getHomeSetTimes();
                     double setClanhomeCost = setClanhomeBaseCost + (homeSetTimes * reSetClanhomeCostIncrease);
-                    String currencyName = MCClans.getPlugin().getServiceHelper().currency.getDisplayName().toPlain();
+                    String currencyName = MCClans.getPlugin().getServiceHelper().currency.getPluralDisplayName().toPlain();
                     boolean success = EconomyUtils.withdraw(clanPlayer.getUUID(), setClanhomeCost);
                     if (!success) {
                         Messages.sendYouDoNotHaveEnoughCurrency(player, setClanhomeCost, currencyName);
@@ -590,6 +596,7 @@ public class ClanCommands {
         Text setHomeText = Text.of("0");
         Text clanCreationText = Text.of("0");
         Text teleportToClanHomeText = Text.of("0");
+        Text clanTax = Text.of("0");
 
         if (Config.getBoolean(Config.USE_ECONOMY)) {
             double setClanhomeCost = Config.getDouble(Config.SET_CLANHOME_COST);
@@ -608,12 +615,19 @@ public class ClanCommands {
             }
             clanCreationText = Text.of(String.valueOf(Config.getDouble(Config.CLAN_CREATION_COST)));
             teleportToClanHomeText = Text.of(String.valueOf(Config.getDouble(Config.TELEPORT_COST)));
+            if (Config.getBoolean(Config.USE_CLAN_TAX)) {
+                clanTax = Text.join(
+                        Text.of(Config.getDouble(Config.CLAN_TAX_COST)),
+                        Text.builder((Config.getBoolean(Config.CLAN_TAX_PER_MEMBER) ? "* members" : "")).color(TextColors.GREEN).build()
+                );
+            }
         }
 
         VerticalTable table = new VerticalTable(" Clan price info", 0);
         table.setValue("Clan creation", clanCreationText);
         table.setValue("Teleport to clan home", teleportToClanHomeText);
         table.setValue("Set clan home", setHomeText);
+        table.setValue("Clan upkeep", clanTax);
 
         table.draw(commandSource, 0);
     }
