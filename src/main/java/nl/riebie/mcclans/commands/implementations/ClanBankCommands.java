@@ -195,7 +195,7 @@ public class ClanBankCommands {
                     Text.join(
                             Text.builder(clanPlayer.getName()).color(TextColors.GREEN).build(),
                             Text.builder(" set to share the tax bill").color(TextColors.DARK_GREEN).build()
-
+                    )
             );
         } else {
             clan.sendMessage(

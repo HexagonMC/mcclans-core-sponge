@@ -73,6 +73,8 @@ public class Config {
     public static final String CLAN_NAME_CHARACTERS_MINIMUM = "clan-name-characters-minimum";
     public static final String CLAN_NAME_CHARACTERS_MAXIMUM = "clan-name-characters-maximum";
 
+    public static final String CLAN_MEMBERS_MAXIMUM = "clan-members-maximum";
+
     // ======================================== SECTION DATABASE ======================================== //
     private static final String SECTION_DATABASE = "database";
 
@@ -141,7 +143,9 @@ public class Config {
                 ConfigOption.builder(CLAN_TAG_CHARACTERS_MAXIMUM, 6).addMinimumNumberConstraint(1).build(),
                 ConfigOption.builder(CLAN_NAME_REGEX, "[A-Za-z0-9_]+").build(),
                 ConfigOption.builder(CLAN_NAME_CHARACTERS_MINIMUM, 2).addMinimumNumberConstraint(1).build(),
-                ConfigOption.builder(CLAN_NAME_CHARACTERS_MAXIMUM, 30).addMinimumNumberConstraint(1).build()
+                ConfigOption.builder(CLAN_NAME_CHARACTERS_MAXIMUM, 30).addMinimumNumberConstraint(1).build(),
+
+                ConfigOption.builder(CLAN_MEMBERS_MAXIMUM, -1).addMinimumNumberConstraint(-1).build()
         ).build();
 
         ConfigSection databaseConfigSection = ConfigSection.builder(SECTION_DATABASE).setConfigOptions(
