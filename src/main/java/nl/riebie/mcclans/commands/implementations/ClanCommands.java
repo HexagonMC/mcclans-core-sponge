@@ -140,14 +140,16 @@ public class ClanCommands {
                 } else {
                     if (Config.getBoolean(Config.USE_ECONOMY)) {
                         double clanCreationCost = Config.getDouble(Config.CLAN_CREATION_COST);
-                        boolean success = EconomyUtils.withdraw(clanPlayer.getUUID(), clanCreationCost);
-                        String currencyName = MCClans.getPlugin().getServiceHelper().currency.getPluralDisplayName().toPlain();
+                        if (clanCreationCost > 0) {
+                            boolean success = EconomyUtils.withdraw(clanPlayer.getUUID(), clanCreationCost);
+                            String currencyName = MCClans.getPlugin().getServiceHelper().currency.getPluralDisplayName().toPlain();
 
-                        if (!success) {
-                            Messages.sendYouDoNotHaveEnoughCurrency(commandSource, clanCreationCost, currencyName);
-                            return;
+                            if (!success) {
+                                Messages.sendYouDoNotHaveEnoughCurrency(commandSource, clanCreationCost, currencyName);
+                                return;
+                            }
+                            Messages.sendYouWereChargedCurrency(commandSource, clanCreationCost, currencyName);
                         }
-                        Messages.sendYouWereChargedCurrency(commandSource, clanCreationCost, currencyName);
                     }
 
                     ClanImpl clanImpl = ClansImpl.getInstance().createClanInternal(clanTag, clanName, clanPlayer);
@@ -596,15 +598,13 @@ public class ClanCommands {
         Text setHomeText = Text.of("0");
         Text clanCreationText = Text.of("0");
         Text teleportToClanHomeText = Text.of("0");
-        Text clanTax = Text.of("0");
 
         if (Config.getBoolean(Config.USE_ECONOMY)) {
             double setClanhomeCost = Config.getDouble(Config.SET_CLANHOME_COST);
             setHomeText = Text.of(String.valueOf(setClanhomeCost));
             double reSetClanhomeCostIncrease = Config.getDouble(Config.RE_SET_CLANHOME_COST_INCREASE);
             if (reSetClanhomeCostIncrease != 0 && clan != null) {
-                double setHomePriceIncrease = 0;
-                setHomePriceIncrease = clan.getHomeSetTimes() * reSetClanhomeCostIncrease;
+                double setHomePriceIncrease = clan.getHomeSetTimes() * reSetClanhomeCostIncrease;
                 setHomeText = Text.join(
                         setHomeText,
                         Text.builder(" + ").color(TextColors.GRAY).build(),
@@ -615,19 +615,38 @@ public class ClanCommands {
             }
             clanCreationText = Text.of(String.valueOf(Config.getDouble(Config.CLAN_CREATION_COST)));
             teleportToClanHomeText = Text.of(String.valueOf(Config.getDouble(Config.TELEPORT_COST)));
-            if (Config.getBoolean(Config.USE_CLAN_TAX)) {
-                clanTax = Text.join(
-                        Text.of(Config.getDouble(Config.CLAN_TAX_COST)),
-                        Text.builder((Config.getBoolean(Config.CLAN_TAX_PER_MEMBER) ? "* members" : "")).color(TextColors.GREEN).build()
-                );
-            }
         }
 
         VerticalTable table = new VerticalTable(" Clan price info", 0);
         table.setValue("Clan creation", clanCreationText);
         table.setValue("Teleport to clan home", teleportToClanHomeText);
         table.setValue("Set clan home", setHomeText);
-        table.setValue("Clan upkeep", clanTax);
+
+        if (Config.getBoolean(Config.USE_CLAN_TAX)) {
+            double upkeep = Utils.round(Config.getDouble(Config.CLAN_TAX_COST), 2);
+            Text.Builder clanTaxBuilder = Text.builder(String.valueOf(upkeep));
+            if (Config.getBoolean(Config.CLAN_TAX_PER_MEMBER)) {
+                if (clan == null) {
+                    clanTaxBuilder.append(
+                            Text.builder(" * ").color(TextColors.GRAY).build(),
+                            Text.of("members")
+                    );
+                } else {
+                    clanTaxBuilder.append(
+                            Text.builder(" * ").color(TextColors.GRAY).build(),
+                            Text.of(String.valueOf(clan.getMemberCount())),
+                            Text.builder(" = ").color(TextColors.GRAY).build(),
+                            Text.of(String.valueOf(Utils.round(upkeep * clan.getMemberCount(), 2)))
+                    );
+                }
+            }
+            clanTaxBuilder.append(
+                    Text.builder(" every ").color(TextColors.GRAY).build(),
+                    Utils.formatTime(Config.getInteger(Config.CLAN_TAX_INTERVAL_SECONDS), TextColors.GRAY, TextColors.RESET)
+            );
+
+            table.setValue("Clan upkeep", clanTaxBuilder.build());
+        }
 
         table.draw(commandSource, 0);
     }

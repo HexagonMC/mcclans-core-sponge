@@ -36,7 +36,9 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
 import org.spongepowered.api.scheduler.Task;
+import org.spongepowered.api.service.economy.Currency;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.format.TextColors;
 
 /**
  * Created by Kippers on 13/02/2016.
@@ -79,12 +81,30 @@ public class ClientConnectionListener {
                 }
             }
 
+            // TODO messages
             if (Config.getBoolean(Config.USE_ECONOMY)) {
-                if (clanPlayer.getEconomyStats().getDebt() > 0) {
-                    clanPlayer.sendMessage(Text.of("You have a debt to your clan of $" + Utils.round(clanPlayer.getEconomyStats().getDebt(), 2) + "!"));
+                Currency currency = MCClans.getPlugin().getServiceHelper().currency;
+                double debt = clanPlayer.getEconomyStats().getDebt();
+                double clanDebt = clan == null ? 0 : clan.getBank().getDebt();
+                if (debt > 0) {
+                    clanPlayer.sendMessage(
+                            Text.join(
+                                    Text.builder("You are ").color(TextColors.RED).build(),
+                                    Text.builder(String.valueOf(Utils.round(debt, 2)) + " ").color(TextColors.WHITE).build(),
+                                    Utils.getDisplayName(currency, debt).toBuilder().color(TextColors.RED).build(),
+                                    Text.builder(" in debt to your clan!").color(TextColors.RED).build()
+                            )
+                    );
                 }
-                if (clan != null && clan.getBank().getDebt() > 0) {
-                    clanPlayer.sendMessage(Text.of("Your clan has a debt of $" + Utils.round(clan.getBank().getDebt(), 2) + "!"));
+                if (clanDebt > 0) {
+                    clanPlayer.sendMessage(
+                            Text.join(
+                                    Text.builder("Your clan is ").color(TextColors.RED).build(),
+                                    Text.builder(String.valueOf(Utils.round(clanDebt, 2)) + " ").color(TextColors.WHITE).build(),
+                                    Utils.getDisplayName(currency, clanDebt).toBuilder().color(TextColors.RED).build(),
+                                    Text.builder(" in debt!").color(TextColors.RED).build()
+                            )
+                    );
                 }
             }
         }

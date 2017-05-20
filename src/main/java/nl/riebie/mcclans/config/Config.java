@@ -97,6 +97,7 @@ public class Config {
     public static final String CLAN_TAX_COST = "clan-tax-cost";
     public static final String CLAN_TAX_PER_MEMBER = "clan-tax-per-member";
     public static final String CLAN_TAX_INTERVAL_SECONDS = "clan-tax-interval-seconds";
+    public static final String CLAN_TAX_MAXIMUM_DEBT = "clan-tax-maximum-debt";
 
     // ======================================== SECTION COMMAND ALIASES ======================================== //
     private static final String SECTION_COMMAND_ALIASES = "command-aliases";
@@ -163,7 +164,8 @@ public class Config {
                 ConfigOption.builder(USE_CLAN_TAX, false).build(),
                 ConfigOption.builder(CLAN_TAX_COST, 5).addMinimumNumberConstraint(0).build(),
                 ConfigOption.builder(CLAN_TAX_PER_MEMBER, false).build(),
-                ConfigOption.builder(CLAN_TAX_INTERVAL_SECONDS, 86400).addMinimumNumberConstraint(60).build()
+                ConfigOption.builder(CLAN_TAX_INTERVAL_SECONDS, 86400).addMinimumNumberConstraint(60).build(),
+                ConfigOption.builder(CLAN_TAX_MAXIMUM_DEBT, 0).addMinimumNumberConstraint(-1).build()
         ).build();
 
         Map<String, String> commandAliases = new HashMap<>();

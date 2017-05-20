@@ -66,7 +66,7 @@ public class ClanBankCommands {
         if (accountOpt.isPresent()) {
             Account account = accountOpt.get();
             BigDecimal balance = account.getBalance(currency);
-            Messages.sendClanBankBalance(sender, balance.doubleValue(), clan.getBank().getDebt(), currency.getPluralDisplayName().toPlain());
+            Messages.sendClanBankBalance(sender, balance.doubleValue(), clan.getBank().getDebt(), Config.getDouble(Config.CLAN_TAX_MAXIMUM_DEBT), currency.getPluralDisplayName().toPlain());
         } else {
             Messages.sendWarningMessage(sender, Messages.NO_ECONOMY_ACCOUNT_FOUND);
         }
@@ -158,14 +158,26 @@ public class ClanBankCommands {
     }
 
     @Command(name = "fee", description = "Set the member fee", isPlayerOnly = true, isClanOnly = true, clanPermission = "fee", spongePermission = "mcclans.user.bank.fee")
-    public void clanBankFeeCommand(CommandSource sender, ClanPlayerImpl clanPlayer, @Parameter(name = "amount", constraint = PositiveNumberConstraint.class) Fee fee) {
+    public void clanBankFeeCommand(CommandSource sender, ClanPlayerImpl clanPlayer, @Parameter(name = "amount", constraint = PositiveNumberConstraint.class) Optional<Fee> feeOpt) {
         if (!Config.getBoolean(Config.USE_ECONOMY)) {
             Messages.sendWarningMessage(sender, Messages.ECONOMY_USAGE_IS_CURRENTLY_DISABLED);
             return;
         }
-        double amount = Utils.round(fee.value, 2);
 
         ClanImpl clan = clanPlayer.getClan();
+        if (!feeOpt.isPresent()) {
+            double fee = clan.getBank().getMemberFee();
+            // TODO messages
+            if (fee == -1) {
+                clan.sendMessage(Text.of("The member fee is set to share the tax bill"));
+            } else {
+                clan.sendMessage(Text.of("The member fee is set to $" + fee));
+            }
+            return;
+        }
+        Fee fee = feeOpt.get();
+        double amount = Utils.round(fee.value, 2);
+
         clan.getBank().setMemberFee(amount);
         TaskForwarder.sendUpdateClan(clan);
         // TODO messages

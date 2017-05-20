@@ -23,6 +23,7 @@
 package nl.riebie.mcclans.utils;
 
 import nl.riebie.mcclans.config.Config;
+import org.spongepowered.api.service.economy.Currency;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.format.TextColors;
@@ -238,5 +239,13 @@ public final class Utils {
 
     public static double round(double value, int scale) {
         return new BigDecimal(value).setScale(scale, RoundingMode.HALF_UP).doubleValue();
+    }
+
+    public static Text getDisplayName(Currency currency, double amount) {
+        if (amount < -1 || amount > 1) {
+            return currency.getPluralDisplayName();
+        } else {
+            return currency.getDisplayName();
+        }
     }
 }
