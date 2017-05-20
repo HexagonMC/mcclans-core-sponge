@@ -44,6 +44,10 @@ public class ClanPlayerPojo {
     public int deathsLow = 0;
     public boolean ffProtection = true;
     public long lastOnlineTime = 0;
+    public double deposit = 0;
+    public double withdraw = 0;
+    public double tax = 0;
+    public double debt = 0;
 
     public static ClanPlayerPojo from(ClanPlayerImpl cp) {
         ClanPlayerPojo clanPlayerPojo = new ClanPlayerPojo();
@@ -69,6 +73,10 @@ public class ClanPlayerPojo {
         clanPlayerPojo.deathsLow = cp.getKillDeath().getDeaths(KillDeathFactor.LOW);
         clanPlayerPojo.ffProtection = cp.isFfProtected();
         clanPlayerPojo.lastOnlineTime = cp.getLastOnline().getTime();
+        clanPlayerPojo.deposit = cp.getEconomyStats().getDeposit();
+        clanPlayerPojo.withdraw = cp.getEconomyStats().getWithdraw();
+        clanPlayerPojo.tax = cp.getEconomyStats().getTax();
+        clanPlayerPojo.debt = cp.getEconomyStats().getDebt();
         return clanPlayerPojo;
     }
 

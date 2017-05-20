@@ -16,6 +16,9 @@ public class ClanBankImpl implements ClanBank {
 
     private final String id;
 
+    private double debt;
+    private double memberFee;
+
     public ClanBankImpl(String id) {
         this.id = id;
     }
@@ -78,5 +81,25 @@ public class ClanBankImpl implements ClanBank {
         }
 
         return EconomyUtils.getBalance(id);
+    }
+
+    public double getDebt() {
+        return debt;
+    }
+
+    public void setDebt(double debt) {
+        this.debt = debt;
+    }
+
+    public void addDebt(double debt) {
+        setDebt(getDebt() + debt);
+    }
+
+    public double getMemberFee() {
+        return memberFee;
+    }
+
+    public void setMemberFee(double memberFee) {
+        this.memberFee = memberFee;
     }
 }

@@ -187,7 +187,8 @@ public class ClansImpl implements ClanService {
     }
 
     public ClanImpl createClanInternal(String tag, String name, ClanPlayerImpl owner) {
-        ClanImpl newClan = new ClanImpl.Builder(getNextAvailableClanID(), tag, name).owner(owner).build();
+        ClanImpl newClan = new ClanImpl.Builder(getNextAvailableClanID(), tag, name, UUID.randomUUID().toString())
+                .owner(owner).build();
         newClan.setupDefaultRanks();
         newClan.addMember(owner);
 
@@ -221,6 +222,7 @@ public class ClansImpl implements ClanService {
         for (ClanPlayerImpl clanPlayer : clan.getMembersImpl()) {
             clanPlayer.setClan(null);
             clanPlayer.setRankInternal(null);
+            clanPlayer.resetEconomyStats();
         }
         List<RankImpl> ranks = clan.getRankImpls();
         for (RankImpl rank : ranks) {

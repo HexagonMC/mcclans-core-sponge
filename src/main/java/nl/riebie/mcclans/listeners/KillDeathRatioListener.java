@@ -23,9 +23,10 @@
 package nl.riebie.mcclans.listeners;
 
 import nl.riebie.mcclans.ClansImpl;
-import nl.riebie.mcclans.config.Config;
 import nl.riebie.mcclans.api.enums.KillDeathFactor;
+import nl.riebie.mcclans.config.Config;
 import nl.riebie.mcclans.events.EventDispatcher;
+import nl.riebie.mcclans.persistence.TaskForwarder;
 import nl.riebie.mcclans.player.ClanPlayerImpl;
 import nl.riebie.mcclans.player.KillDeathFactorHandler;
 import nl.riebie.mcclans.player.LastPlayerDamage;
@@ -107,6 +108,8 @@ public class KillDeathRatioListener {
             killerClanPlayer.getKillDeath().addKill(killFactor);
             victimClanPlayer.getKillDeath().addDeath(deathFactor);
 
+            TaskForwarder.sendUpdateClanPlayer(killerClanPlayer);
+            TaskForwarder.sendUpdateClanPlayer(victimClanPlayer);
             EventDispatcher.getInstance().dispatchClanPlayerKillEvent(killerClanPlayer, victimClanPlayer);
         }
     }

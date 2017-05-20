@@ -22,6 +22,7 @@
 
 package nl.riebie.mcclans.commands.implementations;
 
+import nl.riebie.mcclans.MCClans;
 import nl.riebie.mcclans.api.KillDeath;
 import nl.riebie.mcclans.api.enums.KillDeathFactor;
 import nl.riebie.mcclans.api.events.ClanOwnerChangeEvent;
@@ -30,6 +31,7 @@ import nl.riebie.mcclans.clan.RankFactory;
 import nl.riebie.mcclans.clan.RankImpl;
 import nl.riebie.mcclans.commands.annotations.Command;
 import nl.riebie.mcclans.commands.annotations.Parameter;
+import nl.riebie.mcclans.config.Config;
 import nl.riebie.mcclans.events.EventDispatcher;
 import nl.riebie.mcclans.messages.Messages;
 import nl.riebie.mcclans.player.ClanPlayerImpl;
@@ -121,6 +123,14 @@ public class ClanPlayerCommands {
             lastOnlineMessage = Text.of(targetClanPlayer.getLastOnline().getDifferenceInText());
         }
         table.setValue("Last Online", Text.of(lastOnlineMessage));
+        if (Config.getBoolean(Config.USE_ECONOMY) && targetClanPlayer.getEconomyStats().getDebt() > 0
+                && (clanPlayer == null || clanPlayer.equals(targetClanPlayer)
+                || (clanPlayer.isMemberOfClan(targetClanPlayer.getClan()) && clanPlayer.checkPermission("bankstats")))) {
+            table.setValue("Debt",
+                    Text.builder(String.valueOf(Utils.round(targetClanPlayer.getEconomyStats().getDebt(), 2))
+                            + " " + MCClans.getPlugin().getServiceHelper().currency.getPluralDisplayName().toPlain()).color(TextColors.RED).build()
+            );
+        }
         KillDeath kdr = targetClanPlayer.getKillDeath();
         table.setValue("Kills", Utils.formatKdr(kdr.getTotalKills(), kdr.getKills(KillDeathFactor.HIGH), kdr.getKills(KillDeathFactor.MEDIUM), kdr.getKills(KillDeathFactor.LOW)));
         table.setValue("Deaths", Utils.formatKdr(kdr.getTotalDeaths(), kdr.getDeaths(KillDeathFactor.HIGH), kdr.getDeaths(KillDeathFactor.MEDIUM), kdr.getDeaths(KillDeathFactor.LOW)));

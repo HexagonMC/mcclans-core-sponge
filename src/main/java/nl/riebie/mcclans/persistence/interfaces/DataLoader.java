@@ -123,9 +123,9 @@ public abstract class DataLoader {
 
     protected void loadedClan(int clanID, String clanTag, String clanName, int ownerID, String tagColorId, boolean allowAllyInvites,
                               boolean ffProtection, long creationTime, String homeWorld, double homeX, double homeY, double homeZ, float homeYaw, float homePitch,
-                              int homeSetTimes, long homeLastSetTimeStamp, String bankId) {
-        ClanImpl clan = new ClanImpl.Builder(clanID, clanTag, clanName).tagColor(Utils.getTextColorById(tagColorId, Config.getColor(Config.CLAN_TAG_DEFAULT_COLOR))).acceptAllyInvites(allowAllyInvites)
-                .ffProtection(ffProtection).creationTime(creationTime).homeSetTimes(homeSetTimes).homeLastSetTimeStamp(homeLastSetTimeStamp).bankId(bankId).build();
+                              int homeSetTimes, long homeLastSetTimeStamp, String bankId, double debt, double memberFee) {
+        ClanImpl clan = new ClanImpl.Builder(clanID, clanTag, clanName, bankId).tagColor(Utils.getTextColorById(tagColorId, Config.getColor(Config.CLAN_TAG_DEFAULT_COLOR))).acceptAllyInvites(allowAllyInvites)
+                .ffProtection(ffProtection).creationTime(creationTime).homeSetTimes(homeSetTimes).homeLastSetTimeStamp(homeLastSetTimeStamp).debt(debt).memberFee(memberFee).build();
         if (homeWorld != null && Sponge.getServer().getWorld(UUID.fromString(homeWorld)).isPresent()) {
             // TODO SPONGE homeYaw, homePitch
             clan.setHomeInternal(new Location<>(Sponge.getServer().getWorld(UUID.fromString(homeWorld)).get(), homeX, homeY, homeZ));
@@ -157,7 +157,8 @@ public abstract class DataLoader {
     }
 
     protected void loadedClanPlayer(int clanPlayerID, long uuidMostSigBits, long uuidLeastSigBits, String playerName, int clanID, int rankID,
-                                    int killsHigh, int killsMedium, int killsLow, int deathsHigh, int deathsMedium, int deathsLow, boolean ffProtection, long lastOnlineTime) {
+                                    int killsHigh, int killsMedium, int killsLow, int deathsHigh, int deathsMedium, int deathsLow, boolean ffProtection, long lastOnlineTime,
+                                    double deposit, double withdraw, double tax, double debt) {
         ClanImpl clan = null;
         RankImpl rankImpl = null;
 
@@ -174,7 +175,7 @@ public abstract class DataLoader {
 
         ClanPlayerImpl cp = new ClanPlayerImpl.Builder(clanPlayerID, new UUID(uuidMostSigBits, uuidLeastSigBits), playerName).clan(clan)
                 .rank(rankImpl).kills(killsHigh, killsMedium, killsLow).deaths(deathsHigh, deathsMedium, deathsLow).ffProtection(ffProtection)
-                .lastOnline(new LastOnlineImpl(lastOnlineTime)).build();
+                .lastOnline(new LastOnlineImpl(lastOnlineTime)).economyStats(deposit, withdraw, tax, debt).build();
 
         clanPlayers.put(clanPlayerID, cp);
         if (clan != null) {
