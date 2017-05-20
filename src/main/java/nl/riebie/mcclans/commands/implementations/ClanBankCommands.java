@@ -158,33 +158,54 @@ public class ClanBankCommands {
     }
 
     @Command(name = "fee", description = "Set the member fee", isPlayerOnly = true, isClanOnly = true, clanPermission = "fee", spongePermission = "mcclans.user.bank.fee")
-    public void clanBankFeeCommand(CommandSource sender, ClanPlayerImpl clanPlayer, @Parameter(name = "amount", constraint = PositiveNumberConstraint.class) Optional<Fee> feeOpt) {
+    public void clanBankFeeCommand(CommandSource sender, ClanPlayerImpl clanPlayer, @Parameter(name = "amount", constraint = PositiveNumberConstraint.class) Fee fee) {
         if (!Config.getBoolean(Config.USE_ECONOMY)) {
             Messages.sendWarningMessage(sender, Messages.ECONOMY_USAGE_IS_CURRENTLY_DISABLED);
             return;
         }
+        Currency currency = MCClans.getPlugin().getServiceHelper().currency;
 
         ClanImpl clan = clanPlayer.getClan();
-        if (!feeOpt.isPresent()) {
-            double fee = clan.getBank().getMemberFee();
-            // TODO messages
-            if (fee == -1) {
-                clan.sendMessage(Text.of("The member fee is set to share the tax bill"));
-            } else {
-                clan.sendMessage(Text.of("The member fee is set to $" + fee));
-            }
-            return;
-        }
-        Fee fee = feeOpt.get();
+//        if (!feeOpt.isPresent()) {
+//            double fee = clan.getBank().getMemberFee();
+//            // TODO messages
+//            if (fee == -1) {
+//                clanPlayer.sendMessage(
+//                        Text.builder("The member fee is set to share the tax bill").color(TextColors.DARK_GREEN).build()
+//                );
+//            } else {
+//                clanPlayer.sendMessage(
+//                        Text.join(
+//                                Text.builder("The member fee is set to ").color(TextColors.DARK_GREEN).build(),
+//                                Text.builder(String.valueOf(Utils.round(fee, 2)) + " ").color(TextColors.GREEN).build(),
+//                                Utils.getDisplayName(currency, fee).toBuilder().color(TextColors.DARK_GREEN).build()
+//                        )
+//                );
+//            }
+//            return;
+//        }
+//        Fee fee = feeOpt.get();
         double amount = Utils.round(fee.value, 2);
 
         clan.getBank().setMemberFee(amount);
         TaskForwarder.sendUpdateClan(clan);
         // TODO messages
         if (amount == -1) {
-            clan.sendMessage(Text.of(clanPlayer.getName() + " set the member fee to share the tax bill"));
+            clan.sendMessage(
+                    Text.join(
+                            Text.builder(clanPlayer.getName()).color(TextColors.GREEN).build(),
+                            Text.builder(" set to share the tax bill").color(TextColors.DARK_GREEN).build()
+
+            );
         } else {
-            clan.sendMessage(Text.of(clanPlayer.getName() + " set the member fee to $" + amount));
+            clan.sendMessage(
+                    Text.join(
+                            Text.builder(clanPlayer.getName()).color(TextColors.GREEN).build(),
+                            Text.builder(" set the member fee to ").color(TextColors.DARK_GREEN).build(),
+                            Text.builder(String.valueOf(amount) + " ").color(TextColors.GREEN).build(),
+                            Utils.getDisplayName(currency, amount).toBuilder().color(TextColors.DARK_GREEN).build()
+                    )
+            );
         }
     }
 
