@@ -31,6 +31,7 @@ import nl.riebie.mcclans.commands.annotations.*;
 import nl.riebie.mcclans.commands.implementations.tables.RankViewTable;
 import nl.riebie.mcclans.messages.Messages;
 import nl.riebie.mcclans.player.ClanPlayerImpl;
+import nl.riebie.mcclans.utils.Utils;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.text.Text;
 
@@ -56,27 +57,32 @@ public class ClanRankCommands {
             Messages.sendWarningMessage(sender, Messages.YOU_ARE_NOT_IN_A_CLAN);
             return;
         }
-        if (!clan.containsRank(rankName)) {
-            clanPlayer.getClan().addRank(rankName);
-            Messages.sendRankSuccessfullyCreated(sender, rankName);
-            if (permissions.isPresent()) {
-                RankImpl rank = clanPlayer.getClan().getRank(rankName);
-                for (ClanPermission permission : permissions.get()) {
-                    PermissionModifyResponse response = rank.addPermission(permission.getName());
-                    switch (response) {
-                        case ALREADY_CONTAINS_PERMISSION:
-                            Messages.sendAddingPermissionFailedRankAlreadyHasThisPermission(sender, permission.getName());
-                            break;
-                        case SUCCESSFULLY_MODIFIED:
-                            Messages.sendSuccessfullyAddedThisPermission(sender, permission.getName());
-                            break;
-                        default:
-                            break;
-                    }
+        if (clan.containsRank(rankName)) {
+            Messages.sendRankExistsAlready(sender, rankName);
+            return;
+        }
+        if (Utils.isRankNameBlocked(rankName)) {
+            Messages.sendWarningMessage(sender, Messages.RANK_NAME_BLOCKED);
+            return;
+        }
+
+        clanPlayer.getClan().addRank(rankName);
+        Messages.sendRankSuccessfullyCreated(sender, rankName);
+        if (permissions.isPresent()) {
+            RankImpl rank = clanPlayer.getClan().getRank(rankName);
+            for (ClanPermission permission : permissions.get()) {
+                PermissionModifyResponse response = rank.addPermission(permission.getName());
+                switch (response) {
+                    case ALREADY_CONTAINS_PERMISSION:
+                        Messages.sendAddingPermissionFailedRankAlreadyHasThisPermission(sender, permission.getName());
+                        break;
+                    case SUCCESSFULLY_MODIFIED:
+                        Messages.sendSuccessfullyAddedThisPermission(sender, permission.getName());
+                        break;
+                    default:
+                        break;
                 }
             }
-        } else {
-            Messages.sendRankExistsAlready(sender, rankName);
         }
     }
 

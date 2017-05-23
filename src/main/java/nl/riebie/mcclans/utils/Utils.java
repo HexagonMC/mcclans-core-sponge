@@ -41,6 +41,7 @@ public final class Utils {
     private static List<String> worldsBlockedFromKdr;
     private static List<String> worldsBlockedFromFf;
     private static List<String> blockedTagsAndNames;
+    private static List<String> blockedRankNames;
 
     private Utils() {
         // Private constructor
@@ -220,6 +221,18 @@ public final class Utils {
         }
         for (String name : blockedTagsAndNames) {
             if (name.equalsIgnoreCase(clanTagOrName)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean isRankNameBlocked(String rankName) {
+        if (blockedRankNames == null) {
+            blockedRankNames = Config.getList(Config.BLOCKED_RANK_NAMES, String.class);
+        }
+        for (String name : blockedRankNames) {
+            if (name.equalsIgnoreCase(rankName)) {
                 return true;
             }
         }

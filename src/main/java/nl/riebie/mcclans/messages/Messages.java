@@ -40,6 +40,7 @@ public class Messages {
     public static final String CLAN_TAG_EXISTS_ALREADY = "Clan tag exists already";
     public static final String CLAN_TAG_BLOCKED = "This clan tag is blacklisted. Please try another";
     public static final String CLAN_NAME_BLOCKED = "This clan name is blacklisted. Please try another";
+    public static final String RANK_NAME_BLOCKED = "This rank name is blacklisted. Please try another";
     public static final String YOU_ARE_ALREADY_IN_A_CLAN = "You are already in a clan";
     public static final String CLAN_DOES_NOT_EXIST = "Clan does not exist";
     public static final String YOU_ARE_NOT_IN_A_CLAN = "You are not in a clan";
