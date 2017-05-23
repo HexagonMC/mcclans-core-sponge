@@ -192,6 +192,10 @@ public class MCClans {
             registerBackupTask();
         }
 
+        if (!Config.getBoolean(Config.USE_ECONOMY) && Config.getBoolean(Config.USE_CLAN_TAX)) {
+            Config.setValue(Config.USE_CLAN_TAX, false);
+            getLogger().warn("Cannot use clan tax with economy usage disabled. Deactivating clan tax", true);
+        }
         if (Config.getBoolean(Config.USE_CLAN_TAX)) {
             TaxManager.get().init();
         }
@@ -384,19 +388,22 @@ public class MCClans {
                         @Nonnull
                         @Override
                         public Optional<Text> parse(String tokenInput, CommandSource source, Map<String, Object> variables) {
-                            if (!"clantag".equals(tokenInput)) {
-                                return Optional.empty();
-                            }
                             if (!(source instanceof Player)) {
                                 return Optional.empty();
                             }
                             Player player = (Player) source;
                             ClanPlayerImpl clanPlayer = ClansImpl.getInstance().getClanPlayer(player.getUniqueId());
-                            if (clanPlayer == null || clanPlayer.getClan() == null) {
+                            if (clanPlayer == null || clanPlayer.getClan() == null || clanPlayer.getRank() == null) {
                                 return Optional.empty();
                             }
 
-                            return Optional.of(clanPlayer.getClan().getTagColored());
+                            if ("clantag".equals(tokenInput)) {
+                                return Optional.of(clanPlayer.getClan().getTagColored());
+                            } else if ("rankname".equals(tokenInput)) {
+                                return Optional.of(clanPlayer.getRank().getNameColored());
+                            } else {
+                                return Optional.empty();
+                            }
                         }
                     });
                 } catch (PluginAlreadyRegisteredException e) {

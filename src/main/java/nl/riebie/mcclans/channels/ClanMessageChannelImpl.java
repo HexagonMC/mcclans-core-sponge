@@ -24,9 +24,9 @@ package nl.riebie.mcclans.channels;
 
 import nl.riebie.mcclans.ClansImpl;
 import nl.riebie.mcclans.api.Clan;
-import nl.riebie.mcclans.api.Rank;
 import nl.riebie.mcclans.api.channels.ClanMessageChannel;
 import nl.riebie.mcclans.clan.ClanImpl;
+import nl.riebie.mcclans.clan.RankImpl;
 import nl.riebie.mcclans.player.ClanPlayerImpl;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
@@ -93,8 +93,8 @@ public class ClanMessageChannelImpl extends AbstractMutableMessageChannel implem
     public Optional<Text> transformMessage(@Nullable Object sender, MessageReceiver recipient, Text original, ChatType type) {
         boolean spy = recipient instanceof Player && spies.contains(((Player) recipient).getUniqueId());
 
-        Clan clan = clanPlayer.getClan();
-        Rank rank = clanPlayer.getRank();
+        ClanImpl clan = clanPlayer.getClan();
+        RankImpl rank = clanPlayer.getRank();
         Text rankText = null;
         if (spy && clan != null) {
             rankText = Text.join(
@@ -103,9 +103,8 @@ public class ClanMessageChannelImpl extends AbstractMutableMessageChannel implem
             );
         } else if (rank != null) {
             rankText = Text.join(
-                    Text.builder("[").color(TextColors.GRAY).build(),
-                    Text.builder(rank.getName()).color(TextColors.BLUE).build(),
-                    Text.builder("] ").color(TextColors.GRAY).build()
+                    rank.getNameColored(),
+                    Text.of(" ")
             );
         }
 

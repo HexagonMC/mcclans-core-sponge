@@ -27,6 +27,8 @@ import nl.riebie.mcclans.api.Rank;
 import nl.riebie.mcclans.api.enums.PermissionModifyResponse;
 import nl.riebie.mcclans.api.permissions.ClanPermissionManager;
 import nl.riebie.mcclans.persistence.TaskForwarder;
+import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.format.TextColors;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,6 +61,14 @@ public class RankImpl implements Rank {
     public void setName(String name) {
         this.name = name;
         TaskForwarder.sendUpdateRank(this);
+    }
+
+    public Text getNameColored() {
+        return Text.join(
+                Text.builder("[").color(TextColors.GRAY).build(),
+                Text.builder(name).color(TextColors.BLUE).build(),
+                Text.builder("]").color(TextColors.GRAY).build()
+        );
     }
 
     @Override
@@ -96,7 +106,7 @@ public class RankImpl implements Rank {
         }
     }
 
-    public void setPermissions(List<String> permissions){
+    public void setPermissions(List<String> permissions) {
         this.permissions = permissions;
     }
 

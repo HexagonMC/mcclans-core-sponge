@@ -60,6 +60,7 @@ public class Config {
     public static final String BLOCKED_WORLDS_FF_PROTECTION = "blocked-worlds-ff-protection";
     public static final String BLOCKED_WORLDS_PLAYER_KDR = "blocked-worlds-player-kdr";
     public static final String BLOCKED_CLAN_TAGS_AND_NAMES = "blocked-clan-tags-and-names";
+    public static final String BLOCKED_RANK_NAMES = "blocked-rank-names";
 
     public static final String CREATE_BACKUP_AFTER_HOURS = "create-backup-after-hours";
     public static final String MAXIMUM_AMOUNT_OF_BACKUPS_BEFORE_REMOVING_OLDEST = "maximum-amount-of-backups-before-removing-oldest";
@@ -74,6 +75,8 @@ public class Config {
     public static final String CLAN_NAME_CHARACTERS_MAXIMUM = "clan-name-characters-maximum";
 
     public static final String CLAN_MEMBERS_MAXIMUM = "clan-members-maximum";
+    public static final String CLAN_RANK_NAME_OWNER = "clan-rank-name-owner";
+    public static final String CLAN_RANK_NAME_RECRUIT = "clan-rank-name-recruit";
 
     // ======================================== SECTION DATABASE ======================================== //
     private static final String SECTION_DATABASE = "database";
@@ -132,6 +135,7 @@ public class Config {
                 ConfigOption.builder(BLOCKED_WORLDS_FF_PROTECTION, Arrays.asList("example_world1", "example_world2")).build(),
                 ConfigOption.builder(BLOCKED_WORLDS_PLAYER_KDR, Arrays.asList("example_world1", "example_world2")).build(),
                 ConfigOption.builder(BLOCKED_CLAN_TAGS_AND_NAMES, Arrays.asList("example_name1", "example_name2")).build(),
+                ConfigOption.builder(BLOCKED_RANK_NAMES, Arrays.asList("example_name1", "example_name2")).build(),
 
                 ConfigOption.builder(CREATE_BACKUP_AFTER_HOURS, 24).addMinimumNumberConstraint(0).build(),
                 ConfigOption.builder(MAXIMUM_AMOUNT_OF_BACKUPS_BEFORE_REMOVING_OLDEST, 14).addMinimumNumberConstraint(0).build(),
@@ -145,7 +149,13 @@ public class Config {
                 ConfigOption.builder(CLAN_NAME_CHARACTERS_MINIMUM, 2).addMinimumNumberConstraint(1).build(),
                 ConfigOption.builder(CLAN_NAME_CHARACTERS_MAXIMUM, 30).addMinimumNumberConstraint(1).build(),
 
-                ConfigOption.builder(CLAN_MEMBERS_MAXIMUM, -1).addMinimumNumberConstraint(-1).build()
+                ConfigOption.builder(CLAN_MEMBERS_MAXIMUM, -1).addMinimumNumberConstraint(-1).build(),
+                ConfigOption.builder(CLAN_RANK_NAME_OWNER, "Owner").addMinimumLengthConstraint(1).addNotContainStringConstraint(" ")
+                        .setComment("When changing this rank name, make absolutely sure the new name is not in use by any of the clans, and is different from '" + CLAN_RANK_NAME_RECRUIT + "' and '" + DEFAULT_CLAN_RANKS + "'!")
+                        .build(),
+                ConfigOption.builder(CLAN_RANK_NAME_RECRUIT, "Recruit").addMinimumLengthConstraint(1).addNotContainStringConstraint(" ")
+                        .setComment("When changing this rank name, make absolutely sure the new name is not in use by any of the clans, and is different from '" + CLAN_RANK_NAME_OWNER + "' and '" + DEFAULT_CLAN_RANKS + "'!")
+                        .build()
         ).build();
 
         ConfigSection databaseConfigSection = ConfigSection.builder(SECTION_DATABASE).setConfigOptions(
