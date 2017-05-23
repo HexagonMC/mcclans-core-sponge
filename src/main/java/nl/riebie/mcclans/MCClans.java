@@ -60,7 +60,6 @@ import org.spongepowered.api.service.economy.Currency;
 import org.spongepowered.api.service.economy.EconomyService;
 import org.spongepowered.api.service.user.UserStorageService;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.format.TextColors;
 
 import javax.annotation.Nonnull;
 import java.io.File;
@@ -391,7 +390,7 @@ public class MCClans {
                             if ("clantag".equals(tokenInput)) {
                                 return Optional.of(clanPlayer.getClan().getTagColored());
                             } else if ("rankname".equals(tokenInput)) {
-                                return Optional.of(Text.builder(clanPlayer.getRank().getName()).color(TextColors.BLUE).build());
+                                return Optional.of(clanPlayer.getRank().getNameColored());
                             } else {
                                 return Optional.empty();
                             }
