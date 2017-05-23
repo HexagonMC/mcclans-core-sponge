@@ -53,10 +53,6 @@ public class ClanRankCommands {
     public void clanRankCreateCommand(CommandSource sender, ClanPlayerImpl clanPlayer, @Parameter(name = "rankName") String rankName,
                                       @Parameter(name = "permissions") Optional<List<ClanPermission>> permissions) {
         ClanImpl clan = clanPlayer.getClan();
-        if (clan == null) {
-            Messages.sendWarningMessage(sender, Messages.YOU_ARE_NOT_IN_A_CLAN);
-            return;
-        }
         if (clan.containsRank(rankName)) {
             Messages.sendRankExistsAlready(sender, rankName);
             return;
@@ -66,10 +62,10 @@ public class ClanRankCommands {
             return;
         }
 
-        clanPlayer.getClan().addRank(rankName);
+        clan.addRank(rankName);
         Messages.sendRankSuccessfullyCreated(sender, rankName);
         if (permissions.isPresent()) {
-            RankImpl rank = clanPlayer.getClan().getRank(rankName);
+            RankImpl rank = clan.getRank(rankName);
             for (ClanPermission permission : permissions.get()) {
                 PermissionModifyResponse response = rank.addPermission(permission.getName());
                 switch (response) {
