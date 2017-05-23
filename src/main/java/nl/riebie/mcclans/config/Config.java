@@ -75,6 +75,8 @@ public class Config {
     public static final String CLAN_NAME_CHARACTERS_MAXIMUM = "clan-name-characters-maximum";
 
     public static final String CLAN_MEMBERS_MAXIMUM = "clan-members-maximum";
+    public static final String CLAN_RANK_NAME_OWNER = "clan-rank-name-owner";
+    public static final String CLAN_RANK_NAME_RECRUIT = "clan-rank-name-recruit";
 
     // ======================================== SECTION DATABASE ======================================== //
     private static final String SECTION_DATABASE = "database";
@@ -147,7 +149,13 @@ public class Config {
                 ConfigOption.builder(CLAN_NAME_CHARACTERS_MINIMUM, 2).addMinimumNumberConstraint(1).build(),
                 ConfigOption.builder(CLAN_NAME_CHARACTERS_MAXIMUM, 30).addMinimumNumberConstraint(1).build(),
 
-                ConfigOption.builder(CLAN_MEMBERS_MAXIMUM, -1).addMinimumNumberConstraint(-1).build()
+                ConfigOption.builder(CLAN_MEMBERS_MAXIMUM, -1).addMinimumNumberConstraint(-1).build(),
+                ConfigOption.builder(CLAN_RANK_NAME_OWNER, "Owner").addMinimumLengthConstraint(1).addNotContainStringConstraint(" ")
+                        .setComment("When changing this rank name, make absolutely sure the new name is not in use by any of the clans, and is different from '" + CLAN_RANK_NAME_RECRUIT + "' and '" + DEFAULT_CLAN_RANKS + "'!")
+                        .build(),
+                ConfigOption.builder(CLAN_RANK_NAME_RECRUIT, "Recruit").addMinimumLengthConstraint(1).addNotContainStringConstraint(" ")
+                        .setComment("When changing this rank name, make absolutely sure the new name is not in use by any of the clans, and is different from '" + CLAN_RANK_NAME_OWNER + "' and '" + DEFAULT_CLAN_RANKS + "'!")
+                        .build()
         ).build();
 
         ConfigSection databaseConfigSection = ConfigSection.builder(SECTION_DATABASE).setConfigOptions(

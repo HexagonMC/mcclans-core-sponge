@@ -23,6 +23,7 @@
 package nl.riebie.mcclans.clan;
 
 import nl.riebie.mcclans.ClansImpl;
+import nl.riebie.mcclans.config.Config;
 import nl.riebie.mcclans.utils.Pair;
 
 import java.util.ArrayList;
@@ -34,8 +35,8 @@ import java.util.List;
 public class RankFactory {
 
     private static RankFactory instance;
-    private final static String OWNER_IDENTIFIER = "Owner";
-    private final static String RECRUIT_IDENTIFIER = "Recruit";
+    private final static String OWNER_IDENTIFIER = Config.getString(Config.CLAN_RANK_NAME_OWNER);
+    private final static String RECRUIT_IDENTIFIER = Config.getString(Config.CLAN_RANK_NAME_RECRUIT);
 
     private RankImpl owner;
     private RankImpl recruit;

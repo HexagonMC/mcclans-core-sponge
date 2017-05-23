@@ -192,6 +192,10 @@ public class MCClans {
             registerBackupTask();
         }
 
+        if (!Config.getBoolean(Config.USE_ECONOMY) && Config.getBoolean(Config.USE_CLAN_TAX)) {
+            Config.setValue(Config.USE_CLAN_TAX, false);
+            getLogger().warn("Cannot use clan tax with economy usage disabled. Deactivating clan tax", true);
+        }
         if (Config.getBoolean(Config.USE_CLAN_TAX)) {
             TaxManager.get().init();
         }

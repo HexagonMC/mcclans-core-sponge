@@ -400,7 +400,7 @@ public class ClanCommands {
     private void printInfo(CommandSource commandSource, ClanImpl clan) {
         VerticalTable table = new VerticalTable(" Clan info " + clan.getTag(), 0);
         table.setValue("Clan", Text.join(clan.getTagColored(), Text.of(" " + clan.getName())));
-        table.setValue("Owner", Text.of(clan.getOwner().getName()));
+        table.setValue(Config.getString(Config.CLAN_RANK_NAME_OWNER), Text.of(clan.getOwner().getName()));
         table.setValue("Members", Text.of(String.valueOf(clan.getMembers().size())));
         table.setValue("Allies", generateAllyList(clan));
         if (Config.getBoolean(Config.USE_ECONOMY) && clan.getBank().getDebt() > 0) {
