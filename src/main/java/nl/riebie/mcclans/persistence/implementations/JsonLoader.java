@@ -26,13 +26,14 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import nl.riebie.mcclans.MCClans;
+import nl.riebie.mcclans.persistence.exceptions.FlatFileVersionsNotEqualException;
 import nl.riebie.mcclans.persistence.exceptions.GetDataVersionFailedException;
+import nl.riebie.mcclans.persistence.exceptions.WrappedDataException;
 import nl.riebie.mcclans.persistence.interfaces.DataLoader;
 import nl.riebie.mcclans.persistence.pojo.*;
-import nl.riebie.mcclans.persistence.exceptions.FlatFileVersionsNotEqualException;
-import nl.riebie.mcclans.persistence.exceptions.WrappedDataException;
-import nl.riebie.mcclans.persistence.upgrade.versions.JsonUpgrade2;
 import nl.riebie.mcclans.persistence.upgrade.interfaces.DataUpgrade;
+import nl.riebie.mcclans.persistence.upgrade.versions.JsonUpgrade2;
+import nl.riebie.mcclans.persistence.upgrade.versions.JsonUpgrade3;
 import nl.riebie.mcclans.utils.FileUtils;
 
 import java.io.File;
@@ -168,6 +169,7 @@ public class JsonLoader extends DataLoader {
     @Override
     protected List<DataUpgrade> getDataUpgrades(List<DataUpgrade> dataUpgrades) {
         dataUpgrades.add(new JsonUpgrade2());
+        dataUpgrades.add(new JsonUpgrade3());
         return dataUpgrades;
     }
 
@@ -178,7 +180,7 @@ public class JsonLoader extends DataLoader {
 
         for (ClanPojo clan : clans.list) {
             super.loadedClan(clan.clanID, clan.clanTag, clan.clanName, clan.ownerID, clan.tagColorId, clan.allowAllyInvites, clan.ffProtection, clan.creationTime, clan.homeWorld,
-                    clan.homeX, clan.homeY, clan.homeZ, clan.homeYaw, clan.homePitch, clan.homeSetTimes, clan.homeSetTimeStamp, clan.bankId);
+                    clan.homeX, clan.homeY, clan.homeZ, clan.homeYaw, clan.homePitch, clan.homeSetTimes, clan.homeSetTimeStamp, clan.bankId, clan.debt, clan.memberFee);
         }
 
         try {
@@ -213,7 +215,8 @@ public class JsonLoader extends DataLoader {
 
         for (ClanPlayerPojo clanPlayer : clanPlayers.list) {
             super.loadedClanPlayer(clanPlayer.clanPlayerID, clanPlayer.uuidMostSigBits, clanPlayer.uuidLeastSigBits, clanPlayer.playerName, clanPlayer.clanID, clanPlayer.rankID, clanPlayer.killsHigh, clanPlayer.killsMedium,
-                    clanPlayer.killsLow, clanPlayer.deathsHigh, clanPlayer.deathsMedium, clanPlayer.deathsLow, clanPlayer.ffProtection, clanPlayer.lastOnlineTime);
+                    clanPlayer.killsLow, clanPlayer.deathsHigh, clanPlayer.deathsMedium, clanPlayer.deathsLow, clanPlayer.ffProtection, clanPlayer.lastOnlineTime,
+                    clanPlayer.deposit, clanPlayer.withdraw, clanPlayer.tax, clanPlayer.debt);
         }
 
         try {

@@ -25,15 +25,20 @@ package nl.riebie.mcclans.listeners;
 import nl.riebie.mcclans.ClansImpl;
 import nl.riebie.mcclans.MCClans;
 import nl.riebie.mcclans.clan.ClanImpl;
+import nl.riebie.mcclans.config.Config;
 import nl.riebie.mcclans.messages.Messages;
 import nl.riebie.mcclans.player.ClanInvite;
 import nl.riebie.mcclans.player.ClanPlayerImpl;
 import nl.riebie.mcclans.player.LastOnlineImpl;
+import nl.riebie.mcclans.utils.Utils;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
 import org.spongepowered.api.scheduler.Task;
+import org.spongepowered.api.service.economy.Currency;
+import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.format.TextColors;
 
 /**
  * Created by Kippers on 13/02/2016.
@@ -73,6 +78,33 @@ public class ClientConnectionListener {
                         });
                         taskBuilder.delayTicks(20L).submit(MCClans.getPlugin());
                     }
+                }
+            }
+
+            // TODO messages
+            if (Config.getBoolean(Config.USE_ECONOMY)) {
+                Currency currency = MCClans.getPlugin().getServiceHelper().currency;
+                double debt = clanPlayer.getEconomyStats().getDebt();
+                double clanDebt = clan == null ? 0 : clan.getBank().getDebt();
+                if (debt > 0) {
+                    clanPlayer.sendMessage(
+                            Text.join(
+                                    Text.builder("You are ").color(TextColors.RED).build(),
+                                    Text.builder(String.valueOf(Utils.round(debt, 2)) + " ").color(TextColors.WHITE).build(),
+                                    Utils.getDisplayName(currency, debt).toBuilder().color(TextColors.RED).build(),
+                                    Text.builder(" in debt to your clan!").color(TextColors.RED).build()
+                            )
+                    );
+                }
+                if (clanDebt > 0) {
+                    clanPlayer.sendMessage(
+                            Text.join(
+                                    Text.builder("Your clan is ").color(TextColors.RED).build(),
+                                    Text.builder(String.valueOf(Utils.round(clanDebt, 2)) + " ").color(TextColors.WHITE).build(),
+                                    Utils.getDisplayName(currency, clanDebt).toBuilder().color(TextColors.RED).build(),
+                                    Text.builder(" in debt!").color(TextColors.RED).build()
+                            )
+                    );
                 }
             }
         }

@@ -74,6 +74,8 @@ public class Config {
     public static final String CLAN_NAME_CHARACTERS_MINIMUM = "clan-name-characters-minimum";
     public static final String CLAN_NAME_CHARACTERS_MAXIMUM = "clan-name-characters-maximum";
 
+    public static final String CLAN_MEMBERS_MAXIMUM = "clan-members-maximum";
+
     // ======================================== SECTION DATABASE ======================================== //
     private static final String SECTION_DATABASE = "database";
 
@@ -94,6 +96,11 @@ public class Config {
     public static final String SET_CLANHOME_COST = "set-clanhome-cost";
     public static final String RE_SET_CLANHOME_COST_INCREASE = "re-set-clanhome-cost-increase";
     public static final String TELEPORT_COST = "teleport-cost";
+    public static final String USE_CLAN_TAX = "use-clan-tax";
+    public static final String CLAN_TAX_COST = "clan-tax-cost";
+    public static final String CLAN_TAX_PER_MEMBER = "clan-tax-per-member";
+    public static final String CLAN_TAX_INTERVAL_SECONDS = "clan-tax-interval-seconds";
+    public static final String CLAN_TAX_MAXIMUM_DEBT = "clan-tax-maximum-debt";
 
     // ======================================== SECTION COMMAND ALIASES ======================================== //
     private static final String SECTION_COMMAND_ALIASES = "command-aliases";
@@ -138,7 +145,9 @@ public class Config {
                 ConfigOption.builder(CLAN_TAG_CHARACTERS_MAXIMUM, 6).addMinimumNumberConstraint(1).build(),
                 ConfigOption.builder(CLAN_NAME_REGEX, "[A-Za-z0-9_]+").build(),
                 ConfigOption.builder(CLAN_NAME_CHARACTERS_MINIMUM, 2).addMinimumNumberConstraint(1).build(),
-                ConfigOption.builder(CLAN_NAME_CHARACTERS_MAXIMUM, 30).addMinimumNumberConstraint(1).build()
+                ConfigOption.builder(CLAN_NAME_CHARACTERS_MAXIMUM, 30).addMinimumNumberConstraint(1).build(),
+
+                ConfigOption.builder(CLAN_MEMBERS_MAXIMUM, -1).addMinimumNumberConstraint(-1).build()
         ).build();
 
         ConfigSection databaseConfigSection = ConfigSection.builder(SECTION_DATABASE).setConfigOptions(
@@ -157,7 +166,12 @@ public class Config {
                 ConfigOption.builder(CLAN_CREATION_COST, 50).addMinimumNumberConstraint(0).build(),
                 ConfigOption.builder(SET_CLANHOME_COST, 10).addMinimumNumberConstraint(0).build(),
                 ConfigOption.builder(RE_SET_CLANHOME_COST_INCREASE, 0).addMinimumNumberConstraint(0).build(),
-                ConfigOption.builder(TELEPORT_COST, 0).addMinimumNumberConstraint(0).build()
+                ConfigOption.builder(TELEPORT_COST, 0).addMinimumNumberConstraint(0).build(),
+                ConfigOption.builder(USE_CLAN_TAX, false).build(),
+                ConfigOption.builder(CLAN_TAX_COST, 5).addMinimumNumberConstraint(0).build(),
+                ConfigOption.builder(CLAN_TAX_PER_MEMBER, false).build(),
+                ConfigOption.builder(CLAN_TAX_INTERVAL_SECONDS, 86400).addMinimumNumberConstraint(60).build(),
+                ConfigOption.builder(CLAN_TAX_MAXIMUM_DEBT, 0).addMinimumNumberConstraint(-1).build()
         ).build();
 
         Map<String, String> commandAliases = new HashMap<>();

@@ -29,6 +29,7 @@ import nl.riebie.mcclans.persistence.exceptions.WrappedDataException;
 import nl.riebie.mcclans.persistence.interfaces.DataLoader;
 import nl.riebie.mcclans.persistence.upgrade.interfaces.DataUpgrade;
 import nl.riebie.mcclans.persistence.upgrade.versions.DatabaseUpgrade2;
+import nl.riebie.mcclans.persistence.upgrade.versions.DatabaseUpgrade3;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -70,6 +71,7 @@ public class DatabaseLoader extends DataLoader {
     @Override
     protected List<DataUpgrade> getDataUpgrades(List<DataUpgrade> dataUpgrades) {
         dataUpgrades.add(new DatabaseUpgrade2());
+        dataUpgrades.add(new DatabaseUpgrade3());
         return dataUpgrades;
     }
 
@@ -99,9 +101,11 @@ public class DatabaseLoader extends DataLoader {
                     long homeLastSetTimeStamp = clansResultSet.getLong("clanhome_set_timestamp");
 
                     String bankId = clansResultSet.getString("bank_id");
+                    double debt = clansResultSet.getDouble("debt");
+                    double memberFee = clansResultSet.getDouble("member_fee");
 
                     super.loadedClan(clanID, clanTag, clanName, ownerID, tagColorId, allowAllyInvites, ffProtection, creationTime, homeWorld, homeX,
-                            homeY, homeZ, homeYaw, homePitch, homeSetTimes, homeLastSetTimeStamp, bankId);
+                            homeY, homeZ, homeYaw, homePitch, homeSetTimes, homeLastSetTimeStamp, bankId, debt, memberFee);
                 }
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -149,9 +153,13 @@ public class DatabaseLoader extends DataLoader {
                     int deathsLow = clanPlayersResultSet.getInt("deaths_low");
                     boolean ffProtection = clanPlayersResultSet.getBoolean("ff_protection");
                     long lastOnlineTime = clanPlayersResultSet.getLong("last_online_time");
+                    double deposit = clanPlayersResultSet.getDouble("deposit");
+                    double withdraw = clanPlayersResultSet.getDouble("withdraw");
+                    double tax = clanPlayersResultSet.getDouble("tax");
+                    double debt = clanPlayersResultSet.getDouble("debt");
 
                     super.loadedClanPlayer(clanPlayerID, uuidMostSigBits, uuidLeastSigBits, playerName, clanID, rankID, killsHigh, killsMedium,
-                            killsLow, deathsHigh, deathsMedium, deathsLow, ffProtection, lastOnlineTime);
+                            killsLow, deathsHigh, deathsMedium, deathsLow, ffProtection, lastOnlineTime, deposit, withdraw, tax, debt);
                 }
 
             } catch (Exception e) {

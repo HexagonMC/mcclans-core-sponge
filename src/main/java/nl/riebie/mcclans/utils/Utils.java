@@ -23,6 +23,7 @@
 package nl.riebie.mcclans.utils;
 
 import nl.riebie.mcclans.config.Config;
+import org.spongepowered.api.service.economy.Currency;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.format.TextColors;
@@ -30,6 +31,8 @@ import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 import javax.annotation.Nullable;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
@@ -245,5 +248,17 @@ public final class Utils {
 
     public static String getTimeString() {
         return new SimpleDateFormat("HH:mm:ss").format(System.currentTimeMillis());
+    }
+
+    public static double round(double value, int scale) {
+        return new BigDecimal(value).setScale(scale, RoundingMode.HALF_UP).doubleValue();
+    }
+
+    public static Text getDisplayName(Currency currency, double amount) {
+        if (amount < -1 || amount > 1) {
+            return currency.getPluralDisplayName();
+        } else {
+            return currency.getDisplayName();
+        }
     }
 }

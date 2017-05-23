@@ -65,7 +65,7 @@ public class ClanImpl implements Clan, Cloneable {
     private boolean allowAllyInvites = true;
     private Date creationDate;
     private boolean ffProtection;
-    private ClanBank clanBank;
+    private ClanBankImpl clanBank;
 
     private ClanImpl(Builder builder) {
         this.clanID = builder.clanID;
@@ -82,6 +82,8 @@ public class ClanImpl implements Clan, Cloneable {
         this.ffProtection = builder.ffProtection;
 
         this.clanBank = new ClanBankImpl(builder.bankId);
+        this.clanBank.setDebt(builder.debt);
+        this.clanBank.setMemberFee(builder.memberFee);
     }
 
     public int getID() {
@@ -444,8 +446,8 @@ public class ClanImpl implements Clan, Cloneable {
         ClanPlayerImpl member = getMember(player.getUUID());
         if (member != null) {
             member.setClan(null);
-
             member.setRankInternal(null);
+            member.resetEconomyStats();
 
             members.remove(member);
             TaskForwarder.sendUpdateClanPlayer(member);
@@ -638,13 +640,14 @@ public class ClanImpl implements Clan, Cloneable {
         TaskForwarder.sendUpdateClan(this);
     }
 
+    @Deprecated
     @Override
     public String getBankId() {
         return this.clanBank.getId();
     }
 
     @Override
-    public ClanBank getBank() {
+    public ClanBankImpl getBank() {
         return this.clanBank;
     }
 
@@ -706,11 +709,14 @@ public class ClanImpl implements Clan, Cloneable {
         private Date creationDate = new Date();
         private boolean ffProtection = true;
         private String bankId;
+        private double debt = 0;
+        private double memberFee = 0;
 
-        public Builder(int clanID, String tag, String name) {
+        public Builder(int clanID, String tag, String name, String bankId) {
             this.tag = tag;
             this.name = name;
             this.clanID = clanID;
+            this.bankId = bankId;
         }
 
         public Builder name(String name) {
@@ -758,8 +764,13 @@ public class ClanImpl implements Clan, Cloneable {
             return this;
         }
 
-        public Builder bankId(String identifier) {
-            this.bankId = identifier;
+        public Builder debt(double debt) {
+            this.debt = debt;
+            return this;
+        }
+
+        public Builder memberFee(double memberFee) {
+            this.memberFee = memberFee;
             return this;
         }
 
