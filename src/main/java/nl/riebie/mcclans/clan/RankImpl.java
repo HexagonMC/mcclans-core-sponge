@@ -67,7 +67,7 @@ public class RankImpl implements Rank {
         return Text.join(
                 Text.builder("[").color(TextColors.GRAY).build(),
                 Text.builder(name).color(TextColors.BLUE).build(),
-                Text.builder("] ").color(TextColors.GRAY).build()
+                Text.builder("]").color(TextColors.GRAY).build()
         );
     }
 
