@@ -35,7 +35,7 @@ import nl.riebie.mcclans.utils.EconomyUtils;
 import nl.riebie.mcclans.utils.Utils;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.event.cause.NamedCause;
+import org.spongepowered.api.event.cause.EventContext;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.service.economy.Currency;
 import org.spongepowered.api.service.economy.EconomyService;
@@ -82,7 +82,7 @@ public class TaxManager {
 
     private void triggerTaxEvent() {
         List<Clan> clans = ClansImpl.getInstance().getClans();
-        ClanTaxEvent taxEvent = new ClanTaxEvent(Cause.of(NamedCause.source(MCClans.getPlugin())), clans);
+        ClanTaxEvent taxEvent = new ClanTaxEvent(Cause.builder().append(MCClans.getPlugin()).build(EventContext.empty()), clans);
         double cost = Config.getDouble(Config.CLAN_TAX_COST);
         if (cost > 0) {
             for (Clan clan : clans) {

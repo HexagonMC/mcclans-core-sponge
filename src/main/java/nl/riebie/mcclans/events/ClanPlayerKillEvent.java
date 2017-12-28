@@ -25,7 +25,7 @@ package nl.riebie.mcclans.events;
 import nl.riebie.mcclans.api.events.ClanEvent;
 import nl.riebie.mcclans.player.ClanPlayerImpl;
 import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.event.cause.NamedCause;
+import org.spongepowered.api.event.cause.EventContext;
 
 /**
  * Created by Kippers on 9-2-2016.
@@ -36,7 +36,7 @@ public class ClanPlayerKillEvent extends ClanEvent {
     private ClanPlayerImpl victim;
 
     public ClanPlayerKillEvent(ClanPlayerImpl killer, ClanPlayerImpl victim) {
-        super(Cause.of(NamedCause.source(killer)));
+        super(Cause.builder().append(killer).build(EventContext.empty()));
         this.killer = killer;
         this.victim = victim;
     }

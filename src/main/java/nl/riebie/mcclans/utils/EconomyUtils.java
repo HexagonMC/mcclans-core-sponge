@@ -24,7 +24,7 @@ package nl.riebie.mcclans.utils;
 
 import nl.riebie.mcclans.MCClans;
 import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.event.cause.NamedCause;
+import org.spongepowered.api.event.cause.EventContext;
 import org.spongepowered.api.service.economy.Currency;
 import org.spongepowered.api.service.economy.EconomyService;
 import org.spongepowered.api.service.economy.account.Account;
@@ -81,7 +81,7 @@ public class EconomyUtils {
         TransactionResult result = account.withdraw(
                 currency,
                 BigDecimal.valueOf(charge),
-                Cause.of(NamedCause.of("MCClans", MCClans.getPlugin()))
+                Cause.builder().append("MCClans").build(EventContext.empty())
         );
         return (result.getResult().equals(ResultType.SUCCESS));
     }
@@ -115,7 +115,7 @@ public class EconomyUtils {
         TransactionResult result = account.deposit(
                 currency,
                 BigDecimal.valueOf(charge),
-                Cause.of(NamedCause.of("MCClans", MCClans.getPlugin()))
+                Cause.builder().append("MCClans").build(EventContext.empty())
         );
         return (result.getResult().equals(ResultType.SUCCESS));
     }
@@ -171,7 +171,7 @@ public class EconomyUtils {
                 toAccount,
                 currency,
                 BigDecimal.valueOf(charge),
-                Cause.of(NamedCause.of("MCClans", MCClans.getPlugin()))
+                Cause.builder().append("MCClans").build(EventContext.empty())
         );
         return (result.getResult().equals(ResultType.SUCCESS));
     }
