@@ -1,0 +1,14 @@
+stages:
+  - deploy
+
+deploy:
+  stage: deploy
+  script:
+    - REL_BUILD=1 ./gradlew build
+  only:
+  - develop
+  tags:
+    - Java8
+  artifacts:
+    paths:
+    - "build/libs/*.jar"

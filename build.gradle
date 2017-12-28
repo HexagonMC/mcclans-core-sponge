@@ -60,3 +60,5 @@ shadowJar {
 artifacts {
     archives shadowJar
 }
+
+compileJava.options.encoding = 'UTF-8'
