@@ -73,6 +73,11 @@ public class ClanChatCommands {
                 }
             }
         } else {
+            if (!player.hasPermission("mcclans.user.chat.toggle.clan")) {
+                Messages.sendYouDoNotHaveTheRequiredPermission(player, "mcclans.user.chat.toggle.clan");
+                return;
+            }
+
             PlayerChatState chatState = clanPlayer.getChatState();
             if (chatState.equals(PlayerChatState.CLAN)) {
                 clanPlayer.setChatState(PlayerChatState.GLOBAL);
@@ -98,6 +103,11 @@ public class ClanChatCommands {
                 }
             }
         } else {
+            if (!player.hasPermission("mcclans.user.chat.toggle.ally")) {
+                Messages.sendYouDoNotHaveTheRequiredPermission(player, "mcclans.user.chat.toggle.ally");
+                return;
+            }
+
             PlayerChatState chatState = clanPlayer.getChatState();
             if (chatState.equals(PlayerChatState.ALLY)) {
                 clanPlayer.setChatState(PlayerChatState.GLOBAL);
