@@ -43,7 +43,7 @@ shadowJar {
         include dependency("org.bstats:bstats-sponge:1.2")
     }
 
-    relocate "org.bstats", "nl.riebie.mcclans.shade.org.bstats"
+    relocate "org.bstats", "nl.riebie.mcclans.org.bstats"
 
     Boolean devBuild = System.getenv("DEV_BUILD") as Boolean ?: false;
     Boolean relBuild = System.getenv("REL_BUILD") as Boolean ?: false;
