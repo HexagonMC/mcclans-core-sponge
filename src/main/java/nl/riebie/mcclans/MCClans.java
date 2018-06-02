@@ -33,14 +33,14 @@ import nl.riebie.mcclans.config.Config;
 import nl.riebie.mcclans.economy.TaxManager;
 import nl.riebie.mcclans.enums.DBMSType;
 import nl.riebie.mcclans.listeners.*;
-import nl.riebie.mcclans.metrics.BStatsMetrics;
-import nl.riebie.mcclans.metrics.MetricsWrapper;
 import nl.riebie.mcclans.persistence.DatabaseConnectionOwner;
 import nl.riebie.mcclans.persistence.DatabaseHandler;
 import nl.riebie.mcclans.persistence.TaskExecutor;
 import nl.riebie.mcclans.player.ClanPlayerImpl;
 import nl.riebie.mcclans.utils.FileUtils;
 import nl.riebie.mcclans.utils.Pair;
+
+import org.bstats.sponge.Metrics;
 import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandManager;
@@ -86,15 +86,12 @@ public class MCClans {
     private File configDir;
 
     @Inject
-    public MetricsWrapper stats;
-    @Inject
-    public BStatsMetrics bStats;
+    private Metrics metrics;
 
     private boolean loadError = false;
 
     @Listener
     public void onPreInitialize(GamePreInitializationEvent event) {
-        stats.start();
         Sponge.getServiceManager().setProvider(this, ClanService.class, ClansImpl.getInstance());
     }
 
